@@ -34,10 +34,20 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileInput }) 
     <form onSubmit={form.handleSubmit(onSubmit)} className="grid max-w-md gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField label="Imię" htmlFor="p-first" error={errors.firstName?.message}>
-          <Input id="p-first" aria-invalid={!!errors.firstName} {...form.register("firstName")} />
+          <Input
+            id="p-first"
+            placeholder="Imię"
+            aria-invalid={!!errors.firstName}
+            {...form.register("firstName")}
+          />
         </FormField>
         <FormField label="Nazwisko" htmlFor="p-last" error={errors.lastName?.message}>
-          <Input id="p-last" aria-invalid={!!errors.lastName} {...form.register("lastName")} />
+          <Input
+            id="p-last"
+            placeholder="Nazwisko"
+            aria-invalid={!!errors.lastName}
+            {...form.register("lastName")}
+          />
         </FormField>
       </div>
       <Button type="submit" disabled={pending} className="justify-self-start">
@@ -76,15 +86,29 @@ export function PasswordForm() {
       <FormField label="Obecne hasło" htmlFor="pw-cur" error={errors.currentPassword?.message}>
         <PasswordInput
           id="pw-cur"
+          aria-invalid={!!errors.currentPassword}
+          placeholder="Obecne hasło"
           autoComplete="current-password"
           {...form.register("currentPassword")}
         />
       </FormField>
       <FormField label="Nowe hasło" htmlFor="pw-new" error={errors.newPassword?.message}>
-        <PasswordInput id="pw-new" autoComplete="new-password" {...form.register("newPassword")} />
+        <PasswordInput
+          id="pw-new"
+          aria-invalid={!!errors.newPassword}
+          placeholder="Min. 8 znaków"
+          autoComplete="new-password"
+          {...form.register("newPassword")}
+        />
       </FormField>
       <FormField label="Powtórz nowe hasło" htmlFor="pw-conf" error={errors.confirm?.message}>
-        <PasswordInput id="pw-conf" autoComplete="new-password" {...form.register("confirm")} />
+        <PasswordInput
+          id="pw-conf"
+          aria-invalid={!!errors.confirm}
+          placeholder="Powtórz nowe hasło"
+          autoComplete="new-password"
+          {...form.register("confirm")}
+        />
       </FormField>
       <Button type="submit" disabled={pending} className="justify-self-start">
         {pending ? "Zapisywanie…" : "Zmień hasło"}

@@ -34,6 +34,7 @@ model User {
   updatedAt     DateTime     @updatedAt
   sessions      Session[]
   accounts      Account[]
+  businesses    Business[]
 }
 
 model Session {
@@ -78,4 +79,42 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@index([identifier])
+}
+
+// ---------- Biznesy ----------
+// Biznes należy do użytkownika; do niego będą przypisywane potrzeby i zapytania.
+
+model Business {
+  id          String   @id @default(cuid())
+  name        String
+  nip         String?  @unique // NIP pilnuje, żeby ta sama firma nie została dodana dwa razy
+  industry    String?
+  street      String?
+  postalCode  String?
+  city        String?
+  website     String?
+  description String?
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  needs       Need[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+// ---------- Potrzeby ----------
+// Potrzeba należy do biznesu: oczekiwany efekt + opis zapotrzebowania. Podstawa zapytań do agenta.
+
+model Need {
+  id              String   @id @default(cuid())
+  title           String
+  expectedOutcome String
+  description     String
+  businessId      String
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([businessId])
 }

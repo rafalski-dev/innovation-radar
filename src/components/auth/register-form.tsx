@@ -51,6 +51,7 @@ export function RegisterForm() {
         <FormField label="Imię" htmlFor="firstName" error={errors.firstName?.message}>
           <Input
             id="firstName"
+            placeholder="np. Anna"
             autoComplete="given-name"
             aria-invalid={!!errors.firstName}
             {...form.register("firstName")}
@@ -59,6 +60,7 @@ export function RegisterForm() {
         <FormField label="Nazwisko" htmlFor="lastName" error={errors.lastName?.message}>
           <Input
             id="lastName"
+            placeholder="np. Kowalska"
             autoComplete="family-name"
             aria-invalid={!!errors.lastName}
             {...form.register("lastName")}
@@ -68,6 +70,7 @@ export function RegisterForm() {
       <FormField label="E-mail" htmlFor="email" error={errors.email?.message}>
         <Input
           id="email"
+          placeholder="jan.kowalski@example.com"
           type="email"
           autoComplete="email"
           aria-invalid={!!errors.email}
@@ -77,6 +80,7 @@ export function RegisterForm() {
       <FormField label="Hasło" htmlFor="password" error={errors.password?.message}>
         <PasswordInput
           id="password"
+          placeholder="Min. 8 znaków"
           autoComplete="new-password"
           aria-invalid={!!errors.password}
           {...form.register("password")}

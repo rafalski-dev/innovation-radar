@@ -39,6 +39,7 @@ export function LoginForm() {
       <FormField label="E-mail" htmlFor="email" error={errors.email?.message}>
         <Input
           id="email"
+          placeholder="jan.kowalski@example.com"
           type="email"
           autoComplete="email"
           aria-invalid={!!errors.email}
@@ -48,6 +49,7 @@ export function LoginForm() {
       <FormField label="Hasło" htmlFor="password" error={errors.password?.message}>
         <PasswordInput
           id="password"
+          placeholder="Twoje hasło"
           autoComplete="current-password"
           aria-invalid={!!errors.password}
           {...form.register("password")}

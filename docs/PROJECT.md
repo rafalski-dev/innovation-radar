@@ -30,8 +30,19 @@ Docelowy przepływ użytkownika (Grażynka z Januszex):
 9. Oceń kontakt (feedback: prośba po dniu, a jeśli brak, po miesiącu).
 10. Wygeneruj raport z listy tematycznej.
 
-Zrobione: kroki 1 (konto) i landing. Dalej: organizacje (2), opis potrzeby i czat (3-5), agent i
-wyniki (6), listy (7), kontakt i feedback (8-9), raport (10), panel administracji.
+**Organizacja** (krok 2): użytkownik tworzy własne organizacje (`Business` w kodzie: nazwa, NIP, branża, adres: ulica,
+kod pocztowy, miasto, www; opis działalności zostanie pobrany automatycznie ze strony www). Adres (ulica i numer, kod pocztowy, miasto) i NIP są **obowiązkowe**; NIP jest walidowany sumą kontrolną i **unikalny w całej
+bazie** (ta sama firma nie może zostać dodana dwa razy; w bazie zapisywany bez spacji i myślników),
+widzi i zmienia tylko swoje (`/dashboard/businesses`).
+
+**Potrzeba** (kroki 3-4): `Need` należy do organizacji (tytuł, oczekiwany efekt, zapotrzebowanie).
+Strona organizacji `/dashboard/businesses/[id]` pokazuje jego potrzeby; dodawanie i edycja to osobne
+strony (`.../needs/new`, `.../needs/[needId]/edit`). Potrzebę widzi i zmienia tylko właściciel
+organizacji. Do potrzeby będą przypisywane **zapytania** do agenta (kroki 5-6).
+
+Zrobione: konto (1), organizacje (2), potrzeby (3-4), landing. Dalej: czat z pytaniami pomocniczymi i
+agent z wynikami (5-6), listy (7), kontakt i feedback (8-9), raport (10), panel administracji.
+
 Usunięte: tickety `Innovation`, zespoły, tablica i panele ról (tabele skasowane z bazy). W bazie
 zostają pola `organization`, `position`, `interests` oraz enum ról na później.
 Obecny `/dashboard` to tylko panel powitalny i profil (imię, nazwisko, zmiana hasła).
