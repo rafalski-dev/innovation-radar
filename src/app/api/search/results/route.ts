@@ -9,7 +9,7 @@ import { generateResultsSchema, type AgentStats, type Candidate } from "@/valida
 export const maxDuration = 60;
 
 // Limit uruchomień agenta na użytkownika (koszt API) i czas ważności cache.
-const RUN_LIMIT = 3;
+const RUN_LIMIT = 5;
 const RUN_WINDOW_MS = 30 * 60 * 1000;
 const CACHE_MS = 7 * 24 * 60 * 60 * 1000;
 
