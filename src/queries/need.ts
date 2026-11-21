@@ -14,6 +14,23 @@ export async function getNeedsForBusiness(businessId: string) {
   const session = await requireSession();
   return db.need.findMany({
     where: { businessId, ...accessibleNeedWhere(session.user.id) },
+    include: {
+      files: { select: { id: true, fileName: true, size: true }, orderBy: { createdAt: "asc" } },
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+  });
+}
+
+// Wszystkie potrzeby ze wszystkich dostępnych organizacji (strona /dashboard/needs).
+export async function getMyNeeds() {
+  await connection();
+  const session = await requireSession();
+  return db.need.findMany({
+    where: accessibleNeedWhere(session.user.id),
+    include: {
+      business: { select: { id: true, name: true } },
+      files: { select: { id: true, fileName: true, size: true }, orderBy: { createdAt: "asc" } },
+    },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
 }
@@ -21,7 +38,12 @@ export async function getNeedsForBusiness(businessId: string) {
 export async function getMyNeed(id: string, businessId: string) {
   await connection();
   const session = await requireSession();
-  return db.need.findFirst({ where: { id, businessId, ...accessibleNeedWhere(session.user.id) } });
+  return db.need.findFirst({
+    where: { id, businessId, ...accessibleNeedWhere(session.user.id) },
+    include: {
+      files: { select: { id: true, fileName: true, size: true }, orderBy: { createdAt: "asc" } },
+    },
+  });
 }
 
 export type NeedRow = Awaited<ReturnType<typeof getNeedsForBusiness>>[number];

@@ -106,19 +106,35 @@ model Business {
 }
 
 // ---------- Potrzeby ----------
-// Potrzeba należy do biznesu: oczekiwany efekt + opis zapotrzebowania. Podstawa zapytań do agenta.
+// Potrzeba należy do biznesu: tytuł + opis (na razie jedno pole). Podstawa zapytań do agenta.
 
 model Need {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   title           String
-  expectedOutcome String
+  expectedOutcome String? // wycofane z formularza (na razie jeden opis); stare wpisy zachowują wartość
   description     String
+  linkUrl         String? // opcjonalny link do materiałów (strona, artykuł, specyfikacja)
+  files           NeedFile[]
   businessId      String
-  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@index([businessId])
+}
+
+// Opcjonalne pliki PDF przy potrzebie (do NEED_FILES_MAX). Sama zawartość leży w Cloudflare R2 pod kluczem `key`;
+// pobieranie przez /api/need-files/[fileId] (sprawdza dostęp i przekierowuje na podpisany adres).
+model NeedFile {
+  id        String   @id @default(cuid())
+  needId    String
+  need      Need     @relation(fields: [needId], references: [id], onDelete: Cascade)
+  fileName  String
+  size      Int
+  key       String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([needId])
 }
 
 // Osoby przypisane do organizacji. Właściciel (Business.ownerId) jest jej administratorem

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { type ActionResult, fail, ok, validationError } from "@/lib/action-result";
+import { deleteObjects } from "@/lib/r2";
 import { getSession } from "@/lib/session";
 import { ownedBusinessWhere } from "@/queries/business";
 import {
@@ -82,10 +83,16 @@ export async function deleteBusiness(id: string): Promise<ActionResult> {
   if (!session) return fail("Zaloguj się");
 
   try {
+    // pliki potrzeb leżą w R2: zbieramy klucze przed kaskadowym usunięciem z bazy
+    const files = await db.needFile.findMany({
+      where: { need: { businessId: id, business: ownedBusinessWhere(session.user.id) } },
+      select: { key: true },
+    });
     const result = await db.business.deleteMany({
       where: { id, ...ownedBusinessWhere(session.user.id) },
     });
     if (result.count === 0) return fail("Nie znaleziono organizacji");
+    await deleteObjects(files.map((f) => f.key));
   } catch (error) {
     console.error(error);
     return fail("Nie udało się usunąć organizacji");

@@ -29,7 +29,15 @@ export async function getMyBusinessesWithNeeds() {
   const businesses = await db.business.findMany({
     where: accessibleBusinessWhere(session.user.id),
     include: {
-      needs: { orderBy: [{ createdAt: "desc" }, { id: "desc" }] },
+      needs: {
+        include: {
+          files: {
+            select: { id: true, fileName: true, size: true },
+            orderBy: { createdAt: "asc" },
+          },
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      },
       owner: { select: { id: true, name: true, email: true } },
       members: {
         orderBy: { createdAt: "asc" },

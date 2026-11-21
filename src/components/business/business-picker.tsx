@@ -6,6 +6,7 @@ import { PencilIcon, PlusIcon } from "lucide-react";
 import { deleteBusiness } from "@/actions/business";
 import { BusinessMembers } from "@/components/business/business-members";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import { NeedAttachments } from "@/components/need/need-attachments";
 import { NeedRowActions } from "@/components/need/need-row-actions";
 import { buttonVariants } from "@/components/shadcn/button";
 import type { BusinessWithNeeds } from "@/queries/business";
@@ -138,14 +139,16 @@ export function BusinessPicker({
               Ta organizacja nie ma jeszcze żadnej potrzeby. Opisz pierwszą.
             </p>
           ) : (
-            <ul className="divide-y rounded-lg border">
+            <ul className="grid gap-3">
               {selected.needs.map((need) => (
-                <li key={need.id} className="flex items-start justify-between gap-4 p-4">
+                <li
+                  key={need.id}
+                  className="flex items-start justify-between gap-4 rounded-lg border p-4"
+                >
                   <div className="min-w-0 space-y-1">
                     <div className="font-medium">{need.title}</div>
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {need.expectedOutcome}
-                    </p>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{need.description}</p>
+                    <NeedAttachments need={need} />
                   </div>
                   <NeedRowActions need={need} />
                 </li>
