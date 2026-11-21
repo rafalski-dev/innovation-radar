@@ -51,7 +51,8 @@ export function NeedForm({
   const [fileError, setFileError] = useState<string>();
   const [newFiles, setNewFiles] = useState<File[]>([]); // wybrane, jeszcze niewysłane
   const [removedIds, setRemovedIds] = useState<string[]>([]); // zapisane pliki do usunięcia
-  const backHref = businesses ? "/dashboard/needs" : `/dashboard/businesses/${businessId}`;
+  // edycja i dodawanie z listy potrzeb wracają na /dashboard/needs; dodawanie ze strony organizacji na nią
+  const backHref = need || businesses ? "/dashboard/needs" : `/dashboard/businesses/${businessId}`;
   const form = useForm<NeedInput>({
     resolver: zodResolver(needSchema),
     defaultValues: {
