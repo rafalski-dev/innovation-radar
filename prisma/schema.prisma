@@ -19,22 +19,23 @@ enum UserRole {
 }
 
 model User {
-  id            String       @id
-  name          String
-  firstName     String?
-  lastName      String?
-  email         String       @unique
-  emailVerified Boolean      @default(false)
-  image         String?
-  role          UserRole     @default(USER)
-  organization  String?
-  position      String?
-  interests     String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  businesses    Business[]
+  id                  String           @id
+  name                String
+  firstName           String?
+  lastName            String?
+  email               String           @unique
+  emailVerified       Boolean          @default(false)
+  image               String?
+  role                UserRole         @default(USER)
+  organization        String?
+  position            String?
+  interests           String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  sessions            Session[]
+  accounts            Account[]
+  businesses          Business[]
+  businessMemberships BusinessMember[]
 }
 
 model Session {
@@ -85,9 +86,9 @@ model Verification {
 // Biznes należy do użytkownika; do niego będą przypisywane potrzeby i zapytania.
 
 model Business {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
-  nip         String?  @unique // NIP pilnuje, żeby ta sama firma nie została dodana dwa razy
+  nip         String?          @unique // NIP pilnuje, żeby ta sama firma nie została dodana dwa razy
   industry    String?
   street      String?
   postalCode  String?
@@ -95,10 +96,11 @@ model Business {
   website     String?
   description String?
   ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner       User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   needs       Need[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  members     BusinessMember[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   @@index([ownerId])
 }
@@ -117,4 +119,17 @@ model Need {
   updatedAt       DateTime @updatedAt
 
   @@index([businessId])
+}
+
+// Osoby przypisane do organizacji. Właściciel (Business.ownerId) jest jej administratorem
+// i nie ma tu wpisu; członkowie widzą organizację i zarządzają jej potrzebami.
+model BusinessMember {
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([businessId, userId])
+  @@index([userId])
 }

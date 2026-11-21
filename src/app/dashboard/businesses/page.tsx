@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PlusIcon } from "lucide-react";
-import { BusinessTable } from "@/components/business/business-table";
+import { BusinessPicker } from "@/components/business/business-picker";
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/shadcn/button";
-import { getMyBusinesses } from "@/queries/business";
+import { getMyBusinessesWithNeeds } from "@/queries/business";
 
 export const metadata: Metadata = { title: "Moje organizacje" };
 
-export default async function BusinessesPage() {
-  const businesses = await getMyBusinesses();
+export default async function BusinessesPage({ searchParams }: PageProps<"/dashboard/businesses">) {
+  const { org } = await searchParams;
+  const businesses = await getMyBusinessesWithNeeds();
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Moje organizacje"
-        description="Do organizacji przypiszesz potrzeby i zapytania, dla których szukamy rozwiązań."
+        description="Wybierz organizację, aby zobaczyć jej dane i potrzeby, dla których szukamy rozwiązań."
         action={
           <Link href="/dashboard/businesses/new" className={buttonVariants()}>
             <PlusIcon />
@@ -23,7 +24,10 @@ export default async function BusinessesPage() {
           </Link>
         }
       />
-      <BusinessTable businesses={businesses} />
+      <BusinessPicker
+        businesses={businesses}
+        initialId={typeof org === "string" ? org : undefined}
+      />
     </div>
   );
 }

@@ -31,9 +31,15 @@ Docelowy przepływ użytkownika (Grażynka z Januszex):
 10. Wygeneruj raport z listy tematycznej.
 
 **Organizacja** (krok 2): użytkownik tworzy własne organizacje (`Business` w kodzie: nazwa, NIP, branża, adres: ulica,
-kod pocztowy, miasto, www; opis działalności zostanie pobrany automatycznie ze strony www). Adres (ulica i numer, kod pocztowy, miasto) i NIP są **obowiązkowe**; NIP jest walidowany sumą kontrolną i **unikalny w całej
+kod pocztowy, miasto, www; opis działalności zostanie pobrany automatycznie ze strony www). Adres (ulica i numer, kod pocztowy, miasto) i NIP są **obowiązkowe**; NIP ma dokładnie 10 cyfr (bez sprawdzania sumy kontrolnej) i **unikalny w całej
 bazie** (ta sama firma nie może zostać dodana dwa razy; w bazie zapisywany bez spacji i myślników),
 widzi i zmienia tylko swoje (`/dashboard/businesses`).
+
+**Osoby w organizacji**: właściciel jest jej **administratorem**: sam edytuje dane, usuwa organizację
+oraz dodaje i usuwa osoby (po e-mailu **istniejącego konta**, tabela `BusinessMember`). Przypisana osoba
+(członek) widzi organizację i zarządza jej potrzebami, ale nie edytuje danych ani osób. Dostęp w
+jednym miejscu: `accessibleBusinessWhere` w `src/queries/business.ts`. Do zrobienia: zaproszenie
+osoby, która nie ma jeszcze konta, oraz przekazanie administracji.
 
 **Potrzeba** (kroki 3-4): `Need` należy do organizacji (tytuł, oczekiwany efekt, zapotrzebowanie).
 Strona organizacji `/dashboard/businesses/[id]` pokazuje jego potrzeby; dodawanie i edycja to osobne

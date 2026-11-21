@@ -5,7 +5,13 @@ import { db } from "@/lib/db";
 import { type ActionResult, fail, ok, validationError } from "@/lib/action-result";
 import { getSession } from "@/lib/session";
 import { ownedBusinessWhere } from "@/queries/business";
-import { type BusinessInput, businessSchema, normalizeNip } from "@/validation/business";
+import {
+  type AddMemberInput,
+  type BusinessInput,
+  addMemberSchema,
+  businessSchema,
+  normalizeNip,
+} from "@/validation/business";
 
 const PATH = "/dashboard/businesses";
 
@@ -83,6 +89,65 @@ export async function deleteBusiness(id: string): Promise<ActionResult> {
   } catch (error) {
     console.error(error);
     return fail("Nie udało się usunąć organizacji");
+  }
+
+  revalidatePath(PATH);
+  return ok();
+}
+
+// Osobami zarządza tylko administrator (właściciel). Dodać można osobę z istniejącym kontem.
+export async function addBusinessMember(
+  businessId: string,
+  input: AddMemberInput,
+): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session) return fail("Zaloguj się");
+
+  const parsed = addMemberSchema.safeParse(input);
+  if (!parsed.success) return validationError(parsed.error);
+
+  try {
+    const business = await db.business.findFirst({
+      where: { id: businessId, ...ownedBusinessWhere(session.user.id) },
+    });
+    if (!business) return fail("Tylko administrator może dodawać osoby");
+
+    const user = await db.user.findUnique({ where: { email: parsed.data.email.toLowerCase() } });
+    if (!user) return fail("Nie ma konta z takim adresem e-mail");
+    if (user.id === business.ownerId) return fail("Ta osoba jest już administratorem");
+
+    const existing = await db.businessMember.findUnique({
+      where: { businessId_userId: { businessId, userId: user.id } },
+    });
+    if (existing) return fail("Ta osoba jest już przypisana do organizacji");
+
+    await db.businessMember.create({ data: { businessId, userId: user.id } });
+  } catch (error) {
+    console.error(error);
+    return fail("Nie udało się dodać osoby");
+  }
+
+  revalidatePath(PATH);
+  return ok();
+}
+
+export async function removeBusinessMember(
+  businessId: string,
+  userId: string,
+): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session) return fail("Zaloguj się");
+
+  try {
+    const business = await db.business.findFirst({
+      where: { id: businessId, ...ownedBusinessWhere(session.user.id) },
+    });
+    if (!business) return fail("Tylko administrator może usuwać osoby");
+
+    await db.businessMember.deleteMany({ where: { businessId, userId } });
+  } catch (error) {
+    console.error(error);
+    return fail("Nie udało się usunąć osoby");
   }
 
   revalidatePath(PATH);

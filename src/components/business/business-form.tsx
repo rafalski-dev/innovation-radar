@@ -61,7 +61,7 @@ export function BusinessForm({ business }: { business?: BusinessRow }) {
         />
       </FormField>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <FormField label="NIP" htmlFor="b-nip" error={errors.nip?.message}>
           <Input
             id="b-nip"

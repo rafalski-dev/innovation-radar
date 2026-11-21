@@ -47,7 +47,7 @@ export function RegisterForm() {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <FormField label="Imię" htmlFor="firstName" error={errors.firstName?.message}>
           <Input
             id="firstName"
