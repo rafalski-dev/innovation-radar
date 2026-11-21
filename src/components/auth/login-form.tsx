@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/shadcn/button";
+import { PasswordInput } from "@/components/auth/password-input";
 import { Input } from "@/components/shadcn/input";
 import { authClient } from "@/lib/auth-client";
 import { type LoginInput, loginSchema } from "@/validation/auth";
@@ -45,9 +46,8 @@ export function LoginForm() {
         />
       </FormField>
       <FormField label="Hasło" htmlFor="password" error={errors.password?.message}>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="current-password"
           aria-invalid={!!errors.password}
           {...form.register("password")}

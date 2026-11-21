@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/shadcn/button";
+import { PasswordInput } from "@/components/auth/password-input";
 import { Input } from "@/components/shadcn/input";
 import { Textarea } from "@/components/shadcn/textarea";
 import { authClient } from "@/lib/auth-client";
@@ -140,9 +141,8 @@ export function RegisterForm() {
         />
       </FormField>
       <FormField label="Hasło" htmlFor="password" error={errors.password?.message}>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="new-password"
           aria-invalid={!!errors.password}
           {...form.register("password")}

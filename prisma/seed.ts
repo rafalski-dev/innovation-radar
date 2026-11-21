@@ -10,7 +10,7 @@ import type { InnovationStatus } from "@/validation/innovation";
 const DEMO_EMAIL = "demo@radar-innowacji.pl";
 const DEMO_PASSWORD = "DemoRadar2026!";
 
-const innovations: (InnovationInput & { status: InnovationStatus })[] = [
+const innovations: (Omit<InnovationInput, "teamId"> & { status: InnovationStatus })[] = [
   {
     title: "Aplikacja do nauki matematyki w klasach 4–6",
     summary: "Mobilna aplikacja z zadaniami dopasowującymi trudność do postępów ucznia.",

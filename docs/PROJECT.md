@@ -65,6 +65,25 @@ Stan po etapie 1:
 - Seed: konto demo `demo@radar-innowacji.pl` (hasło w `prisma/seed.ts`) + 4 tickety.
 - Brak: edycja/usuwanie ticketów, zmiana statusu, drag & drop (wymaga nowej paczki).
 
+## Etap 2 (zrobione: sidebar, Moje pomysły, Zespoły, Profil; później: widoki OFFICIAL i BUSINESS)
+
+Nawigacja dashboardu: boczny panel (sidebar) w `/dashboard`, pozycje zależne od `role`.
+Górny nagłówek zostaje na linki publiczne, konto i wylogowanie.
+
+| Sekcja          | Ścieżka              | Kto      | Zawartość                                           |
+| --------------- | -------------------- | -------- | --------------------------------------------------- |
+| Tablica         | `/dashboard`         | wszyscy  | tablica statusów                                    |
+| Moje pomysły    | `/dashboard/ideas`   | USER     | lista, edycja i usuwanie (tylko status „Zgłoszone”) |
+| Zespoły         | `/dashboard/teams`   | USER     | tworzenie zespołu, członkowie (po e-mailu), pomysły |
+| Profil          | `/dashboard/profile` | wszyscy  | edycja danych, zmiana hasła                         |
+| Do oceny        | `/dashboard/review`  | OFFICIAL | później                                             |
+| Zapotrzebowania | `/dashboard/needs`   | BUSINESS | później                                             |
+
+Decyzje (propozycje, do zmiany): zespół = współautorzy pomysłu (nie instytucja); jest właściciel
+i członkowie; zespół widzi i edytuje wspólnie pomysły przypisane do zespołu; pomysł można
+edytować i usuwać tylko w statusie „Zgłoszone”. Widoczność ticketów: własne + zespołów, których
+użytkownik jest członkiem.
+
 ## 3. Encje (dane)
 
 Kolejność budowy: `Institution` → `Partner` → `Innovation` → `Assessment` → `Match`.

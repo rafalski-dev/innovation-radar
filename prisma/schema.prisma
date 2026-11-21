@@ -33,6 +33,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
   innovations   Innovation[]
+  ownedTeams    Team[]
+  memberships   TeamMember[]
 }
 
 model Session {
@@ -139,9 +141,36 @@ model Innovation {
   contactEmail String?
   authorId     String
   author       User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  teamId       String?
+  team         Team?             @relation(fields: [teamId], references: [id], onDelete: SetNull)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
   @@index([authorId])
+  @@index([teamId])
   @@index([status])
+}
+
+// ---------- Zespoły ----------
+
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  ownerId     String
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  innovations Innovation[]
+  createdAt   DateTime     @default(now())
+}
+
+// Właściciel też ma wpis członka, dzięki temu "moje zespoły" to jedno zapytanie.
+model TeamMember {
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([teamId, userId])
+  @@index([userId])
 }

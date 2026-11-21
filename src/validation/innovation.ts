@@ -79,6 +79,8 @@ export const innovationKey = (number: number) => `RI-${number}`;
 
 // Wartość pola „sektor”, gdy użytkownik go nie wybrał (Select nie przyjmuje pustej wartości).
 export const NO_SECTOR = "NONE";
+// To samo dla pola „zespół”.
+export const NO_TEAM = "NONE";
 
 export const innovationSchema = z.object({
   title: z
@@ -110,6 +112,7 @@ export const innovationSchema = z.object({
     .max(500)
     .refine((v) => v === "" || /^https?:\/\/\S+$/.test(v), "Podaj poprawny adres (https://…)"),
   creators: z.string().trim().max(500, "Maksymalnie 500 znaków"),
+  teamId: z.string(),
   contactEmail: z
     .string()
     .trim()

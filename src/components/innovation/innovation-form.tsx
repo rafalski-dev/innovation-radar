@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createInnovation } from "@/actions/innovation";
+import { createInnovation, updateInnovation } from "@/actions/innovation";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/shadcn/button";
 import {
@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn/select";
+import type { InnovationRow } from "@/queries/innovation";
 import { Textarea } from "@/components/shadcn/textarea";
 import {
   INNOVATION_SECTORS,
@@ -31,6 +32,7 @@ import {
   INNOVATION_TYPES,
   type InnovationInput,
   NO_SECTOR,
+  NO_TEAM,
   innovationKey,
   innovationSchema,
   innovationSectorLabels,
@@ -38,44 +40,63 @@ import {
   innovationTypeLabels,
 } from "@/validation/innovation";
 
-const defaults: InnovationInput = {
-  title: "",
-  summary: "",
-  problem: "",
-  solution: "",
-  type: "TECHNOLOGICAL",
-  stage: "IDEA",
-  sector: NO_SECTOR,
-  sourceUrl: "",
-  creators: "",
-  contactEmail: "",
-};
+function toDefaults(innovation?: InnovationRow): InnovationInput {
+  return {
+    title: innovation?.title ?? "",
+    summary: innovation?.summary ?? "",
+    problem: innovation?.problem ?? "",
+    solution: innovation?.solution ?? "",
+    type: innovation?.type ?? "TECHNOLOGICAL",
+    stage: innovation?.stage ?? "IDEA",
+    sector: innovation?.sector ?? NO_SECTOR,
+    teamId: innovation?.teamId ?? NO_TEAM,
+    sourceUrl: innovation?.sourceUrl ?? "",
+    creators: innovation?.creators ?? "",
+    contactEmail: innovation?.contactEmail ?? "",
+  };
+}
 
 const sectorItems = { [NO_SECTOR]: "Brak", ...innovationSectorLabels };
 
-export function InnovationForm({ trigger }: { trigger: React.ReactElement }) {
+type InnovationFormProps = {
+  // brak = dodawanie, jest = edycja
+  innovation?: InnovationRow;
+  teams: { id: string; name: string }[];
+  trigger: React.ReactElement;
+};
+
+export function InnovationForm({ innovation, teams, trigger }: InnovationFormProps) {
+  const isEdit = Boolean(innovation);
+  const teamItems = {
+    [NO_TEAM]: "Brak (tylko ja)",
+    ...Object.fromEntries(teams.map((t) => [t.id, t.name])),
+  };
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const form = useForm<InnovationInput>({
     resolver: zodResolver(innovationSchema),
-    defaultValues: defaults,
+    defaultValues: toDefaults(innovation),
   });
   const { errors } = form.formState;
 
   function handleOpenChange(next: boolean) {
     setOpen(next);
-    if (next) form.reset(defaults);
+    if (next) form.reset(toDefaults(innovation));
   }
 
   function onSubmit(values: InnovationInput) {
     startTransition(async () => {
-      const result = await createInnovation(values);
+      const result = innovation
+        ? await updateInnovation(innovation.id, values)
+        : await createInnovation(values);
       if (!result.success) {
         toast.error(result.error);
         return;
       }
-      toast.success(`Zgłoszono pomysł ${innovationKey(result.data)}`);
+      toast.success(
+        innovation ? "Zapisano zmiany" : `Zgłoszono pomysł ${innovationKey(Number(result.data))}`,
+      );
       setOpen(false);
     });
   }
@@ -85,7 +106,7 @@ export function InnovationForm({ trigger }: { trigger: React.ReactElement }) {
       <DialogTrigger render={trigger} />
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Nowy pomysł</DialogTitle>
+          <DialogTitle>{isEdit ? "Edytuj pomysł" : "Nowy pomysł"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
@@ -210,6 +231,34 @@ export function InnovationForm({ trigger }: { trigger: React.ReactElement }) {
             </FormField>
           </div>
 
+          {teams.length > 0 && (
+            <FormField label="Zespół (opcjonalnie)">
+              <Controller
+                control={form.control}
+                name="teamId"
+                render={({ field }) => (
+                  <Select
+                    items={teamItems}
+                    value={field.value ?? null}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Wybierz…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_TEAM}>Brak (tylko ja)</SelectItem>
+                      {teams.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </FormField>
+          )}
+
           <FormField
             label="Twórcy (opcjonalnie)"
             htmlFor="creators"
@@ -248,7 +297,7 @@ export function InnovationForm({ trigger }: { trigger: React.ReactElement }) {
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline" />}>Anuluj</DialogClose>
             <Button type="submit" disabled={pending}>
-              {pending ? "Zapisywanie…" : "Zgłoś pomysł"}
+              {pending ? "Zapisywanie…" : isEdit ? "Zapisz" : "Zgłoś pomysł"}
             </Button>
           </DialogFooter>
         </form>

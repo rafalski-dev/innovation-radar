@@ -5,8 +5,5 @@ export const site = {
   name: "Radar innowacji",
   description:
     "Platforma, która prowadzi innowacje ze szkół, uczelni i samorządów od zgłoszenia do partnera.",
-  nav: [
-    { href: "/", label: "Start" },
-    { href: "/dashboard", label: "Dashboard" },
-  ] satisfies NavItem[],
+  nav: [{ href: "/", label: "Start" }] satisfies NavItem[],
 };

@@ -20,6 +20,10 @@ export const auth = betterAuth({
   },
   databaseHooks: {
     user: {
+      update: {
+        // roli nie zmienia się przez updateUser (inaczej każdy mógłby się „awansować”)
+        before: async (data) => ({ data: { ...data, role: undefined } }),
+      },
       create: {
         // Walidacja po stronie serwera: pola wymagane zależą od roli.
         before: async (user) => {

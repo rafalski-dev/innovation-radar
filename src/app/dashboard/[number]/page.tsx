@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { TypeBadge } from "@/components/innovation/type-badge";
 import { Badge } from "@/components/shadcn/badge";
+import { InnovationRowActions } from "@/components/innovation/innovation-row-actions";
 import { getInnovationByNumber } from "@/queries/innovation";
+import { getMyTeams } from "@/queries/team";
 import {
   innovationKey,
   innovationSectorLabels,
@@ -31,7 +33,7 @@ export default async function InnovationDetailPage({ params }: PageProps<"/dashb
   const number = Number(raw);
   if (!Number.isInteger(number)) notFound();
 
-  const innovation = await getInnovationByNumber(number);
+  const [innovation, teams] = await Promise.all([getInnovationByNumber(number), getMyTeams()]);
   if (!innovation) notFound();
 
   return (
@@ -45,7 +47,10 @@ export default async function InnovationDetailPage({ params }: PageProps<"/dashb
       </Link>
 
       <div className="space-y-3">
-        <div className="text-sm text-muted-foreground">{innovationKey(innovation.number)}</div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">{innovationKey(innovation.number)}</span>
+          <InnovationRowActions innovation={innovation} teams={teams} />
+        </div>
         <h1 className="text-2xl font-semibold tracking-tight">{innovation.title}</h1>
         <div className="flex flex-wrap gap-2">
           <Badge>{innovationStatusLabels[innovation.status]}</Badge>
@@ -60,6 +65,7 @@ export default async function InnovationDetailPage({ params }: PageProps<"/dashb
       <Section title="Streszczenie">{innovation.summary}</Section>
       <Section title="Problem">{innovation.problem}</Section>
       <Section title="Rozwiązanie">{innovation.solution}</Section>
+      {innovation.team && <Section title="Zespół">{innovation.team.name}</Section>}
       {innovation.creators && <Section title="Twórcy">{innovation.creators}</Section>}
       {innovation.contactEmail && <Section title="Kontakt">{innovation.contactEmail}</Section>}
       {innovation.sourceUrl && <Section title="Źródło">{innovation.sourceUrl}</Section>}
