@@ -8,6 +8,7 @@ import {
   SearchCheckIcon,
   SendIcon,
 } from "lucide-react";
+import { HeroRadar } from "@/components/landing/hero-radar";
 import { buttonVariants } from "@/components/shadcn/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card";
 import { getSession } from "@/lib/session";
@@ -58,31 +59,36 @@ export default async function Home() {
 
   return (
     <div className="space-y-16">
-      <section className="space-y-5 py-10 text-center">
-        <p className="text-sm font-medium text-muted-foreground">Dla firm szukających rozwiązań</p>
-        <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-          Znajdź gotową innowację, zanim zbudujesz ją od zera
-        </h1>
-        <p className="mx-auto max-w-2xl text-muted-foreground">
-          Opisz swoje zapotrzebowanie. Agent AI przeszuka patenty, publikacje naukowe i projekty
-          badawcze, a Ty dostaniesz dopasowane wyniki z uzasadnieniem i kontaktem do autorów.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3 pt-2">
-          {session ? (
-            <Link href="/dashboard" className={buttonVariants({ size: "lg" })}>
-              Przejdź do panelu
-              <ArrowRightIcon />
-            </Link>
-          ) : (
-            <>
-              <Link href="/register" className={buttonVariants({ size: "lg" })}>
-                Załóż konto
+      <section className="relative isolate overflow-hidden rounded-3xl border">
+        <HeroRadar />
+        <div className="relative z-10 space-y-5 px-4 py-20 text-center sm:py-32">
+          <p className="text-sm font-medium text-muted-foreground">
+            Dla firm szukających rozwiązań
+          </p>
+          <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+            Znajdź gotową innowację, zanim zbudujesz ją od zera
+          </h1>
+          <p className="mx-auto max-w-2xl text-muted-foreground">
+            Opisz swoje zapotrzebowanie. Agent AI przeszuka patenty, publikacje naukowe i projekty
+            badawcze, a Ty dostaniesz dopasowane wyniki z uzasadnieniem i kontaktem do autorów.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
+            {session ? (
+              <Link href="/dashboard" className={buttonVariants({ size: "lg" })}>
+                Przejdź do panelu
+                <ArrowRightIcon />
               </Link>
-              <Link href="/login" className={buttonVariants({ size: "lg", variant: "outline" })}>
-                Zaloguj się
-              </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link href="/register" className={buttonVariants({ size: "lg" })}>
+                  Załóż konto
+                </Link>
+                <Link href="/login" className={buttonVariants({ size: "lg", variant: "outline" })}>
+                  Zaloguj się
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </section>
 
