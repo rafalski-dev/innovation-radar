@@ -5,7 +5,7 @@ import { accessibleNeedWhere } from "@/queries/need";
 
 // Pobranie PDF przy potrzebie: tylko dla osób z dostępem do organizacji. Plik leży w prywatnym
 // buckecie R2, więc po sprawdzeniu dostępu przekierowujemy na krótko ważny podpisany adres.
-export async function GET(_request: Request, ctx: RouteContext<"/api/need-files/[fileId]">) {
+export async function GET(_request: Request, ctx: RouteContext<"/api/project-files/[fileId]">) {
   const session = await getSession();
   if (!session) return new Response("Zaloguj się", { status: 401 });
   if (!isR2Configured()) return new Response("Pliki nie są skonfigurowane", { status: 503 });

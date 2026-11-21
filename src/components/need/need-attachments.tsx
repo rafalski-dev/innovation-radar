@@ -26,7 +26,7 @@ export function NeedAttachments({ need }: Props) {
       {need.files.map((file) => (
         <a
           key={file.id}
-          href={`/api/need-files/${file.id}`}
+          href={`/api/project-files/${file.id}`}
           target="_blank"
           rel="noreferrer"
           className="inline-flex min-w-0 items-center gap-1 hover:underline"

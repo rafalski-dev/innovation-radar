@@ -47,7 +47,7 @@ async function main() {
 
   const needs = await db.need.count({ where: { businessId: business.id } });
   if (needs > 0) {
-    console.log(`Need: pominięto (organizacja demo ma już ${needs} potrzeb)`);
+    console.log(`Need: pominięto (organizacja demo ma już ${needs} projektów)`);
     return;
   }
   await db.need.create({
@@ -59,7 +59,7 @@ async function main() {
         "Szukamy rozwiązania do wizyjnej kontroli detali na taśmie. Budżet do 200 tys. zł, wdrożenie w 6 miesięcy.",
     },
   });
-  console.log("Need: dodano potrzebę demo");
+  console.log("Need: dodano projekt demo");
 }
 
 main()

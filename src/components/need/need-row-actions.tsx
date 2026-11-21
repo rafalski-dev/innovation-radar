@@ -11,7 +11,7 @@ export function NeedRowActions({ need }: { need: NeedRow }) {
   return (
     <div className="flex gap-1">
       <Link
-        href={`/dashboard/businesses/${need.businessId}/needs/${need.id}/edit`}
+        href={`/dashboard/businesses/${need.businessId}/projects/${need.id}/edit`}
         className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
       >
         <PencilIcon />

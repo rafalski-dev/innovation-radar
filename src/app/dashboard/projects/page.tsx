@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/shadcn/button";
 import { getMyNeeds } from "@/queries/need";
 
-export const metadata: Metadata = { title: "Potrzeby" };
+export const metadata: Metadata = { title: "Projekty" };
 
 export default async function NeedsPage() {
   const needs = await getMyNeeds();
@@ -15,18 +15,18 @@ export default async function NeedsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Potrzeby"
-        description="Lista potrzeb ze wszystkich Twoich organizacji. Na ich podstawie agent wyszuka patenty i rozwiązania problemów."
+        title="Projekty"
+        description="Lista projektów ze wszystkich Twoich organizacji. Na ich podstawie agent wyszuka patenty i rozwiązania problemów."
         action={
-          <Link href="/dashboard/needs/new" className={buttonVariants()}>
+          <Link href="/dashboard/projects/new" className={buttonVariants()}>
             <PlusIcon />
-            Nowa potrzeba
+            Nowy projekt
           </Link>
         }
       />
       {needs.length === 0 ? (
         <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-          Nie masz jeszcze żadnej potrzeby. Dodaj pierwszą przyciskiem „Nowa potrzeba”.
+          Nie masz jeszcze żadnego projektu. Dodaj pierwszą przyciskiem „Nowy projekt”.
         </p>
       ) : (
         <ul className="grid gap-3">

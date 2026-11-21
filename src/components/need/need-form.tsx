@@ -51,8 +51,9 @@ export function NeedForm({
   const [fileError, setFileError] = useState<string>();
   const [newFiles, setNewFiles] = useState<File[]>([]); // wybrane, jeszcze niewysłane
   const [removedIds, setRemovedIds] = useState<string[]>([]); // zapisane pliki do usunięcia
-  // edycja i dodawanie z listy potrzeb wracają na /dashboard/needs; dodawanie ze strony organizacji na nią
-  const backHref = need || businesses ? "/dashboard/needs" : `/dashboard/businesses/${businessId}`;
+  // edycja i dodawanie z listy potrzeb wracają na /dashboard/projects; dodawanie ze strony organizacji na nią
+  const backHref =
+    need || businesses ? "/dashboard/projects" : `/dashboard/businesses/${businessId}`;
   const form = useForm<NeedInput>({
     resolver: zodResolver(needSchema),
     defaultValues: {
@@ -131,7 +132,7 @@ export function NeedForm({
         toast.error(result.error);
         return;
       }
-      toast.success(need ? "Zapisano zmiany" : "Dodano potrzebę");
+      toast.success(need ? "Zapisano zmiany" : "Dodano projekt");
       router.push(backHref);
       router.refresh();
     });
@@ -174,7 +175,7 @@ export function NeedForm({
         </FormField>
       )}
 
-      <FormField label="Tytuł potrzeby *" htmlFor="n-title" error={errors.title?.message}>
+      <FormField label="Tytuł projektu *" htmlFor="n-title" error={errors.title?.message}>
         <Input
           id="n-title"
           placeholder="np. Automatyczna kontrola jakości na linii"
@@ -184,7 +185,7 @@ export function NeedForm({
       </FormField>
 
       <FormField
-        label="Opis potrzeby *"
+        label="Opis projektu *"
         htmlFor="n-description"
         error={errors.description?.message}
       >
@@ -231,7 +232,7 @@ export function NeedForm({
               {savedFiles.map((file) => (
                 <li key={file.id} className="flex items-center justify-between gap-2 px-3 py-2">
                   <a
-                    href={`/api/need-files/${file.id}`}
+                    href={`/api/project-files/${file.id}`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex min-w-0 items-center gap-2 hover:underline"
@@ -286,7 +287,7 @@ export function NeedForm({
           Anuluj
         </Link>
         <Button type="submit" disabled={pending}>
-          {pending ? "Zapisywanie…" : need ? "Zapisz" : "Dodaj potrzebę"}
+          {pending ? "Zapisywanie…" : need ? "Zapisz" : "Dodaj projekt"}
         </Button>
       </div>
     </form>

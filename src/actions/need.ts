@@ -124,11 +124,11 @@ export async function createNeed(
   } catch (error) {
     console.error(error);
     await deleteObjects(files.map((f) => f.key));
-    return fail("Nie udało się zapisać potrzeby");
+    return fail("Nie udało się zapisać projekt");
   }
 
   revalidatePath(`/dashboard/businesses/${businessId}`);
-  revalidatePath("/dashboard/needs");
+  revalidatePath("/dashboard/projects");
   return ok();
 }
 
@@ -151,7 +151,7 @@ export async function updateNeed(
       where: { id, ...accessibleNeedWhere(session.user.id) },
       include: { files: { select: { id: true, key: true } } },
     });
-    if (!existing) return fail("Nie znaleziono potrzeby");
+    if (!existing) return fail("Nie znaleziono projektu");
 
     const removed = existing.files.filter((f) => options.removeFileIds?.includes(f.id));
     if (existing.files.length - removed.length + attachments.length > NEED_FILES_MAX) {
@@ -179,7 +179,7 @@ export async function updateNeed(
   }
 
   revalidatePath("/dashboard/businesses", "layout");
-  revalidatePath("/dashboard/needs");
+  revalidatePath("/dashboard/projects");
   return ok();
 }
 
@@ -195,14 +195,14 @@ export async function deleteNeed(id: string): Promise<ActionResult> {
     const result = await db.need.deleteMany({
       where: { id, ...accessibleNeedWhere(session.user.id) },
     });
-    if (result.count === 0) return fail("Nie znaleziono potrzeby");
+    if (result.count === 0) return fail("Nie znaleziono projektu");
     await deleteObjects(files.map((f) => f.key));
   } catch (error) {
     console.error(error);
-    return fail("Nie udało się usunąć potrzeby");
+    return fail("Nie udało się usunąć projekt");
   }
 
   revalidatePath("/dashboard/businesses", "layout");
-  revalidatePath("/dashboard/needs");
+  revalidatePath("/dashboard/projects");
   return ok();
 }

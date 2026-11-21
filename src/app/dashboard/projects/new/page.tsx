@@ -5,17 +5,17 @@ import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/shadcn/button";
 import { getMyBusinesses } from "@/queries/business";
 
-export const metadata: Metadata = { title: "Nowa potrzeba" };
+export const metadata: Metadata = { title: "Nowy projekt" };
 
 export default async function NewNeedPage() {
   const businesses = await getMyBusinesses();
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Nowa potrzeba" description="Wybierz organizację i opisz, czego szukasz." />
+      <PageHeader title="Nowy projekt" description="Wybierz organizację i opisz, czego szukasz." />
       {businesses.length === 0 ? (
         <div className="space-y-3 rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-          <p>Potrzeba należy do organizacji. Najpierw dodaj swoją pierwszą organizację.</p>
+          <p>Projekt należy do organizacji. Najpierw dodaj swoją pierwszą organizację.</p>
           <Link href="/dashboard/businesses/new" className={buttonVariants({ size: "sm" })}>
             Nowa organizacja
           </Link>

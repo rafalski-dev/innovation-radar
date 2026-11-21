@@ -106,7 +106,7 @@ model Business {
 }
 
 // ---------- Potrzeby ----------
-// Potrzeba należy do biznesu: tytuł + opis (na razie jedno pole). Podstawa zapytań do agenta.
+// Projekt należy do biznesu: tytuł + opis (na razie jedno pole). Podstawa zapytań do agenta.
 
 model Need {
   id              String    @id @default(cuid())
@@ -124,7 +124,7 @@ model Need {
 }
 
 // Opcjonalne pliki PDF przy potrzebie (do NEED_FILES_MAX). Sama zawartość leży w Cloudflare R2 pod kluczem `key`;
-// pobieranie przez /api/need-files/[fileId] (sprawdza dostęp i przekierowuje na podpisany adres).
+// pobieranie przez /api/project-files/[fileId] (sprawdza dostęp i przekierowuje na podpisany adres).
 model NeedFile {
   id        String   @id @default(cuid())
   needId    String

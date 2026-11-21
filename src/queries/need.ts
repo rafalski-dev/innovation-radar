@@ -21,7 +21,7 @@ export async function getNeedsForBusiness(businessId: string) {
   });
 }
 
-// Wszystkie potrzeby ze wszystkich dostępnych organizacji (strona /dashboard/needs).
+// Wszystkie potrzeby ze wszystkich dostępnych organizacji (strona /dashboard/projects).
 export async function getMyNeeds() {
   await connection();
   const session = await requireSession();

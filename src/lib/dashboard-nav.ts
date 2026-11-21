@@ -1,4 +1,10 @@
-import { BuildingIcon, LayoutDashboardIcon, ClipboardListIcon, UserIcon } from "lucide-react";
+import {
+  BuildingIcon,
+  LayoutDashboardIcon,
+  ClipboardListIcon,
+  SearchIcon,
+  UserIcon,
+} from "lucide-react";
 
 // Nawigacja dashboardu: jedno miejsce. Kolejne sekcje (potrzeby, wyniki, listy, panel
 // administracji) dojdą tu jako osobne pozycje.
@@ -11,6 +17,7 @@ export type DashboardNavItem = {
 export const dashboardNav: DashboardNavItem[] = [
   { href: "/dashboard", label: "Panel", icon: LayoutDashboardIcon },
   { href: "/dashboard/businesses", label: "Moje organizacje", icon: BuildingIcon },
-  { href: "/dashboard/needs", label: "Potrzeby", icon: ClipboardListIcon },
+  { href: "/dashboard/projects", label: "Projekty", icon: ClipboardListIcon },
+  { href: "/dashboard/search", label: "Wyszukiwanie", icon: SearchIcon },
   { href: "/dashboard/profile", label: "Profil", icon: UserIcon },
 ];

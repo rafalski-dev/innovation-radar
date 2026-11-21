@@ -124,7 +124,7 @@ export default async function Home() {
 
       {!session && (
         <section className="space-y-4 rounded-xl border bg-muted/40 px-6 py-10 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight">Zacznij od opisu potrzeby</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">Zacznij od opisu projektu</h2>
           <p className="text-sm text-muted-foreground">
             Konto wymaga tylko imienia, nazwiska, adresu e-mail i hasła.
           </p>

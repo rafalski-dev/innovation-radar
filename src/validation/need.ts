@@ -25,7 +25,7 @@ export const needSchema = z.object({
     .min(3, "Tytuł musi mieć co najmniej 3 znaki")
     .max(150, "Tytuł może mieć maksymalnie 150 znaków"),
   // wymagane: organizacja (poza schematem), tytuł i opis; link i pliki PDF są opcjonalne
-  description: z.string().trim().min(1, "Opisz potrzebę").max(4000, "Maksymalnie 4000 znaków"),
+  description: z.string().trim().min(1, "Opisz projekt").max(4000, "Maksymalnie 4000 znaków"),
   // opcjonalny link; pusty string = brak
   linkUrl: z
     .string()

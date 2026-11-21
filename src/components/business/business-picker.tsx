@@ -125,18 +125,18 @@ export function BusinessPicker({
 
         <div className="space-y-3 border-t pt-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-muted-foreground">Potrzeby</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground">Projekty</h3>
             <Link
-              href={`/dashboard/businesses/${selected.id}/needs/new`}
+              href={`/dashboard/businesses/${selected.id}/projects/new`}
               className={buttonVariants({ size: "sm" })}
             >
               <PlusIcon />
-              Nowa potrzeba
+              Nowy projekt
             </Link>
           </div>
           {selected.needs.length === 0 ? (
             <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-              Ta organizacja nie ma jeszcze żadnej potrzeby. Opisz pierwszą.
+              Ta organizacja nie ma jeszcze żadnego projektu. Opisz pierwszą.
             </p>
           ) : (
             <ul className="grid gap-3">
