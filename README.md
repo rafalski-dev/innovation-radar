@@ -1,58 +1,60 @@
-# Starter: Next.js + Prisma + shadcn
+# Radar innowacji
 
-Uniwersalny starter aplikacji CRUD z AI. Stack: Next.js 16 (App Router) · Prisma 7 + Neon (Postgres) ·
-Zod 4 · React Hook Form · shadcn (Base UI) · Tailwind 4 · AI SDK (Anthropic, Groq).
+Projekt hackathonowy PCI. Platforma dla firm i instytucji, które szukają gotowych rozwiązań i partnerów
+dla swoich problemów. Użytkownik opisuje problem, a agent AI przeszukuje polskie i europejskie bazy
+(UPRP, EPO, PBN/PPM/BazTech, Interreg, NCBiR), ocenia znalezione materiały i uzasadnia dopasowanie.
 
-Repo nie jest związane z żadną dziedziną. Konkretny projekt opisujesz w [`docs/PROJECT.md`](docs/PROJECT.md),
-a encja `item` to tylko przykład wzorca CRUD.
+## Dla jury: jak wypróbować
 
-## Uruchomienie
+1. Wejdź na działający prototyp: **https://innovation-radar-three.vercel.app/**
+2. Zaloguj się kontem testowym:
 
-1. Zainstaluj zależności: `npm install` (generuje też klienta Prismy).
-2. Skopiuj `.env.example` do `.env` i uzupełnij:
-   - `DATABASE_URL`: connection string z [Neon](https://console.neon.tech),
-   - `ANTHROPIC_API_KEY`, `GROQ_API_KEY`: tylko jeśli używasz funkcji AI.
-3. Utwórz tabele: `npm run db:push`
-4. (Opcjonalnie) dane testowe: `npm run db:seed`
-5. Start: `npm run dev` → http://localhost:3000
+   | Pole   | Wartość          |
+   | ------ | ---------------- |
+   | E-mail | `test@gmail.com` |
+   | Hasło  | `Mini12345!`     |
 
-## Deploy na Vercel
+3. Możesz też założyć własne konto (rejestracja na stronie głównej).
 
-Plik `.env` nie trafia do repo, więc zmienne trzeba ustawić w Vercelu, inaczej build się zatrzyma
-z błędem `Niepoprawne zmienne środowiskowe`.
+Co sprawdzić po zalogowaniu:
 
-1. Vercel → projekt → **Settings → Environment Variables**: dodaj `DATABASE_URL`
-   (oraz `ANTHROPIC_API_KEY` / `GROQ_API_KEY`, jeśli używasz AI) dla środowisk Production i Preview.
-   Alternatywa: integracja Neon w zakładce **Storage** ustawia `DATABASE_URL` automatycznie.
-2. **Deployments → ⋯ → Redeploy** (zmienne działają dopiero w nowym buildzie).
-3. Schemat bazy wysyłasz lokalnie (`npm run db:push`); Vercel go nie zmienia.
+- **Organizacje** (`Dashboard → Organizacje`): dodanie firmy (NIP, adres, branża), dodanie osób do organizacji.
+- **Projekty**: opis problemu firmy, opcjonalny link i pliki PDF (do 3, każdy do 20 MB).
+- **Wyszukiwanie** (`Dashboard → Wyszukiwanie → Nowe wyszukiwanie`): wybór projektu i zapis zapytania do historii.
 
-## Nowy projekt z tego startera
+## Cel prototypu
 
-1. Skopiuj repo (albo oznacz je na GitHubie jako _Template repository_).
-2. Wypełnij [`docs/PROJECT.md`](docs/PROJECT.md): cel, encje z polami, strony, funkcje AI.
-3. Zmień nazwę i nawigację w [`src/lib/site.ts`](src/lib/site.ts).
-4. Uruchom Claude Code i wpisz `/start-project`. Claude sprawdzi opis, zaproponuje plan encji
-   i po akceptacji zbuduje je według wzorca.
-5. Pojedyncza encja: `/new-feature <encja>`.
-6. Encja wzorcowa `item`: zostaw ją, dopóki nie zbudujesz pierwszej własnej encji, potem usuń
-   `src/{validation,actions,queries}/item.ts`, `src/components/item/`, `src/app/item/`,
-   model i enumy z `prisma/schema.prisma`, wpis w `site.nav` oraz dane w `prisma/seed.ts`.
+Zaprezentować działający prototyp z jak największą liczbą funkcji z planu. Status funkcji:
 
-## Skrypty
+| #   | Funkcja                                                                             | Status      |
+| --- | ----------------------------------------------------------------------------------- | ----------- |
+| 1   | Panel rejestracji organizacji i użytkowników                                        | gotowe      |
+| 2   | Asystent formułowania problematyki badawczej                                        | w budowie   |
+| 3   | Rekomendacje rozbicia problemów na aspekty                                          | w budowie   |
+| 4   | Rekomendacje rozbicia aspektów na proponowane wyszukania w bazach źródeł            | w budowie   |
+| 5   | Moduł dodawania źródeł do wyszukiwań                                                | planowane   |
+| 6   | Ocena przydatności materiałów w kontekście wyszukiwań                               | planowane   |
+| 7   | Zautomatyzowany raport dla problemu (aspekty, wyszukiwania, wybrane źródła)         | planowane   |
+| 8   | Dzielenie się wynikami z innymi podmiotami i kontakt w celu konsultacji             | planowane   |
+| 9   | Alerty o nowych materiałach pasujących do zapytania                                 | planowane   |
+| 10  | Własny zbiór opracowań (zapis analiz AI, bez ponownej weryfikacji tego samego materiału) | planowane   |
+| 11  | Regularne wypuszczanie nowych wersji                                                | w trakcie   |
 
-| Skrypt              | Co robi                                        |
-| ------------------- | ---------------------------------------------- |
-| `npm run dev`       | serwer deweloperski                            |
-| `npm run typecheck` | sprawdzenie typów (wymagane na koniec zadania) |
-| `npm run lint`      | ESLint                                         |
-| `npm run format`    | Prettier (formatuje cały projekt)              |
-| `npm run db:push`   | synchronizuje `prisma/schema.prisma` z bazą    |
-| `npm run db:seed`   | dane testowe z `prisma/seed.ts`                |
-| `npm run db:studio` | podgląd bazy w przeglądarce                    |
+Szczegóły: [`docs/PROJECT.md`](docs/PROJECT.md), plan agenta wyszukującego: [`docs/AGENT.md`](docs/AGENT.md),
+wytyczne organizatorów: [`docs/CHALLENGE.md`](docs/CHALLENGE.md).
 
-## Struktura
+## Stack
 
-Zasady i struktura plików dla Claude: [`CLAUDE.md`](CLAUDE.md).
+Next.js 16 (App Router) · Prisma 7 + Neon (Postgres) · Better Auth · Zod 4 · React Hook Form ·
+shadcn (Base UI) · Tailwind 4 · AI SDK (Anthropic) · Cloudflare R2 (pliki PDF) · Vercel.
 
-# innovation-radar
+## Uruchomienie lokalne
+
+1. `npm install` (generuje też klienta Prismy).
+2. Skopiuj `.env.example` do `.env` i uzupełnij: `DATABASE_URL` (Neon), `BETTER_AUTH_SECRET`
+   (`openssl rand -base64 32`), `BETTER_AUTH_URL` (`http://localhost:3000`), opcjonalnie `ANTHROPIC_API_KEY`
+   i zmienne `R2_*` (pliki PDF).
+3. `npm run db:push` tworzy tabele, a `npm run db:seed` wczytuje dane testowe (opcjonalnie).
+4. `npm run dev` → http://localhost:3000
+
+Skrypty: `dev`, `typecheck`, `lint`, `format`, `db:push`, `db:seed`, `db:studio`. Zasady kodu: [`CLAUDE.md`](CLAUDE.md).
