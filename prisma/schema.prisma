@@ -1,0 +1,35 @@
+// Prisma schema: https://pris.ly/d/prisma-schema
+// Po każdej zmianie: npm run db:push
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------- Item (encja wzorcowa, do skopiowania i usunięcia) ----------
+
+enum ItemStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum ItemPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Item {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  status      ItemStatus   @default(DRAFT)
+  priority    ItemPriority @default(MEDIUM)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}

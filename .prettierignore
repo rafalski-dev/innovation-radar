@@ -1,0 +1,8 @@
+node_modules
+.next
+src/generated
+src/components/shadcn
+package-lock.json
+skills-lock.json
+.agents
+.windsurf
