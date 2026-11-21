@@ -2,10 +2,11 @@
 export type NavItem = { href: string; label: string };
 
 export const site = {
-  name: "Nazwa aplikacji",
-  description: "Krótki opis aplikacji (uzupełnij w src/lib/site.ts).",
+  name: "Radar innowacji",
+  description:
+    "Platforma, która prowadzi innowacje ze szkół, uczelni i samorządów od zgłoszenia do partnera.",
   nav: [
     { href: "/", label: "Start" },
-    { href: "/item", label: "Elementy" },
+    { href: "/dashboard", label: "Dashboard" },
   ] satisfies NavItem[],
 };

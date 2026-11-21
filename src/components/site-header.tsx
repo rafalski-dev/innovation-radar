@@ -1,13 +1,13 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { SiteNav } from "@/components/site-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/auth/user-menu";
+import { buttonVariants } from "@/components/shadcn/button";
+import { getSession } from "@/lib/session";
 import { site } from "@/lib/site";
-import { cn } from "@/lib/utils";
 
-export function SiteHeader() {
-  const pathname = usePathname();
+export async function SiteHeader() {
+  const session = await getSession();
 
   return (
     <header className="border-b">
@@ -15,24 +15,20 @@ export function SiteHeader() {
         <Link href="/" className="font-semibold">
           {site.name}
         </Link>
-        <nav className="flex flex-1 items-center gap-4 text-sm">
-          {site.nav.map((item) => {
-            const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "text-muted-foreground transition-colors hover:text-foreground",
-                  active && "font-medium text-foreground",
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <SiteNav />
         <ThemeToggle />
+        {session ? (
+          <UserMenu name={session.user.name} />
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+              Zaloguj się
+            </Link>
+            <Link href="/register" className={buttonVariants({ size: "sm" })}>
+              Załóż konto
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

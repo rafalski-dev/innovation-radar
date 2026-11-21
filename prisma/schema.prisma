@@ -10,26 +10,138 @@ datasource db {
   provider = "postgresql"
 }
 
-// ---------- Item (encja wzorcowa, do skopiowania i usunięcia) ----------
+// ---------- Użytkownicy (Better Auth) ----------
 
-enum ItemStatus {
-  DRAFT
-  ACTIVE
+enum UserRole {
+  USER
+  OFFICIAL
+  BUSINESS
+}
+
+model User {
+  id            String       @id
+  name          String
+  email         String       @unique
+  emailVerified Boolean      @default(false)
+  image         String?
+  role          UserRole     @default(USER)
+  organization  String?
+  position      String?
+  interests     String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  innovations   Innovation[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+// ---------- Innovation ----------
+
+enum InnovationType {
+  TECHNOLOGICAL
+  ORGANIZATIONAL
+  EDUCATIONAL
+  SOCIAL
+  PROCESS
+}
+
+enum InnovationStage {
+  IDEA
+  PROTOTYPE
+  PILOT
+  IMPLEMENTED
+  SCALED
+}
+
+enum InnovationSector {
+  EDUCATION
+  HEALTH_QUALITY_OF_LIFE
+  ICT
+  MOBILITY
+  AEROSPACE
+  ENVIRONMENT
+  ADMINISTRATION
+  OTHER
+}
+
+enum InnovationStatus {
+  SUBMITTED
+  ASSESSED
+  RECOMMENDED
+  MATCHED
   ARCHIVED
 }
 
-enum ItemPriority {
-  LOW
-  MEDIUM
-  HIGH
+enum InnovationSource {
+  MANUAL
+  AI_EXTRACTED
+  IMPORTED
 }
 
-model Item {
-  id          String       @id @default(cuid())
-  name        String
-  description String?
-  status      ItemStatus   @default(DRAFT)
-  priority    ItemPriority @default(MEDIUM)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+model Innovation {
+  id           String            @id @default(cuid())
+  number       Int               @unique @default(autoincrement())
+  title        String
+  summary      String
+  problem      String
+  solution     String
+  type         InnovationType
+  stage        InnovationStage
+  sector       InnovationSector?
+  status       InnovationStatus  @default(SUBMITTED)
+  source       InnovationSource  @default(MANUAL)
+  sourceUrl    String?
+  creators     String?
+  contactEmail String?
+  authorId     String
+  author       User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([authorId])
+  @@index([status])
 }
