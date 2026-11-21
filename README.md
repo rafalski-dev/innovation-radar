@@ -1,8 +1,9 @@
 # Radar innowacji
 
 Projekt hackathonowy PCI. Platforma dla firm i instytucji, które szukają gotowych rozwiązań i partnerów
-dla swoich problemów. Użytkownik opisuje problem, a agent AI przeszukuje polskie i europejskie bazy
-(UPRP, EPO, PBN/PPM/BazTech, Interreg, NCBiR), ocenia znalezione materiały i uzasadnia dopasowanie.
+dla swoich problemów. Użytkownik opisuje problem, AI proponuje frazy do wyszukiwarki, a agent przeszukuje
+publiczne bazy i pokazuje listę wyników z uzasadnieniem i linkiem do źródła. Obecnie agent przeszukuje
+NCBiR i RAD-on, a kolejne bazy (UPRP, EPO, PBN/PPM/BazTech, Interreg) są w planie.
 
 ## Dla jury: jak wypróbować
 
@@ -20,25 +21,32 @@ Co sprawdzić po zalogowaniu:
 
 - **Organizacje** (`Dashboard → Organizacje`): dodanie firmy (NIP, adres, branża), dodanie osób do organizacji.
 - **Projekty**: opis problemu firmy, opcjonalny link i pliki PDF (do 3, każdy do 20 MB).
-- **Wyszukiwanie** (`Dashboard → Wyszukiwanie → Nowe wyszukiwanie`): wybór projektu i zapis zapytania do historii.
+- **Wyszukiwanie** (`Dashboard → Wyszukiwania → Nowe wyszukiwanie`):
+  1. wybierz projekt i kliknij „Generuj frazy” (3–5 fraz po polsku), popraw je i zatwierdź,
+  2. kliknij „Szukaj w źródłach” (do minuty): agent pokaże do 3 wyników z linkami do źródeł,
+  3. jeśli lista jest dobra, kliknij „Zatwierdź wyszukiwanie”. Zapisze się w historii razem z frazami.
 
 ## Cel prototypu
 
 Zaprezentować działający prototyp z jak największą liczbą funkcji z planu. Status funkcji:
 
-| #   | Funkcja                                                                             | Status      |
-| --- | ----------------------------------------------------------------------------------- | ----------- |
-| 1   | Panel rejestracji organizacji i użytkowników                                        | gotowe      |
-| 2   | Asystent formułowania problematyki badawczej                                        | w budowie   |
-| 3   | Rekomendacje rozbicia problemów na aspekty                                          | w budowie   |
-| 4   | Rekomendacje rozbicia aspektów na proponowane wyszukania w bazach źródeł            | w budowie   |
-| 5   | Moduł dodawania źródeł do wyszukiwań                                                | planowane   |
-| 6   | Ocena przydatności materiałów w kontekście wyszukiwań                               | planowane   |
-| 7   | Zautomatyzowany raport dla problemu (aspekty, wyszukiwania, wybrane źródła)         | planowane   |
-| 8   | Dzielenie się wynikami z innymi podmiotami i kontakt w celu konsultacji             | planowane   |
-| 9   | Alerty o nowych materiałach pasujących do zapytania                                 | planowane   |
-| 10  | Własny zbiór opracowań (zapis analiz AI, bez ponownej weryfikacji tego samego materiału) | planowane   |
-| 11  | Regularne wypuszczanie nowych wersji                                                | w trakcie   |
+| #   | Funkcja                                                             | Status    | Co jest w prototypie                                                                                                                          |
+| --- | ------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Panel rejestracji organizacji i użytkowników                        | gotowe    | konta, organizacje (NIP, adres), osoby w organizacji, projekty z linkiem i PDF                                                                |
+| 2   | Asystent formułowania problematyki badawczej                        | częściowo | AI wnioskuje frazy z opisu projektu (bez czatu z pytaniami pomocniczymi)                                                                      |
+| 3   | Rekomendacje rozbicia problemów na aspekty                          | planowane | brak podziału na aspekty                                                                                                                      |
+| 4   | Rekomendacje rozbicia aspektów na proponowane wyszukania w bazach   | częściowo | 3–5 fraz do wyszukiwania, edytowalne i zatwierdzane przez użytkownika                                                                         |
+| 5   | Moduł dodawania źródeł do wyszukiwań                                | częściowo | agent przeszukuje NCBiR i RAD-on; lista źródeł jest w kodzie, bez modułu w aplikacji                                                          |
+| 6   | Ocena przydatności materiałów w kontekście wyszukiwań               | częściowo | każdy wynik ma uzasadnienie „dlaczego pasuje” (bez oceny punktowej)                                                                           |
+| 7   | Zautomatyzowany raport dla problemu (aspekty, wyszukiwania, źródła) | planowane | brak                                                                                                                                          |
+| 8   | Dzielenie się wynikami z innymi podmiotami i kontakt w konsultacji  | planowane | osoby w organizacji współdzielą projekty, wyniki nie są jeszcze udostępniane                                                                  |
+| 9   | Alerty o nowych materiałach pasujących do zapytania                 | planowane | brak                                                                                                                                          |
+| 10  | Własny zbiór opracowań (zapis analiz AI, bez ponownej weryfikacji)  | częściowo | zatwierdzone wyszukiwania z wynikami zapisują się w historii, a te same frazy dla tego projektu wracają z zapisu (7 dni) bez ponownego kosztu |
+| 11  | Regularne wypuszczanie nowych wersji                                | w trakcie | wdrożenie z gałęzi `main` na Vercel po każdej zmianie                                                                                         |
+
+**Ograniczenia agenta (kontrola kosztów):** model Claude Haiku, do 3 wyszukiwań i 3 wyników na uruchomienie,
+5 uruchomień na 30 minut na użytkownika. Wyniki pochodzą z wyszukiwarki ograniczonej do wskazanych domen,
+a link każdego wyniku pochodzi z faktycznych wyników wyszukiwania. Ocena AI to propozycja, decyduje człowiek.
 
 Szczegóły: [`docs/PROJECT.md`](docs/PROJECT.md), plan agenta wyszukującego: [`docs/AGENT.md`](docs/AGENT.md),
 wytyczne organizatorów: [`docs/CHALLENGE.md`](docs/CHALLENGE.md).
@@ -46,7 +54,7 @@ wytyczne organizatorów: [`docs/CHALLENGE.md`](docs/CHALLENGE.md).
 ## Stack
 
 Next.js 16 (App Router) · Prisma 7 + Neon (Postgres) · Better Auth · Zod 4 · React Hook Form ·
-shadcn (Base UI) · Tailwind 4 · AI SDK (Anthropic) · Cloudflare R2 (pliki PDF) · Vercel.
+shadcn (Base UI) · Tailwind 4 · Claude API (Anthropic, Haiku) · Cloudflare R2 (pliki PDF) · Vercel.
 
 ## Uruchomienie lokalne
 
