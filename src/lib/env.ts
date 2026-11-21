@@ -11,6 +11,8 @@ const envSchema = z.object({
     .url("BETTER_AUTH_URL: pełny adres aplikacji, np. http://localhost:3000"),
   ANTHROPIC_API_KEY: z.string().optional(),
   GROQ_API_KEY: z.string().optional(),
+  // "true" = agent zwraca przykładowych kandydatów bez wywołania API (testy UI za darmo)
+  AGENT_MOCK: z.string().optional(),
   // Cloudflare R2 (pliki PDF przy potrzebach). Opcjonalne: bez nich aplikacja działa, a dodawanie plików jest wyłączone.
   R2_ACCOUNT_ID: z.string().optional(),
   R2_ACCESS_KEY_ID: z.string().optional(),

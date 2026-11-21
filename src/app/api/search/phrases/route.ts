@@ -7,6 +7,10 @@ import { accessibleNeedWhere } from "@/queries/need";
 import { generatePhrasesSchema, phrasesSchema, type Phrases } from "@/validation/search";
 
 const PHRASES_MODEL = "claude-haiku-5-5";
+// Limit generowań na użytkownika w oknie 30 minut (kontrola kosztów API).
+const WINDOW_LIMIT = 20;
+const WINDOW_MINUTES = 30;
+const WINDOW_MS = WINDOW_MINUTES * 60 * 1000;
 const outputSchema = z.object({ phrases: phrasesSchema });
 
 function respond(result: ActionResult<Phrases>, status = 200) {
@@ -32,6 +36,20 @@ export async function POST(request: Request) {
       select: { title: true, description: true, linkUrl: true },
     });
     if (!need) return respond(fail("Nie znaleziono projektu"), 404);
+
+    const used = await db.phraseGeneration.count({
+      where: { userId: session.user.id, createdAt: { gte: new Date(Date.now() - WINDOW_MS) } },
+    });
+    if (used >= WINDOW_LIMIT) {
+      return respond(
+        fail(
+          `Osiągnięto limit generowania fraz (${WINDOW_LIMIT} na ${WINDOW_MINUTES} minut). Spróbuj za chwilę`,
+        ),
+        429,
+      );
+    }
+    // liczymy próbę przed wywołaniem API, żeby szybkie powtórne kliknięcia też się wliczały
+    await db.phraseGeneration.create({ data: { userId: session.user.id } });
 
     // Messages API Anthropic wprost (bez SDK). Wymuszamy narzędzie, żeby dostać JSON zgodny ze schematem.
     const response = await fetch("https://api.anthropic.com/v1/messages", {

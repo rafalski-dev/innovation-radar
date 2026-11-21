@@ -37,6 +37,8 @@ model User {
   businesses          Business[]
   businessMemberships BusinessMember[]
   searches            Search[]
+  phraseGenerations   PhraseGeneration[]
+  agentRuns           AgentRun[]
 }
 
 model Session {
@@ -159,7 +161,15 @@ model BusinessMember {
 model Search {
   id        String   @id @default(cuid())
   query     String
-  phrases   Json? // zatwierdzone frazy (słowa kluczowe PL/EN, zapytania, wykluczenia)
+  phrases   Json? // zatwierdzone frazy: lista 3-5 tekstów (po polsku)
+  status    SearchStatus @default(DRAFT)
+  error     String?
+  phrasesKey String? // hash projektu + fraz: ten sam klucz w ciągu 7 dni = wynik z cache, bez kosztu
+  startedAt DateTime? // ustawiane tylko przy prawdziwym uruchomieniu agenta (limit na użytkownika)
+  webSearches  Int?
+  inputTokens  Int?
+  outputTokens Int?
+  results   SearchResult[]
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   needId    String?
@@ -168,4 +178,47 @@ model Search {
 
   @@index([userId, createdAt])
   @@index([needId])
+}
+
+// Licznik generowań fraz przez AI: służy do limitu na użytkownika (koszt API), nie do historii.
+model PhraseGeneration {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+enum SearchStatus {
+  DRAFT
+  RUNNING
+  DONE
+  FAILED
+}
+
+// Kandydat znaleziony przez agenta (zawsze z linkiem do źródła).
+model SearchResult {
+  id           String @id @default(cuid())
+  searchId     String
+  search       Search @relation(fields: [searchId], references: [id], onDelete: Cascade)
+  position     Int
+  title        String
+  summary      String
+  organization String?
+  sourceName   String
+  sourceUrl    String
+  why          String
+
+  @@index([searchId])
+}
+
+// Licznik uruchomień agenta (limit na użytkownika; sam wynik zapisuje się dopiero po zatwierdzeniu).
+model AgentRun {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }

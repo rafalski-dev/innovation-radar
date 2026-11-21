@@ -12,3 +12,16 @@ export async function getMySearches() {
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
 }
+
+// Jedno wyszukiwanie zalogowanego użytkownika razem z wynikami agenta.
+export async function getSearch(id: string) {
+  await connection();
+  const session = await requireSession();
+  return db.search.findFirst({
+    where: { id, userId: session.user.id },
+    include: {
+      need: { select: { id: true, title: true, business: { select: { name: true } } } },
+      results: { orderBy: { position: "asc" } },
+    },
+  });
+}

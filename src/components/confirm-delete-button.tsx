@@ -19,9 +19,11 @@ import type { ActionResult } from "@/lib/action-result";
 type ConfirmDeleteButtonProps = {
   itemName: string;
   onConfirm: () => Promise<ActionResult>;
+  // ikona przycisku (domyślnie kosz)
+  icon?: React.ReactNode;
 };
 
-export function ConfirmDeleteButton({ itemName, onConfirm }: ConfirmDeleteButtonProps) {
+export function ConfirmDeleteButton({ itemName, onConfirm, icon }: ConfirmDeleteButtonProps) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -40,7 +42,7 @@ export function ConfirmDeleteButton({ itemName, onConfirm }: ConfirmDeleteButton
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button variant="ghost" size="icon-sm" />}>
-        <Trash2Icon />
+        {icon ?? <Trash2Icon />}
         <span className="sr-only">Usuń</span>
       </DialogTrigger>
       <DialogContent>
