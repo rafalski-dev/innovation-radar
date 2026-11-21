@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/shadcn/button";
-import { Textarea } from "@/components/shadcn/textarea";
+import { createSearch } from "@/actions/search";
 import { FormField } from "@/components/form-field";
+import { Button } from "@/components/shadcn/button";
+import { searchSchema } from "@/validation/search";
 
 export type SearchNeedOption = {
   id: string;
@@ -14,9 +16,10 @@ export type SearchNeedOption = {
   businessName: string;
 };
 
-// Formularz wyszukiwania: wybór projektu (opcjonalny) + opis tego, czego szukamy.
-// Agent AI dopiero powstaje, więc na razie formularz nie wysyła zapytania.
+// Formularz nowego wyszukiwania: wybór projektu (opcjonalny) + opis tego, czego szukamy.
 export function SearchForm({ needs }: { needs: SearchNeedOption[] }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
   const [needId, setNeedId] = useState("");
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string>();
@@ -29,18 +32,28 @@ export function SearchForm({ needs }: { needs: SearchNeedOption[] }) {
 
   function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (query.trim().length < 10) {
-      setError("Opisz, czego szukasz (min. 10 znaków)");
+    const input = { query, needId };
+    const parsed = searchSchema.safeParse(input);
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message);
       return;
     }
     setError(undefined);
-    toast.info("Agent wyszukiwania jest w budowie. Zapytanie nie zostało jeszcze wysłane.");
+    startTransition(async () => {
+      const result = await createSearch(input);
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Zapisano wyszukiwanie");
+      router.push("/dashboard/search");
+    });
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       {needs.length > 0 && (
-        <FormField label="Projekt (opcjonalnie)">
+        <FormField label="Projekt (opcjonalnie)" error={error}>
           <div className="grid gap-2 sm:grid-cols-2">
             {needs.map((n) => (
               <label
@@ -63,18 +76,9 @@ export function SearchForm({ needs }: { needs: SearchNeedOption[] }) {
           </div>
         </FormField>
       )}
-      <FormField label="Czego szukasz?" htmlFor="query" error={error}>
-        <Textarea
-          id="query"
-          rows={6}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Opisz problem i oczekiwany efekt, np. „Szukamy technologii obniżającej zużycie energii w chłodniach”."
-        />
-      </FormField>
-      <Button type="submit">
+      <Button type="submit" disabled={pending}>
         <SearchIcon />
-        Szukaj
+        {pending ? "Zapisywanie…" : "Szukaj"}
       </Button>
     </form>
   );

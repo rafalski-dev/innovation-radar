@@ -5,6 +5,7 @@ Next.js 16 App Router · Prisma 7 + Neon · Zod 4 · React Hook Form · shadcn (
 ## Zanim zaczniesz zadanie
 
 1. Przeczytaj `docs/PROJECT.md`: cel projektu, encje, strony. To jest źródło prawdy o domenie.
+   - Wytyczne organizatorów hackathonu (wyzwanie, wymagania, scenariusz demo, kryteria oceny): `docs/CHALLENGE.md` (oryginał: `docs/challenge.pdf`). Decyzje produktowe sprawdzaj z nimi.
 2. Encja wzorcowa to `item` (neutralny przykład, nie część domeny). Nową encję buduj, kopiując jej pliki (komenda `/new-feature <encja>`).
 3. Czytaj tylko pliki potrzebne do zadania, nie cały projekt.
 

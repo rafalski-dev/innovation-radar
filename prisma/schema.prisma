@@ -36,6 +36,7 @@ model User {
   accounts            Account[]
   businesses          Business[]
   businessMemberships BusinessMember[]
+  searches            Search[]
 }
 
 model Session {
@@ -109,16 +110,17 @@ model Business {
 // Projekt należy do biznesu: tytuł + opis (na razie jedno pole). Podstawa zapytań do agenta.
 
 model Need {
-  id              String    @id @default(cuid())
+  id              String     @id @default(cuid())
   title           String
   expectedOutcome String? // wycofane z formularza (na razie jeden opis); stare wpisy zachowują wartość
   description     String
   linkUrl         String? // opcjonalny link do materiałów (strona, artykuł, specyfikacja)
   files           NeedFile[]
+  searches        Search[]
   businessId      String
-  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  business        Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   @@index([businessId])
 }
@@ -148,4 +150,21 @@ model BusinessMember {
 
   @@id([businessId, userId])
   @@index([userId])
+}
+
+// ---------- Wyszukiwania ----------
+// Historia zapytań użytkownika do agenta. Projekt jest opcjonalny (po jego usunięciu wpis zostaje).
+// Wyniki agenta dojdą w osobnej tabeli, gdy agent powstanie.
+
+model Search {
+  id        String   @id @default(cuid())
+  query     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  needId    String?
+  need      Need?    @relation(fields: [needId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([needId])
 }

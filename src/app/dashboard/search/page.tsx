@@ -1,33 +1,51 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { BuildingIcon, PlusIcon } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
-import { SearchForm } from "@/components/search/search-form";
-import { getMyNeeds } from "@/queries/need";
+import { buttonVariants } from "@/components/shadcn/button";
+import { getMySearches } from "@/queries/search";
 
-export const metadata: Metadata = { title: "Wyszukiwanie" };
+export const metadata: Metadata = { title: "Wyszukiwania" };
 
-export default async function SearchPage() {
-  const needs = await getMyNeeds();
+const dateFormat = new Intl.DateTimeFormat("pl-PL", { dateStyle: "medium", timeStyle: "short" });
+
+export default async function SearchesPage() {
+  const searches = await getMySearches();
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
       <PageHeader
-        title="Wyszukiwanie"
-        description="Opisz, czego szukasz. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
+        title="Wyszukiwania"
+        description="Historia Twoich wyszukiwań. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
+        action={
+          <Link href="/dashboard/search/new" className={buttonVariants()}>
+            <PlusIcon />
+            Nowe wyszukiwanie
+          </Link>
+        }
       />
-      <SearchForm
-        needs={needs.map((n) => ({
-          id: n.id,
-          title: n.title,
-          description: n.description,
-          businessName: n.business.name,
-        }))}
-      />
-      <section className="space-y-2">
-        <h2 className="text-lg font-medium">Wyniki</h2>
+      {searches.length === 0 ? (
         <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-          Tu pojawią się dopasowane wyniki z uzasadnieniem i historia Twoich wyszukiwań.
+          Nie masz jeszcze żadnego wyszukiwania. Dodaj pierwsze przyciskiem „Nowe wyszukiwanie”.
         </p>
-      </section>
+      ) : (
+        <ul className="grid gap-3">
+          {searches.map((s) => (
+            <li key={s.id} className="space-y-1 rounded-lg border p-4">
+              <p className="line-clamp-3 text-sm">{s.query}</p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <time dateTime={s.createdAt.toISOString()}>{dateFormat.format(s.createdAt)}</time>
+                {s.need && (
+                  <span className="inline-flex items-center gap-1">
+                    <BuildingIcon className="size-3" />
+                    {s.need.title} · {s.need.business.name}
+                  </span>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
