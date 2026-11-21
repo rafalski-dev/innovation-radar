@@ -18,7 +18,7 @@ export function RegisterForm() {
   const [pending, startTransition] = useTransition();
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { firstName: "", lastName: "", email: "", password: "" },
+    defaultValues: { firstName: "", lastName: "", email: "", password: "", confirmPassword: "" },
   });
   const { errors } = form.formState;
 
@@ -84,6 +84,19 @@ export function RegisterForm() {
           autoComplete="new-password"
           aria-invalid={!!errors.password}
           {...form.register("password")}
+        />
+      </FormField>
+      <FormField
+        label="Powtórz hasło"
+        htmlFor="confirmPassword"
+        error={errors.confirmPassword?.message}
+      >
+        <PasswordInput
+          id="confirmPassword"
+          placeholder="Powtórz hasło"
+          autoComplete="new-password"
+          aria-invalid={!!errors.confirmPassword}
+          {...form.register("confirmPassword")}
         />
       </FormField>
       <Button type="submit" disabled={pending}>
