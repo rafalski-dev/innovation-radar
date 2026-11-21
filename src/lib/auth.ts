@@ -1,4 +1,4 @@
-import { APIError, betterAuth } from "better-auth";
+import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "@/lib/db";
@@ -11,33 +11,18 @@ export const auth = betterAuth({
   emailAndPassword: { enabled: true, minPasswordLength: 8 },
   user: {
     additionalFields: {
-      // Rola wybierana przy rejestracji (prototyp: bez weryfikacji urzędników i firm).
-      role: { type: "string", required: false, defaultValue: "USER", input: true },
-      organization: { type: "string", required: false, input: true },
-      position: { type: "string", required: false, input: true },
-      interests: { type: "string", required: false, input: true },
+      // Rola nadawana tylko przez serwer (domyślnie USER); klient nie może jej ustawić.
+      // Role administracyjne będą nadawane w panelu administracji.
+      role: { type: "string", required: false, defaultValue: "USER", input: false },
+      firstName: { type: "string", required: false, input: true },
+      lastName: { type: "string", required: false, input: true },
     },
   },
   databaseHooks: {
     user: {
       update: {
-        // roli nie zmienia się przez updateUser (inaczej każdy mógłby się „awansować”)
+        // roli nie zmienia się przez updateUser
         before: async (data) => ({ data: { ...data, role: undefined } }),
-      },
-      create: {
-        // Walidacja po stronie serwera: pola wymagane zależą od roli.
-        before: async (user) => {
-          const u = user as { role?: string; organization?: string; position?: string };
-          if (u.role && !["USER", "OFFICIAL", "BUSINESS"].includes(u.role)) {
-            throw new APIError("BAD_REQUEST", { message: "Niepoprawna rola" });
-          }
-          if (u.role === "OFFICIAL" && (!u.organization?.trim() || !u.position?.trim())) {
-            throw new APIError("BAD_REQUEST", { message: "Podaj instytucję i stanowisko" });
-          }
-          if (u.role === "BUSINESS" && !u.organization?.trim()) {
-            throw new APIError("BAD_REQUEST", { message: "Podaj nazwę firmy" });
-          }
-        },
       },
     },
   },

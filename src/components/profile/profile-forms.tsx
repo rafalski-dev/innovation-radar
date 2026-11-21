@@ -9,9 +9,7 @@ import { PasswordInput } from "@/components/auth/password-input";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
-import { Textarea } from "@/components/shadcn/textarea";
 import { authClient } from "@/lib/auth-client";
-import type { UserRole } from "@/validation/auth";
 import {
   type PasswordInput as PasswordValues,
   type ProfileInput,
@@ -19,13 +17,7 @@ import {
   profileSchema,
 } from "@/validation/profile";
 
-export function ProfileForm({
-  role,
-  defaultValues,
-}: {
-  role: UserRole;
-  defaultValues: ProfileInput;
-}) {
+export function ProfileForm({ defaultValues }: { defaultValues: ProfileInput }) {
   const [pending, startTransition] = useTransition();
   const form = useForm<ProfileInput>({ resolver: zodResolver(profileSchema), defaultValues });
   const { errors } = form.formState;
@@ -40,28 +32,14 @@ export function ProfileForm({
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="grid max-w-md gap-4">
-      <FormField label="Imię" htmlFor="p-name" error={errors.name?.message}>
-        <Input id="p-name" aria-invalid={!!errors.name} {...form.register("name")} />
-      </FormField>
-      {role !== "USER" && (
-        <FormField
-          label={role === "OFFICIAL" ? "Instytucja / urząd" : "Nazwa firmy"}
-          htmlFor="p-org"
-          error={errors.organization?.message}
-        >
-          <Input id="p-org" {...form.register("organization")} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FormField label="Imię" htmlFor="p-first" error={errors.firstName?.message}>
+          <Input id="p-first" aria-invalid={!!errors.firstName} {...form.register("firstName")} />
         </FormField>
-      )}
-      {role === "OFFICIAL" && (
-        <FormField label="Stanowisko" htmlFor="p-pos" error={errors.position?.message}>
-          <Input id="p-pos" {...form.register("position")} />
+        <FormField label="Nazwisko" htmlFor="p-last" error={errors.lastName?.message}>
+          <Input id="p-last" aria-invalid={!!errors.lastName} {...form.register("lastName")} />
         </FormField>
-      )}
-      {role === "BUSINESS" && (
-        <FormField label="Czego szukasz?" htmlFor="p-int" error={errors.interests?.message}>
-          <Textarea id="p-int" rows={3} {...form.register("interests")} />
-        </FormField>
-      )}
+      </div>
       <Button type="submit" disabled={pending} className="justify-self-start">
         {pending ? "Zapisywanie…" : "Zapisz profil"}
       </Button>

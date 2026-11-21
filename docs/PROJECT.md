@@ -5,6 +5,37 @@
 > Szkic przygotowany na podstawie wytycznych. Pozycje oznaczone **(propozycja)** czekają na decyzję
 > zespołu (patrz sekcja 7).
 
+## ZMIANA KONCEPCJI (listopad 2026)
+
+Ta sekcja ma pierwszeństwo przed opisem niżej (część treści poniżej jest nieaktualna).
+
+- Zostaje **jedna rola: użytkownik** (firma lub osoba szukająca rozwiązań). Panele urzędnika i biznesu
+  są usunięte. Konto: imię, nazwisko, e-mail, hasło. Rola `USER` nadawana przez serwer; role
+  administracyjne dojdą w **panelu administracji** (jeszcze nie zrobiony).
+- Platforma **nie przeszukuje pomysłów dodanych przez użytkowników**. Wyszukiwanie robi **agent AI**
+  (do zbudowania), który agreguje dane z zewnętrznych źródeł: UPRP, EPO, PBN/PPM/BazTech,
+  Interreg, NCBiR (patrz `CHALLENGE.md`, sekcja 7).
+- Landing page jest kierowany do firm szukających nowych rozwiązań.
+
+Docelowy przepływ użytkownika (Grażynka z Januszex):
+
+1. Załóż konto.
+2. Powiąż z organizacją / załóż organizację / zostaw indywidualnie.
+3. Opisz oczekiwany efekt.
+4. Opisz zapotrzebowanie.
+5. Czat z pytaniami pomocniczymi do opisu.
+6. Dopasowane wyniki z uzasadnieniem (historia wyszukiwania zapamiętana).
+7. Dodaj wynik do list tematycznych (ulubione / konkretne projekty).
+8. Skontaktuj się z wpisem.
+9. Oceń kontakt (feedback: prośba po dniu, a jeśli brak, po miesiącu).
+10. Wygeneruj raport z listy tematycznej.
+
+Zrobione: kroki 1 (konto) i landing. Dalej: organizacje (2), opis potrzeby i czat (3-5), agent i
+wyniki (6), listy (7), kontakt i feedback (8-9), raport (10), panel administracji.
+Usunięte: tickety `Innovation`, zespoły, tablica i panele ról (tabele skasowane z bazy). W bazie
+zostają pola `organization`, `position`, `interests` oraz enum ról na później.
+Obecny `/dashboard` to tylko panel powitalny i profil (imię, nazwisko, zmiana hasła).
+
 ## 1. Cel
 
 Platforma, która prowadzi innowację z instytucji publicznej (szkoła, uczelnia, samorząd) przez cały
@@ -78,6 +109,9 @@ Górny nagłówek zostaje na linki publiczne, konto i wylogowanie.
 | Profil          | `/dashboard/profile` | wszyscy  | edycja danych, zmiana hasła                         |
 | Do oceny        | `/dashboard/review`  | OFFICIAL | później                                             |
 | Zapotrzebowania | `/dashboard/needs`   | BUSINESS | później                                             |
+
+Formularze tworzenia i edycji to osobne strony (nie dialogi): `/dashboard/ideas/new`,
+`/dashboard/ideas/[number]/edit`, `/dashboard/teams/new`. Usuwanie zostaje potwierdzeniem w oknie.
 
 Decyzje (propozycje, do zmiany): zespół = współautorzy pomysłu (nie instytucja); jest właściciel
 i członkowie; zespół widzi i edytuje wspólnie pomysły przypisane do zespołu; pomysł można

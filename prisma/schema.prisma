@@ -21,6 +21,8 @@ enum UserRole {
 model User {
   id            String       @id
   name          String
+  firstName     String?
+  lastName      String?
   email         String       @unique
   emailVerified Boolean      @default(false)
   image         String?
@@ -32,9 +34,6 @@ model User {
   updatedAt     DateTime     @updatedAt
   sessions      Session[]
   accounts      Account[]
-  innovations   Innovation[]
-  ownedTeams    Team[]
-  memberships   TeamMember[]
 }
 
 model Session {
@@ -79,98 +78,4 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@index([identifier])
-}
-
-// ---------- Innovation ----------
-
-enum InnovationType {
-  TECHNOLOGICAL
-  ORGANIZATIONAL
-  EDUCATIONAL
-  SOCIAL
-  PROCESS
-}
-
-enum InnovationStage {
-  IDEA
-  PROTOTYPE
-  PILOT
-  IMPLEMENTED
-  SCALED
-}
-
-enum InnovationSector {
-  EDUCATION
-  HEALTH_QUALITY_OF_LIFE
-  ICT
-  MOBILITY
-  AEROSPACE
-  ENVIRONMENT
-  ADMINISTRATION
-  OTHER
-}
-
-enum InnovationStatus {
-  SUBMITTED
-  ASSESSED
-  RECOMMENDED
-  MATCHED
-  ARCHIVED
-}
-
-enum InnovationSource {
-  MANUAL
-  AI_EXTRACTED
-  IMPORTED
-}
-
-model Innovation {
-  id           String            @id @default(cuid())
-  number       Int               @unique @default(autoincrement())
-  title        String
-  summary      String
-  problem      String
-  solution     String
-  type         InnovationType
-  stage        InnovationStage
-  sector       InnovationSector?
-  status       InnovationStatus  @default(SUBMITTED)
-  source       InnovationSource  @default(MANUAL)
-  sourceUrl    String?
-  creators     String?
-  contactEmail String?
-  authorId     String
-  author       User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  teamId       String?
-  team         Team?             @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-
-  @@index([authorId])
-  @@index([teamId])
-  @@index([status])
-}
-
-// ---------- Zespoły ----------
-
-model Team {
-  id          String       @id @default(cuid())
-  name        String
-  ownerId     String
-  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  members     TeamMember[]
-  innovations Innovation[]
-  createdAt   DateTime     @default(now())
-}
-
-// Właściciel też ma wpis członka, dzięki temu "moje zespoły" to jedno zapytanie.
-model TeamMember {
-  teamId    String
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@id([teamId, userId])
-  @@index([userId])
 }

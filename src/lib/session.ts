@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import type { UserRole } from "@/validation/auth";
 
 export async function getSession() {
   return auth.api.getSession({ headers: await headers() });
@@ -10,5 +11,13 @@ export async function getSession() {
 export async function requireSession() {
   const session = await getSession();
   if (!session) redirect("/login");
+  return session;
+}
+
+// Dla stron i akcji ograniczonych do roli. Nieuprawnionych odsyła na tablicę.
+export async function requireRole(...roles: UserRole[]) {
+  const session = await requireSession();
+  const role = ((session.user as { role?: string }).role ?? "USER") as UserRole;
+  if (!roles.includes(role)) redirect("/dashboard");
   return session;
 }

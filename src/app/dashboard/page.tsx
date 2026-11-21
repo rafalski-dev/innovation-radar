@@ -1,35 +1,21 @@
 import type { Metadata } from "next";
-import { PlusIcon } from "lucide-react";
-import { InnovationBoard } from "@/components/innovation/innovation-board";
-import { InnovationForm } from "@/components/innovation/innovation-form";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/shadcn/button";
-import { getInnovations } from "@/queries/innovation";
-import { getMyTeams } from "@/queries/team";
+import { requireSession } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Dashboard" };
+export const metadata: Metadata = { title: "Panel" };
 
 export default async function DashboardPage() {
-  const [innovations, teams] = await Promise.all([getInnovations(), getMyTeams()]); // sprawdza sesję (redirect do /login)
+  const session = await requireSession();
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dashboard"
-        description="Twoje zgłoszone pomysły według etapu procesu."
-        action={
-          <InnovationForm
-            teams={teams}
-            trigger={
-              <Button>
-                <PlusIcon />
-                Nowy pomysł
-              </Button>
-            }
-          />
-        }
+        title={`Cześć, ${session.user.name}`}
+        description="Tu pojawi się opis Twojego zapotrzebowania, wyniki wyszukiwania i listy tematyczne."
       />
-      <InnovationBoard innovations={innovations} />
+      <p className="rounded-lg border border-dashed py-12 text-center text-sm text-muted-foreground">
+        Wyszukiwanie innowacji jest w przygotowaniu.
+      </p>
     </div>
   );
 }

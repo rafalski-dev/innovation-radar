@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/page-header";
 import { PasswordForm, ProfileForm } from "@/components/profile/profile-forms";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
-import { userRoleLabels } from "@/validation/auth";
 
 export const metadata: Metadata = { title: "Profil" };
 
@@ -15,19 +14,14 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title="Profil"
-        description={`${user.email} · rola: ${userRoleLabels[user.role]}`}
-      />
+      <PageHeader title="Profil" description={user.email} />
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground">Dane</h2>
         <ProfileForm
-          role={user.role}
           defaultValues={{
-            name: user.name,
-            organization: user.organization ?? "",
-            position: user.position ?? "",
-            interests: user.interests ?? "",
+            // starsze konta nie mają osobnych pól: dzielimy zapisane imię i nazwisko
+            firstName: user.firstName ?? user.name.split(" ")[0] ?? "",
+            lastName: user.lastName ?? user.name.split(" ").slice(1).join(" "),
           }}
         />
       </section>

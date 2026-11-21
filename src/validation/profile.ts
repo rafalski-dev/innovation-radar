@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 export const profileSchema = z.object({
-  name: z.string().trim().min(2, "Imię musi mieć co najmniej 2 znaki").max(100),
-  organization: z.string().trim().max(150),
-  position: z.string().trim().max(100),
-  interests: z.string().trim().max(1000),
+  firstName: z.string().trim().min(2, "Imię musi mieć co najmniej 2 znaki").max(50),
+  lastName: z.string().trim().min(2, "Nazwisko musi mieć co najmniej 2 znaki").max(50),
 });
 export type ProfileInput = z.infer<typeof profileSchema>;
 

@@ -13,25 +13,11 @@ export async function updateProfile(input: ProfileInput): Promise<ActionResult> 
   const parsed = profileSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
 
-  const user = await db.user.findUnique({ where: { id: session.user.id } });
-  if (!user) return fail("Nie znaleziono konta");
-
-  // pola zależne od roli (jak przy rejestracji); roli nie da się tu zmienić
-  const { name, organization, position, interests } = parsed.data;
-  if (user.role === "OFFICIAL" && (!organization || !position)) {
-    return fail("Podaj instytucję i stanowisko");
-  }
-  if (user.role === "BUSINESS" && !organization) return fail("Podaj nazwę firmy");
-
+  const { firstName, lastName } = parsed.data;
   try {
     await db.user.update({
-      where: { id: user.id },
-      data: {
-        name,
-        organization: user.role === "USER" ? null : organization || null,
-        position: user.role === "OFFICIAL" ? position || null : null,
-        interests: user.role === "BUSINESS" ? interests || null : null,
-      },
+      where: { id: session.user.id },
+      data: { name: `${firstName} ${lastName}`, firstName, lastName },
     });
     revalidatePath("/", "layout");
     return ok();
