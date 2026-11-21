@@ -159,6 +159,7 @@ model BusinessMember {
 model Search {
   id        String   @id @default(cuid())
   query     String
+  phrases   Json? // zatwierdzone frazy (słowa kluczowe PL/EN, zapytania, wykluczenia)
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   needId    String?

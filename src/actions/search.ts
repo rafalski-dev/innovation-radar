@@ -27,6 +27,7 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
       data: {
         query: parsed.data.query,
         needId: parsed.data.needId || null,
+        phrases: parsed.data.phrases,
         userId: session.user.id,
       },
       select: { id: true },
