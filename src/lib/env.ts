@@ -11,7 +11,10 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  throw new Error(`Niepoprawne zmienne środowiskowe (.env):\n${z.prettifyError(parsed.error)}`);
+  throw new Error(
+    "Niepoprawne zmienne środowiskowe (lokalnie: plik .env, na Vercelu: Settings → Environment Variables):\n" +
+      z.prettifyError(parsed.error),
+  );
 }
 
 export const env = parsed.data;

@@ -16,6 +16,17 @@ a encja `item` to tylko przykład wzorca CRUD.
 4. (Opcjonalnie) dane testowe: `npm run db:seed`
 5. Start: `npm run dev` → http://localhost:3000
 
+## Deploy na Vercel
+
+Plik `.env` nie trafia do repo, więc zmienne trzeba ustawić w Vercelu, inaczej build się zatrzyma
+z błędem `Niepoprawne zmienne środowiskowe`.
+
+1. Vercel → projekt → **Settings → Environment Variables**: dodaj `DATABASE_URL`
+   (oraz `ANTHROPIC_API_KEY` / `GROQ_API_KEY`, jeśli używasz AI) dla środowisk Production i Preview.
+   Alternatywa: integracja Neon w zakładce **Storage** ustawia `DATABASE_URL` automatycznie.
+2. **Deployments → ⋯ → Redeploy** (zmienne działają dopiero w nowym buildzie).
+3. Schemat bazy wysyłasz lokalnie (`npm run db:push`); Vercel go nie zmienia.
+
 ## Nowy projekt z tego startera
 
 1. Skopiuj repo (albo oznacz je na GitHubie jako _Template repository_).
@@ -43,4 +54,5 @@ a encja `item` to tylko przykład wzorca CRUD.
 ## Struktura
 
 Zasady i struktura plików dla Claude: [`CLAUDE.md`](CLAUDE.md).
+
 # innovation-radar
