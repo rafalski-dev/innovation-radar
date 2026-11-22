@@ -1,49 +1,146 @@
-# 📡 Radar innowacji
+<div align="center">
 
-Radar innowacji to platforma dla firm i instytucji, które szukają gotowych rozwiązań i partnerów dla swoich problemów. Powstała jako prototyp hackathonowy PCI. Użytkownik opisuje problem, AI proponuje frazy do wyszukiwarki, a agent przeszukuje publiczne bazy (obecnie NCBiR i RAD-on) i pokazuje listę wyników z uzasadnieniem dopasowania, oceną gotowości technologicznej (TRL) i linkiem do źródła.
+<img src="docs/screenshots/01-home-hero.jpg" alt="Horyzont innowacji: strona główna" width="100%" />
 
-🔗 **Podgląd na żywo:** https://innovation-radar-three.vercel.app/
+# 📡 Horyzont innowacji
 
-## 🛠️ Stack technologiczny
+**Transfer innowacji dla każdego.**
 
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/Neon_Postgres-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![React Hook Form](https://img.shields.io/badge/React_Hook_Form-EC5990?style=for-the-badge&logo=reacthookform&logoColor=white)
-![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)
-![Anthropic](https://img.shields.io/badge/Claude_API-D97757?style=for-the-badge&logo=anthropic&logoColor=white)
-![Cloudflare](https://img.shields.io/badge/Cloudflare_R2-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+Znajdź gotową innowację, zanim zbudujesz ją od zera.
 
-| Warstwa                    | Technologie                                      |
-| -------------------------- | ------------------------------------------------ |
-| **Framework**              | Next.js 16 (App Router), React 19, TypeScript    |
-| **Style i komponenty**     | Tailwind CSS 4, shadcn (Base UI), Lucide         |
-| **Baza danych**            | Prisma 7 + Neon (PostgreSQL)                     |
-| **Uwierzytelnianie**       | Better Auth (e-mail i hasło, weryfikacja adresu) |
-| **Formularze i walidacja** | React Hook Form + Zod 4                          |
-| **AI i agent**             | Claude API (Haiku) z narzędziem `web_search`     |
-| **Pliki**                  | Cloudflare R2 (PDF, podpisane adresy)            |
-| **E-mail**                 | Resend                                           |
-| **Narzędzia**              | React Compiler, ESLint, Prettier                 |
-| **Hosting**                | Vercel                                           |
+Agent AI przeszukuje publiczne bazy patentów, publikacji i projektów badawczych, a Ty dostajesz dopasowane wyniki z uzasadnieniem, oceną gotowości technologicznej (TRL) i linkiem do źródła.
+
+[![Demo na żywo](https://img.shields.io/badge/Demo_na_żywo-innovation--radar--three.vercel.app-e8470f?style=for-the-badge&logo=vercel&logoColor=white)](https://innovation-radar-three.vercel.app/)
+
+![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=flat-square&logo=prisma&logoColor=white)
+![Neon](https://img.shields.io/badge/Neon_Postgres-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Claude API](https://img.shields.io/badge/Claude_API-D97757?style=flat-square&logo=anthropic&logoColor=white)
+![Cloudflare R2](https://img.shields.io/badge/Cloudflare_R2-F38020?style=flat-square&logo=cloudflare&logoColor=white)
+
+[Problem](#-problem-i-pomysł) · [Jak to działa](#-jak-to-działa) · [Zrzuty ekranu](#-zrzuty-ekranu) · [Funkcje](#-funkcje) · [Dostępność](#-dostępność) · [Studium przypadku](#-studium-przypadku) · [Dla jury](#-dla-jury-jak-wypróbować) · [Uruchomienie](#️-uruchomienie-lokalne)
+
+</div>
+
+---
+
+## 🎯 Problem i pomysł
+
+Rozwiązanie często **już istnieje**, tylko leży w bazie, której nikt nie przeszukał. Firmy budują od zera rzeczy, które od lat opisują projekty NCBiR, publikacje naukowe czy patenty. Horyzont robi to przeszukiwanie za nich, a **człowiek decyduje**, co zostaje.
+
+Horyzont innowacji powstał jako prototyp na **HackNation 2026 w Bydgoszczy** z inicjatywy [Podkarpackiego Centrum Innowacji](https://pcinn.org/). Użytkownik opisuje swój problem, AI proponuje frazy do wyszukiwarki, a agent przeszukuje wybrane publiczne bazy (NCBiR, RAD-on, Mapa Dotacji UE, Interreg) i pokazuje wyniki, które można zebrać w raport dla zespołu.
+
+## 🧭 Jak to działa
+
+Praca jest uporządkowana w pięciu poziomach. Wielu użytkowników może współtworzyć jeden projekt, dodając do niego własne aspekty.
+
+```mermaid
+flowchart LR
+    O["🏢 Organizacje<br/><sub>wiele, z osobami</sub>"] --> P["📁 Projekty<br/><sub>wiele w organizacji</sub>"]
+    P --> A["🧩 Aspekty<br/><sub>wycinki problemu</sub>"]
+    A --> S["🔎 Wyszukiwania<br/><sub>wyniki z TRL i źródłem</sub>"]
+    S --> R["📄 Raport PDF<br/><sub>dla całego zespołu</sub>"]
+```
+
+1. **Opisz projekt.** Tytuł, opis, do 3 linków i do 3 plików PDF. AI proponuje uzupełnienia opisu.
+2. **Zatwierdź frazy.** AI proponuje 3–5 fraz dla danego aspektu. Poprawiasz je, usuwasz, dodajesz własne i dopiero potem zatwierdzasz.
+3. **Wybierz źródła.** Do dwóch baz na aspekt i liczba wyników. Agent szuka tylko tam, gdzie mu pozwolisz.
+4. **Oceń wyniki.** Każdy wynik ma opis, uzasadnienie „dlaczego pasuje”, link do źródła i poziom TRL. Odznaczasz nieadekwatne i zatwierdzasz.
+5. **Pobierz raport.** Zbiorcze opracowanie projektu w PDF z rekomendowanym następnym krokiem. Możesz też wysłać je całej organizacji.
+
+### Skala TRL
+
+Każdy wynik dostaje ocenę gotowości technologicznej, więc od razu widać, co można wdrożyć, a co rozwijać z partnerem naukowym. Wynik, którego nie da się ocenić ze źródła, liczymy jako TRL 2 i zaznaczamy to w raporcie.
+
+| Grupa            | Poziomy | Znaczenie                                                 |
+| ---------------- | ------- | --------------------------------------------------------- |
+| 🔬 **Badania**   | TRL 1–3 | od obserwacji zjawiska po dowód słuszności koncepcji      |
+| 🛠️ **Prototyp**  | TRL 4–6 | walidacja w laboratorium i demonstracja prototypu         |
+| 🚀 **Wdrożenie** | TRL 7–9 | prototyp w warunkach rzeczywistych, system w eksploatacji |
+
+## 🖼️ Zrzuty ekranu
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/02-home-platform.jpg" alt="Platforma: ocena TRL, frazy, źródła, raport" /></td>
+    <td width="50%"><img src="docs/screenshots/03-home-structure.jpg" alt="Struktura: od organizacji do raportu" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Platforma</b>: ocena TRL, frazy pod kontrolą, źródła i raport</sub></td>
+    <td align="center"><sub><b>Struktura</b>: od organizacji do raportu i przewodnik w pięciu krokach</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/04-home-articles.jpg" alt="Artykuły i FAQ" /></td>
+    <td width="50%"><img src="docs/screenshots/06-article.jpg" alt="Artykuł o finansowaniu innowacji" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Wiedza</b>: artykuły AI i najczęstsze pytania</sub></td>
+    <td align="center"><sub><b>Artykuł</b> z modułem udostępniania w social mediach</sub></td>
+  </tr>
+</table>
+
+### Wersja mobilna
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/screenshots/08-mobile-home.jpg" alt="Strona główna na telefonie" /></td>
+    <td width="33%"><img src="docs/screenshots/09-mobile-menu.jpg" alt="Menu hamburger na telefonie" /></td>
+    <td width="33%"><img src="docs/screenshots/07-login.jpg" alt="Logowanie" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Strona główna</sub></td>
+    <td align="center"><sub>Menu hamburger z ułatwieniami dostępu</sub></td>
+    <td align="center"><sub>Logowanie</sub></td>
+  </tr>
+</table>
 
 ## ✨ Funkcje
 
-- 🏢 **Organizacje i osoby** — konta, organizacje (NIP, adres, branża), dodawanie osób z istniejącymi kontami, role administratora i członka
-- 📁 **Projekty** — opis problemu firmy, do 3 linków i do 3 plików PDF (po 20 MB), numeracja projektów, duplikowanie
-- ✍️ **Asystent opisu** — AI proponuje uzupełnienia opisu projektu, a użytkownik dodaje wybrane jednym kliknięciem
-- 🔤 **Generowanie fraz** — 3–5 fraz do wyszukiwarki po polsku, edytowalnych i zatwierdzanych przez człowieka
-- 🤖 **Agent wyszukujący** — przeszukuje wybrane źródła i zwraca wyniki z uzasadnieniem, oceną TRL i linkiem pochodzącym z faktycznych wyników wyszukiwania
-- ➕ **„Znajdź więcej” i filtry** — wybór liczby wyników i źródeł, dokładanie kolejnych materiałów bez powtórzeń
-- 🗂️ **Aspekty i historia** — zatwierdzone wyszukiwania zapisują się razem z frazami; te same frazy w ciągu 7 dni wracają z zapisu bez kosztu
-- 📊 **Raport projektu** — zbiorcze opracowanie do druku lub PDF, wysyłane e-mailem do członków organizacji (po wysłaniu projekt jest zamknięty do edycji)
-- 🛡️ **Panel administratora** — źródła wyszukiwania, czarne listy (e-maile i tematy), limity i dodatkowe wytyczne dla AI
-- 💸 **Kontrola kosztów** — limity uruchomień agenta i generowań na użytkownika oraz tryb testowy `AGENT_MOCK`
-- 📱 **Responsywny interfejs** — jasny i ciemny motyw, strona główna z animowanym radarem
+**Praca nad projektem**
+
+- 🏢 **Organizacje i osoby**: wiele organizacji (NIP, adres, branża), dodawanie osób z istniejącymi kontami, role administratora i członka. NIP jest unikalny i po utworzeniu nie podlega edycji, a przy duplikacie aplikacja pokazuje e-mail administratora istniejącej organizacji.
+- 📊 **Statystyki aktywności**: na stronie organizacji widać, ile projektów i aspektów dodała każda osoba.
+- 📁 **Projekty**: opis problemu, do 3 linków i do 3 plików PDF (po 20 MB), numeracja, duplikowanie i filtrowanie listy (szukanie, organizacja, status udostępnienia). Karta pokazuje autora, autorów aspektów, użyte bazy i rozpiętość TRL.
+- ✍️ **Asystent opisu**: AI proponuje uzupełnienia, a użytkownik dodaje wybrane jednym kliknięciem.
+- 🧩 **Aspekty**: lista z frazami, użytymi bazami, liczbą wyszukiwań, rozpiętością TRL i autorem, z filtrem zakresu TRL. Cudzy aspekt można podejrzeć, a edytować i usuwać może tylko autor.
+- 📚 **Materiały**: biblioteka wszystkich zapisanych wyników z kontekstem AI (uzasadnienie, frazy, źródło), z wyszukiwaniem i filtrami.
+- 📄 **Raport projektu**: pobierany od razu jako plik PDF (rozpiętość TRL, rekomendowany następny krok, wszystkie aspekty i wyniki), z możliwością wysłania e-mailem do członków organizacji. Po wysłaniu projekt jest zamknięty do edycji.
+
+**AI i wyszukiwanie**
+
+- 🔤 **Frazy**: 3–5 fraz po polsku, edytowalnych i zatwierdzanych przez człowieka.
+- 🤖 **Agent wyszukujący**: szuka w wybranych źródłach i zwraca wyniki z uzasadnieniem, oceną TRL i linkiem pochodzącym z faktycznych wyników wyszukiwania.
+- ➕ **„Znajdź więcej”**: dokładanie kolejnych materiałów bez powtórzeń. Te same frazy w ciągu 7 dni wracają z zapisu bez kosztu.
+
+**Strona publiczna i społeczność**
+
+- 🏠 **Strona główna**: animowany radar, opis platformy z rozwijaną skalą TRL, struktura pracy, losowe aspekty „dla inspiracji”, linki do baz, FAQ.
+- 📰 **Artykuły**: o korzyściach z innowacji i o ich finansowaniu.
+- 📣 **Udostępnianie**: przyciski LinkedIn, Facebook, X i kopiowanie linku.
+- 🛟 **Pomoc na każdej stronie**: zgłoszenie problemu z Horyzontem, problemu ze źródłem lub propozycji zmiany. Zgłoszenia trafiają do panelu administratora.
+
+**Administracja i koszty**
+
+- 🛡️ **Panel administratora**: źródła wyszukiwania, czarne listy (e-maile i tematy), limity, dodatkowe wytyczne dla AI i podgląd zgłoszeń.
+- 💸 **Kontrola kosztów**: limity uruchomień agenta i generowań na użytkownika oraz tryb testowy `AGENT_MOCK`.
+
+## ♿ Dostępność
+
+Horyzont ma dwa tryby dostępności w menu „Ułatwienia dostępu” (w nagłówku, a na telefonie w menu hamburger). Wybór zapamiętuje się w przeglądarce i działa bez migotania przy ładowaniu strony. Domyślny jest ciemny motyw.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/10-wcag-mode.jpg" alt="Tryb WCAG: wysoki kontrast" /></td>
+    <td width="50%"><img src="docs/screenshots/11-colorblind-mode.jpg" alt="Tryb dla daltonistów" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Tryb WCAG</b>: kontrast co najmniej 7:1, podkreślone linki, wyraźny fokus, większa czcionka, bez animacji</sub></td>
+    <td align="center"><sub><b>Tryb dla daltonistów</b>: paleta Okabe-Ito (niebieski i pomarańczowy zamiast czerwieni i zieleni)</sub></td>
+  </tr>
+</table>
 
 ## 🧠 Studium przypadku
 
@@ -68,39 +165,51 @@ Pliki PDF trafiają prosto z przeglądarki do prywatnego bucketu R2 przez krótk
 ## 🧪 Dla jury: jak wypróbować
 
 1. Wejdź na działający prototyp: **https://innovation-radar-three.vercel.app/**
-2. Zaloguj się kontem testowym:
+2. Załóż konto (imię, nazwisko, e-mail i hasło) i potwierdź adres linkiem z wiadomości.
+3. Po zalogowaniu przejdź ścieżkę:
+   - **Organizacje**: dodaj firmę (NIP, adres) i, jeśli chcesz, osoby z istniejącymi kontami.
+   - **Projekty**: opisz problem, dodaj linki lub pliki PDF.
+   - **Aspekty → Nowy aspekt**: wybierz projekt, wygeneruj i zatwierdź frazy, kliknij „Szukaj w źródłach” (do minuty), a potem zatwierdź listę wyników.
+   - **Materiały**: zobacz wszystkie zapisane wyniki z kontekstem AI.
+   - **Projekty → Pobierz raport (PDF)** albo „Wyślij raport” do członków organizacji.
+4. Przycisk **Pomoc** (prawy dolny róg) pozwala zgłosić problem lub pomysł.
 
-   | Pole   | Wartość          |
-   | ------ | ---------------- |
-   | E-mail | `test@gmail.com` |
-   | Hasło  | `Mini12345!`     |
+## 📚 Dokumentacja
 
-3. Możesz też założyć własne konto (rejestracja na stronie głównej).
+Opis projektu: [`docs/PROJECT.md`](docs/PROJECT.md), plan agenta: [`docs/AGENT.md`](docs/AGENT.md), wytyczne organizatorów: [`docs/CHALLENGE.md`](docs/CHALLENGE.md).
 
-Co sprawdzić po zalogowaniu:
+## 🛠️ Stack technologiczny
 
-- **Organizacje**: dodanie firmy i osób do organizacji.
-- **Projekty**: opis problemu, linki i pliki PDF.
-- **Aspekt** (`Aspekty → Nowy aspekt`): wybierz projekt, wygeneruj i zatwierdź frazy, kliknij „Szukaj w źródłach” (do minuty), a potem zatwierdź listę wyników.
-- **Raport**: w projekcie otwórz raport i wyślij go do członków organizacji.
+| Warstwa                    | Technologie                                      |
+| -------------------------- | ------------------------------------------------ |
+| **Framework**              | Next.js 16 (App Router), React 19, TypeScript    |
+| **Style i komponenty**     | Tailwind CSS 4, shadcn (Base UI), Lucide         |
+| **Baza danych**            | Prisma 7 + Neon (PostgreSQL)                     |
+| **Uwierzytelnianie**       | Better Auth (e-mail i hasło, weryfikacja adresu) |
+| **Formularze i walidacja** | React Hook Form + Zod 4                          |
+| **AI i agent**             | Claude API (Haiku) z narzędziem `web_search`     |
+| **Raporty PDF**            | `@react-pdf/renderer` (generowane na serwerze)   |
+| **Pliki**                  | Cloudflare R2 (PDF, podpisane adresy)            |
+| **E-mail**                 | Resend                                           |
+| **Narzędzia**              | React Compiler, ESLint, Prettier                 |
+| **Hosting**                | Vercel                                           |
 
-## 📋 Status funkcji z planu
+### Struktura repozytorium
 
-| #   | Funkcja                                                             | Status    | Co jest w prototypie                                                                  |
-| --- | ------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------- |
-| 1   | Panel rejestracji organizacji i użytkowników                        | gotowe    | konta, organizacje, osoby w organizacji, projekty z linkami i PDF                     |
-| 2   | Asystent formułowania problematyki badawczej                        | częściowo | AI uzupełnia opis i wnioskuje frazy (bez czatu z pytaniami pomocniczymi)              |
-| 3   | Rekomendacje rozbicia problemów na aspekty                          | planowane | aspekty tworzy użytkownik, bez rekomendacji                                           |
-| 4   | Rekomendacje rozbicia aspektów na proponowane wyszukania w bazach   | częściowo | 3–5 fraz, edytowalnych i zatwierdzanych przez użytkownika                             |
-| 5   | Moduł dodawania źródeł do wyszukiwań                                | gotowe    | administrator zarządza źródłami w panelu, użytkownik wybiera do 2 na wyszukanie       |
-| 6   | Ocena przydatności materiałów w kontekście wyszukiwań               | częściowo | uzasadnienie „dlaczego pasuje” i ocena TRL (bez oceny punktowej)                      |
-| 7   | Zautomatyzowany raport dla problemu (aspekty, wyszukiwania, źródła) | gotowe    | raport zbiorczy projektu do druku i PDF, wysyłka e-mailem                             |
-| 8   | Dzielenie się wynikami z innymi podmiotami i kontakt w konsultacji  | częściowo | osoby w organizacji współdzielą projekty i raport, bez udostępniania na zewnątrz      |
-| 9   | Alerty o nowych materiałach pasujących do zapytania                 | planowane | brak                                                                                  |
-| 10  | Własny zbiór opracowań (zapis analiz AI, bez ponownej weryfikacji)  | częściowo | zatwierdzone aspekty zapisują się w historii, a te same frazy wracają z cache (7 dni) |
-| 11  | Regularne wypuszczanie nowych wersji                                | w trakcie | wdrożenie z gałęzi `main` na Vercel po każdej zmianie                                 |
+Jeden plik na encję, bez rozproszenia logiki:
 
-Szczegóły: [`docs/PROJECT.md`](docs/PROJECT.md), plan agenta: [`docs/AGENT.md`](docs/AGENT.md), wytyczne organizatorów: [`docs/CHALLENGE.md`](docs/CHALLENGE.md).
+```text
+src/
+├── app/            strony i trasy API (App Router)
+├── actions/        akcje serwerowe (tylko mutacje)
+├── queries/        odczyty z bazy
+├── validation/     schematy Zod, typy i etykiety
+├── components/     komponenty (project/, search/, material/, landing/, shadcn/ …)
+└── lib/            baza, agent AI, raport PDF, TRL, treści strony głównej
+prisma/             schemat bazy i dane demo (seed)
+docs/               opis projektu, wytyczne organizatorów, plan agenta, zrzuty ekranu
+tests/              testy reguł domenowych
+```
 
 ## ⚙️ Uruchomienie lokalne
 
@@ -148,12 +257,14 @@ R2_BUCKET=...
 
 > Bez `RESEND_API_KEY` aplikacja działa: link weryfikacyjny i reset hasła wypisują się w konsoli serwera. Bez zmiennych `R2_*` wyłączone jest tylko dodawanie plików PDF.
 
-**4. Utwórz tabele i dane testowe**
+**4. Utwórz tabele i dane demo**
 
 ```bash
 npm run db:push
 npm run db:seed
 ```
+
+Seed tworzy źródła wyszukiwania oraz (tylko do lokalnego developmentu) konto demo `demo@radar-innowacji.pl` z hasłem `DemoRadar2026!`, jedną organizację, projekty i przykładowy aspekt z wynikami. Konto demo ma też rolę administratora.
 
 **5. Uruchom serwer deweloperski**
 
@@ -165,4 +276,12 @@ Aplikacja działa pod adresem **http://localhost:3000**.
 
 ### Skrypty
 
-`dev`, `build`, `typecheck`, `lint`, `format`, `db:push`, `db:seed`, `db:studio`. Zasady kodu: [`CLAUDE.md`](CLAUDE.md).
+`dev`, `build`, `typecheck`, `lint`, `format`, `test`, `db:push`, `db:seed`, `db:studio`. Zasady kodu: [`CLAUDE.md`](CLAUDE.md).
+
+---
+
+<div align="center">
+
+Aplikacja powstała z inicjatywy **HackNation 2026 w Bydgoszczy** oraz [Podkarpackiego Centrum Innowacji](https://pcinn.org/).
+
+</div>
