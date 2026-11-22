@@ -120,7 +120,15 @@ Pliki PDF trafiają prosto z przeglądarki do prywatnego bucketu R2 przez krótk
 ## 🧪 Dla jury: jak wypróbować
 
 1. Wejdź na działający prototyp: **https://innovation-radar-three.vercel.app/**
-2. Załóż konto (imię, nazwisko, e-mail i hasło) i potwierdź adres linkiem z wiadomości.
+2. Zaloguj się kontem testowym:
+
+   | Pole   | Wartość                         |
+   | ------ | ------------------------------- |
+   | E-mail | `vojciechkwiatkowski@gmail.com` |
+   | Hasło  | `Mini12345!`                    |
+
+   Możesz też założyć własne konto (imię, nazwisko, e-mail i hasło) i potwierdzić adres linkiem z wiadomości.
+
 3. Po zalogowaniu przejdź ścieżkę:
    - **Organizacje**: dodaj firmę (NIP, adres) i, jeśli chcesz, osoby z istniejącymi kontami.
    - **Projekty**: opisz problem, dodaj linki lub pliki PDF.
