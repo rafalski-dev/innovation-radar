@@ -8,7 +8,7 @@ import { buttonVariants } from "@/components/shadcn/button";
 import { getSearch } from "@/queries/search";
 import { SEARCH_STATUS_LABELS, phrasesSchema, type SearchStatusValue } from "@/validation/search";
 
-export const metadata: Metadata = { title: "Wyszukiwanie" };
+export const metadata: Metadata = { title: "Aspekt" };
 
 export default async function SearchDetailPage({ params }: PageProps<"/dashboard/search/[id]">) {
   const { id } = await params;
@@ -23,10 +23,10 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
     <div className="max-w-3xl space-y-6">
       <Link href="/dashboard/search" className={buttonVariants({ variant: "ghost", size: "sm" })}>
         <ArrowLeftIcon />
-        Wszystkie wyszukiwania
+        Wszystkie aspekty
       </Link>
       <PageHeader
-        title={search.need?.title ?? "Wyszukiwanie"}
+        title={search.need?.title ?? "Aspekt"}
         description={search.need ? search.need.business.name : search.query}
       />
 
@@ -34,7 +34,7 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
         <h2 className="text-sm font-medium">Frazy</h2>
         {phraseList.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            To wyszukiwanie nie ma zapisanych fraz. Utwórz nowe z wygenerowanymi frazami.
+            Ten aspekt nie ma zapisanych fraz. Utwórz nowy z wygenerowanymi frazami.
           </p>
         ) : (
           <ul className="flex flex-wrap gap-2">
@@ -63,7 +63,7 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
           </p>
         ) : search.results.length === 0 ? (
           <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">
-            Do tego wyszukiwania nie zapisano listy wyników.
+            Do tego aspektu nie zapisano listy wyników.
           </p>
         ) : (
           <ResultList items={search.results} />

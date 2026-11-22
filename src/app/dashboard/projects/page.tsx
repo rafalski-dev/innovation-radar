@@ -52,14 +52,14 @@ export default async function NeedsPage() {
                   href="/dashboard/search"
                   className="text-sm text-muted-foreground hover:underline"
                 >
-                  Wyszukiwania: {need._count.searches}
+                  Aspekty: {need._count.searches}
                 </Link>
                 <Link
                   href={`/dashboard/search/new?need=${need.id}`}
                   className={buttonVariants({ variant: "outline", size: "sm" })}
                 >
                   <PlusIcon />
-                  Dodaj wyszukiwanie
+                  Dodaj aspekt
                 </Link>
               </div>
             </li>

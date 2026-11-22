@@ -21,28 +21,28 @@ Co sprawdzić po zalogowaniu:
 
 - **Organizacje** (`Dashboard → Organizacje`): dodanie firmy (NIP, adres, branża), dodanie osób do organizacji.
 - **Projekty**: opis problemu firmy, opcjonalny link i pliki PDF (do 3, każdy do 20 MB).
-- **Wyszukiwanie** (`Dashboard → Wyszukiwania → Nowe wyszukiwanie`):
+- **Aspekt** (`Dashboard → Aspekty → Nowy aspekt`):
   1. wybierz projekt i kliknij „Generuj frazy” (3–5 fraz po polsku), popraw je i zatwierdź,
   2. kliknij „Szukaj w źródłach” (do minuty): agent pokaże do 3 wyników z linkami do źródeł,
-  3. jeśli lista jest dobra, kliknij „Zatwierdź wyszukiwanie”. Zapisze się w historii razem z frazami.
+  3. jeśli lista jest dobra, kliknij „Zatwierdź aspekt”. Zapisze się w historii razem z frazami.
 
 ## Cel prototypu
 
 Zaprezentować działający prototyp z jak największą liczbą funkcji z planu. Status funkcji:
 
-| #   | Funkcja                                                             | Status    | Co jest w prototypie                                                                                                                          |
-| --- | ------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Panel rejestracji organizacji i użytkowników                        | gotowe    | konta, organizacje (NIP, adres), osoby w organizacji, projekty z linkiem i PDF                                                                |
-| 2   | Asystent formułowania problematyki badawczej                        | częściowo | AI wnioskuje frazy z opisu projektu (bez czatu z pytaniami pomocniczymi)                                                                      |
-| 3   | Rekomendacje rozbicia problemów na aspekty                          | planowane | brak podziału na aspekty                                                                                                                      |
-| 4   | Rekomendacje rozbicia aspektów na proponowane wyszukania w bazach   | częściowo | 3–5 fraz do wyszukiwania, edytowalne i zatwierdzane przez użytkownika                                                                         |
-| 5   | Moduł dodawania źródeł do wyszukiwań                                | częściowo | agent przeszukuje NCBiR i RAD-on; lista źródeł jest w kodzie, bez modułu w aplikacji                                                          |
-| 6   | Ocena przydatności materiałów w kontekście wyszukiwań               | częściowo | każdy wynik ma uzasadnienie „dlaczego pasuje” (bez oceny punktowej)                                                                           |
-| 7   | Zautomatyzowany raport dla problemu (aspekty, wyszukiwania, źródła) | planowane | brak                                                                                                                                          |
-| 8   | Dzielenie się wynikami z innymi podmiotami i kontakt w konsultacji  | planowane | osoby w organizacji współdzielą projekty, wyniki nie są jeszcze udostępniane                                                                  |
-| 9   | Alerty o nowych materiałach pasujących do zapytania                 | planowane | brak                                                                                                                                          |
-| 10  | Własny zbiór opracowań (zapis analiz AI, bez ponownej weryfikacji)  | częściowo | zatwierdzone wyszukiwania z wynikami zapisują się w historii, a te same frazy dla tego projektu wracają z zapisu (7 dni) bez ponownego kosztu |
-| 11  | Regularne wypuszczanie nowych wersji                                | w trakcie | wdrożenie z gałęzi `main` na Vercel po każdej zmianie                                                                                         |
+| #   | Funkcja                                                             | Status    | Co jest w prototypie                                                                                                                     |
+| --- | ------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Panel rejestracji organizacji i użytkowników                        | gotowe    | konta, organizacje (NIP, adres), osoby w organizacji, projekty z linkiem i PDF                                                           |
+| 2   | Asystent formułowania problematyki badawczej                        | częściowo | AI wnioskuje frazy z opisu projektu (bez czatu z pytaniami pomocniczymi)                                                                 |
+| 3   | Rekomendacje rozbicia problemów na aspekty                          | planowane | brak podziału na aspekty                                                                                                                 |
+| 4   | Rekomendacje rozbicia aspektów na proponowane wyszukania w bazach   | częściowo | 3–5 fraz do wyszukiwania, edytowalne i zatwierdzane przez użytkownika                                                                    |
+| 5   | Moduł dodawania źródeł do wyszukiwań                                | częściowo | agent przeszukuje NCBiR i RAD-on; lista źródeł jest w kodzie, bez modułu w aplikacji                                                     |
+| 6   | Ocena przydatności materiałów w kontekście wyszukiwań               | częściowo | każdy wynik ma uzasadnienie „dlaczego pasuje” (bez oceny punktowej)                                                                      |
+| 7   | Zautomatyzowany raport dla problemu (aspekty, wyszukiwania, źródła) | planowane | brak                                                                                                                                     |
+| 8   | Dzielenie się wynikami z innymi podmiotami i kontakt w konsultacji  | planowane | osoby w organizacji współdzielą projekty, wyniki nie są jeszcze udostępniane                                                             |
+| 9   | Alerty o nowych materiałach pasujących do zapytania                 | planowane | brak                                                                                                                                     |
+| 10  | Własny zbiór opracowań (zapis analiz AI, bez ponownej weryfikacji)  | częściowo | zatwierdzone aspekty z wynikami zapisują się w historii, a te same frazy dla tego projektu wracają z zapisu (7 dni) bez ponownego kosztu |
+| 11  | Regularne wypuszczanie nowych wersji                                | w trakcie | wdrożenie z gałęzi `main` na Vercel po każdej zmianie                                                                                    |
 
 **Ograniczenia agenta (kontrola kosztów):** model Claude Haiku, do 3 wyszukiwań i 3 wyników na uruchomienie,
 5 uruchomień na 30 minut na użytkownika. Wyniki pochodzą z wyszukiwarki ograniczonej do wskazanych domen,

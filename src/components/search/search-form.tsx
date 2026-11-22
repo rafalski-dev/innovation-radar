@@ -130,7 +130,7 @@ export function SearchForm({
         return;
       }
       setResults(result.data);
-      if (result.data.cached) toast.success("Wynik z zapisanego wyszukiwania (bez kosztu)");
+      if (result.data.cached) toast.success("Wynik z zapisanego aspektu (bez kosztu)");
     });
   }
 
@@ -216,7 +216,7 @@ export function SearchForm({
         toast.error(result.error);
         return;
       }
-      toast.success("Zapisano wyszukiwanie");
+      toast.success("Zapisano aspekt");
       router.push(`/dashboard/search/${result.data.id}`);
     });
   }
@@ -317,11 +317,11 @@ export function SearchForm({
             <p className="text-sm font-medium">Krok 2. Lista wyników ze źródeł</p>
             <p className="text-xs text-muted-foreground">
               Wybierz do {MAX_SOURCES} źródeł, w których agent ma szukać według zatwierdzonych fraz
-              (do minuty). Jeśli lista jest dobra, zatwierdź wyszukiwanie.
+              (do minuty). Jeśli lista jest dobra, zatwierdź aspekt.
             </p>
           </div>
           <fieldset className="grid gap-2 sm:grid-cols-2">
-            <legend className="sr-only">Źródła wyszukiwania</legend>
+            <legend className="sr-only">Źródła aspektu</legend>
             {SOURCES.map((source) => {
               const checked = sources.includes(source.id);
               const locked = !checked && sources.length >= MAX_SOURCES;
@@ -368,7 +368,7 @@ export function SearchForm({
           {results && results.candidates.length > 0 && (
             <Button type="submit" disabled={pending || searching}>
               <CheckIcon />
-              {pending ? "Zapisywanie…" : "Zatwierdź wyszukiwanie"}
+              {pending ? "Zapisywanie…" : "Zatwierdź aspekt"}
             </Button>
           )}
         </div>

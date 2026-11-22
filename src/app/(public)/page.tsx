@@ -27,7 +27,7 @@ const steps = [
   {
     icon: SearchCheckIcon,
     title: "Dostań dopasowane wyniki",
-    text: "Agent przeszukuje źródła publiczne i pokazuje wyniki wraz z uzasadnieniem. Historia wyszukiwań jest zapamiętana.",
+    text: "Agent przeszukuje źródła publiczne i pokazuje wyniki wraz z uzasadnieniem. Historia aspektów jest zapamiętana.",
   },
   {
     icon: BookmarkIcon,

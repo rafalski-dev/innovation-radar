@@ -6,7 +6,7 @@ import { SearchRowActions } from "@/components/search/search-row-actions";
 import { buttonVariants } from "@/components/shadcn/button";
 import { getMySearches } from "@/queries/search";
 
-export const metadata: Metadata = { title: "Wyszukiwania" };
+export const metadata: Metadata = { title: "Aspekty" };
 
 const dateFormat = new Intl.DateTimeFormat("pl-PL", { dateStyle: "medium", timeStyle: "short" });
 
@@ -16,18 +16,18 @@ export default async function SearchesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Wyszukiwania"
-        description="Historia Twoich wyszukiwań. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
+        title="Aspekty"
+        description="Historia Twoich aspektów. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
         action={
           <Link href="/dashboard/search/new" className={buttonVariants()}>
             <PlusIcon />
-            Nowe wyszukiwanie
+            Nowy aspekt
           </Link>
         }
       />
       {searches.length === 0 ? (
         <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-          Nie masz jeszcze żadnego wyszukiwania. Dodaj pierwsze przyciskiem „Nowe wyszukiwanie”.
+          Nie masz jeszcze żadnego aspektu. Dodaj pierwszy przyciskiem „Nowy aspekt”.
         </p>
       ) : (
         <ul className="grid gap-3">
@@ -54,7 +54,7 @@ export default async function SearchesPage() {
                 </div>
               </div>
               <div className="relative z-10">
-                <SearchRowActions id={s.id} name={s.need?.title ?? "wyszukiwanie"} />
+                <SearchRowActions id={s.id} name={s.need?.title ?? "aspekt"} />
               </div>
             </li>
           ))}

@@ -59,7 +59,7 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
     return ok({ id: search.id });
   } catch (error) {
     console.error(error);
-    return fail("Nie udało się zapisać wyszukiwania");
+    return fail("Nie udało się zapisać aspektu");
   }
 }
 
@@ -70,11 +70,11 @@ export async function deleteSearch(id: string): Promise<ActionResult> {
 
   try {
     const { count } = await db.search.deleteMany({ where: { id, userId: session.user.id } });
-    if (count === 0) return fail("Nie znaleziono wyszukiwania");
+    if (count === 0) return fail("Nie znaleziono aspektu");
     revalidatePath("/dashboard/search");
     return ok();
   } catch (error) {
     console.error(error);
-    return fail("Nie udało się usunąć wyszukiwania");
+    return fail("Nie udało się usunąć aspektu");
   }
 }

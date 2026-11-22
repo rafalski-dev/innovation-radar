@@ -18,6 +18,6 @@ export const dashboardNav: DashboardNavItem[] = [
   { href: "/dashboard", label: "Panel", icon: LayoutDashboardIcon },
   { href: "/dashboard/businesses", label: "Moje organizacje", icon: BuildingIcon },
   { href: "/dashboard/projects", label: "Projekty", icon: ClipboardListIcon },
-  { href: "/dashboard/search", label: "Wyszukiwania", icon: SearchIcon },
+  { href: "/dashboard/search", label: "Aspekty", icon: SearchIcon },
   { href: "/dashboard/profile", label: "Profil", icon: UserIcon },
 ];

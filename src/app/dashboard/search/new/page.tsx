@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/page-header";
 import { SearchForm } from "@/components/search/search-form";
 import { getMyNeeds } from "@/queries/need";
 
-export const metadata: Metadata = { title: "Nowe wyszukiwanie" };
+export const metadata: Metadata = { title: "Nowy aspekt" };
 
 export default async function NewSearchPage({
   searchParams,
@@ -15,7 +15,7 @@ export default async function NewSearchPage({
   return (
     <div className="max-w-3xl space-y-6">
       <PageHeader
-        title="Nowe wyszukiwanie"
+        title="Nowy aspekt"
         description="Opisz, czego szukasz. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
       />
       <SearchForm
