@@ -124,6 +124,41 @@ export function BusinessPicker({
         {selected.description && <p className="max-w-2xl text-sm">{selected.description}</p>}
 
         <div className="space-y-3 border-t pt-4">
+          <h3 className="text-sm font-semibold text-muted-foreground">Aktywność użytkowników</h3>
+          <div className="overflow-x-auto rounded-2xl border">
+            <table className="w-full text-sm">
+              <thead className="text-left text-xs text-muted-foreground">
+                <tr className="border-b">
+                  <th className="px-3 py-2 font-medium">Użytkownik</th>
+                  <th className="px-3 py-2 text-right font-medium">Projekty</th>
+                  <th className="px-3 py-2 text-right font-medium">Aspekty</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {selected.activity.map((a) => (
+                  <tr key={a.userId}>
+                    <td className="px-3 py-2">
+                      <div className="font-medium">
+                        {a.name}
+                        {a.isOwner && (
+                          <span className="font-normal text-muted-foreground">
+                            {" "}
+                            · administrator
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs break-all text-muted-foreground">{a.email}</div>
+                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums">{a.projects}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{a.aspects}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="space-y-3 border-t pt-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-muted-foreground">Projekty</h3>
             <Link
@@ -139,7 +174,7 @@ export function BusinessPicker({
               Ta organizacja nie ma jeszcze żadnego projektu. Opisz pierwszą.
             </p>
           ) : (
-            <ul className="grid gap-3">
+            <ul className="grid max-h-[28rem] gap-3 overflow-y-auto pr-1">
               {selected.projects.map((project) => (
                 <li
                   key={project.id}

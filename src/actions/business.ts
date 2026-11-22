@@ -46,7 +46,20 @@ export async function createBusiness(input: BusinessInput): Promise<ActionResult
   try {
     await db.business.create({ data: { ...toData(parsed.data), ownerId: session.user.id } });
   } catch (error) {
-    if (isDuplicate(error)) return fail(DUPLICATE_NIP);
+    if (isDuplicate(error)) {
+      // pokazujemy e-mail administratora istniejącej organizacji, żeby można było poprosić o dostęp
+      const existing = await db.business
+        .findUnique({
+          where: { nip: normalizeNip(parsed.data.nip) },
+          select: { owner: { select: { email: true } } },
+        })
+        .catch(() => null);
+      return fail(
+        existing
+          ? `${DUPLICATE_NIP}. Administrator organizacji: ${existing.owner.email}`
+          : DUPLICATE_NIP,
+      );
+    }
     console.error(error);
     return fail("Nie udało się dodać organizacji");
   }
@@ -64,9 +77,11 @@ export async function updateBusiness(id: string, input: BusinessInput): Promise<
   if (!parsed.success) return validationError(parsed.error);
 
   try {
+    // NIP nie podlega edycji po utworzeniu organizacji (pomijamy go, nawet jeśli ktoś go przyśle)
+    const { nip: _nip, ...data } = toData(parsed.data);
     const result = await db.business.updateMany({
       where: { id, ...ownedBusinessWhere(session.user.id) },
-      data: toData(parsed.data),
+      data,
     });
     if (result.count === 0) return fail("Nie znaleziono organizacji");
   } catch (error) {

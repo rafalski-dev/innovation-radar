@@ -35,6 +35,7 @@ export async function getMyBusinessesWithProjects() {
             select: { id: true, fileName: true, size: true },
             orderBy: { createdAt: "asc" },
           },
+          searches: { select: { userId: true } },
         },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       },
@@ -46,7 +47,22 @@ export async function getMyBusinessesWithProjects() {
     },
     orderBy: [{ name: "asc" }, { id: "asc" }],
   });
-  return businesses.map((b) => ({ ...b, isAdmin: b.ownerId === session.user.id }));
+  return businesses.map((b) => {
+    // aktywność osób w organizacji: projekty (autor; stare wpisy bez autora liczymy administratorowi) i aspekty
+    const people = [b.owner, ...b.members.map((m) => m.user)];
+    const activity = people.map((u) => ({
+      userId: u.id,
+      name: u.name,
+      email: u.email,
+      isOwner: u.id === b.ownerId,
+      projects: b.projects.filter((p) => (p.authorId ?? b.ownerId) === u.id).length,
+      aspects: b.projects.reduce(
+        (sum, p) => sum + p.searches.filter((s) => s.userId === u.id).length,
+        0,
+      ),
+    }));
+    return { ...b, isAdmin: b.ownerId === session.user.id, activity };
+  });
 }
 
 // Do edycji danych organizacji: tylko administrator.

@@ -68,8 +68,18 @@ export function BusinessForm({ business }: { business?: BusinessRow }) {
             inputMode="numeric"
             placeholder="np. 5252344078"
             aria-invalid={!!errors.nip}
+            readOnly={!!business}
+            aria-readonly={!!business}
+            className={
+              business ? "cursor-not-allowed bg-muted/50 text-muted-foreground" : undefined
+            }
             {...form.register("nip")}
           />
+          {business && (
+            <p className="text-xs text-muted-foreground">
+              NIP nie podlega edycji po utworzeniu organizacji.
+            </p>
+          )}
         </FormField>
         <FormField
           label="Branża (opcjonalnie)"
