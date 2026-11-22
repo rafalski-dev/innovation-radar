@@ -50,6 +50,19 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileInput }) 
           />
         </FormField>
       </div>
+      <FormField
+        label="Stanowisko (opcjonalnie)"
+        htmlFor="p-position"
+        error={errors.position?.message}
+      >
+        <Input
+          id="p-position"
+          placeholder="np. Dyrektor ds. rozwoju"
+          autoComplete="organization-title"
+          aria-invalid={!!errors.position}
+          {...form.register("position")}
+        />
+      </FormField>
       <Button type="submit" disabled={pending} className="justify-self-start">
         {pending ? "Zapisywanie…" : "Zapisz profil"}
       </Button>

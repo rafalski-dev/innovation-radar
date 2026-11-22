@@ -13,11 +13,16 @@ export async function updateProfile(input: ProfileInput): Promise<ActionResult> 
   const parsed = profileSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
 
-  const { firstName, lastName } = parsed.data;
+  const { firstName, lastName, position } = parsed.data;
   try {
     await db.user.update({
       where: { id: session.user.id },
-      data: { name: `${firstName} ${lastName}`, firstName, lastName },
+      data: {
+        name: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
+        position: position || null,
+      },
     });
     revalidatePath("/", "layout");
     return ok();

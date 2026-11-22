@@ -22,11 +22,24 @@ export default async function ProfilePage() {
             // starsze konta nie mają osobnych pól: dzielimy zapisane imię i nazwisko
             firstName: user.firstName ?? user.name.split(" ")[0] ?? "",
             lastName: user.lastName ?? user.name.split(" ").slice(1).join(" "),
+            position: user.position ?? "",
           }}
         />
       </section>
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground">Zmiana hasła</h2>
+        <ol className="max-w-md list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+          <li>Wpisz swoje obecne hasło, żeby potwierdzić, że to Ty.</li>
+          <li>Podaj nowe hasło (min. 8 znaków) i powtórz je w drugim polu.</li>
+          <li>
+            Po zapisaniu zostaniesz wylogowany(-a) ze wszystkich innych urządzeń, a w tej
+            przeglądarce nadal jesteś zalogowany(-a).
+          </li>
+          <li>
+            Nie pamiętasz obecnego hasła? Wyloguj się i użyj odnośnika „Nie pamiętam hasła” na
+            stronie logowania: wyślemy link do ustawienia nowego.
+          </li>
+        </ol>
         <PasswordForm />
       </section>
     </div>
