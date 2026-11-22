@@ -15,7 +15,10 @@ export async function getNeedsForBusiness(businessId: string) {
   return db.need.findMany({
     where: { businessId, ...accessibleNeedWhere(session.user.id) },
     include: {
-      files: { select: { id: true, fileName: true, size: true }, orderBy: { createdAt: "asc" } },
+      files: {
+        select: { id: true, fileName: true, size: true },
+        orderBy: { createdAt: "asc" },
+      },
     },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
@@ -29,8 +32,11 @@ export async function getMyNeeds() {
     where: accessibleNeedWhere(session.user.id),
     include: {
       business: { select: { id: true, name: true } },
-      _count: { select: { searches: true } },
-      files: { select: { id: true, fileName: true, size: true }, orderBy: { createdAt: "asc" } },
+      searches: { select: { _count: { select: { results: true } } } },
+      files: {
+        select: { id: true, fileName: true, size: true },
+        orderBy: { createdAt: "asc" },
+      },
     },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
@@ -42,7 +48,30 @@ export async function getMyNeed(id: string, businessId: string) {
   return db.need.findFirst({
     where: { id, businessId, ...accessibleNeedWhere(session.user.id) },
     include: {
-      files: { select: { id: true, fileName: true, size: true }, orderBy: { createdAt: "asc" } },
+      files: {
+        select: { id: true, fileName: true, size: true },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+}
+
+// Dane raportu zbiorczego projektu: projekt, organizacja, pliki oraz aspekty z wynikami.
+export async function getNeedReport(id: string) {
+  await connection();
+  const session = await requireSession();
+  return db.need.findFirst({
+    where: { id, ...accessibleNeedWhere(session.user.id) },
+    include: {
+      business: { select: { id: true, name: true, nip: true, city: true } },
+      files: {
+        select: { id: true, fileName: true, size: true },
+        orderBy: { createdAt: "asc" },
+      },
+      searches: {
+        orderBy: [{ number: "asc" }, { createdAt: "asc" }],
+        include: { results: { orderBy: { position: "asc" } } },
+      },
     },
   });
 }

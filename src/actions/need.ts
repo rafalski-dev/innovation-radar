@@ -3,6 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { type ActionResult, fail, ok, validationError } from "@/lib/action-result";
+import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
+import { sendReportEmail } from "@/lib/email";
+import { env } from "@/lib/env";
+import { projectNumber } from "@/lib/numbering";
 import { createUploadUrl, deleteObjects, inspectPdf, isR2Configured } from "@/lib/r2";
 import { getSession } from "@/lib/session";
 import { accessibleBusinessWhere } from "@/queries/business";
@@ -16,6 +20,8 @@ import {
   type NeedInput,
   needSchema,
 } from "@/validation/need";
+
+const CLOSED_MESSAGE = "Raport projektu został wysłany, projekt jest zamknięty do edycji";
 
 // Krok 1 wysyłki PDF: podpisany adres, pod który przeglądarka wysyła plik prosto do R2.
 // Klucz zawiera id użytkownika, więc przy zapisie potrzeby wiemy, że to jego plik.
@@ -101,6 +107,8 @@ export async function createNeed(
   if (attachments.length > NEED_FILES_MAX) {
     return fail(`Maksymalnie ${NEED_FILES_MAX} pliki PDF`);
   }
+  const blocked = await findBlockedTopic(parsed.data.title, parsed.data.description);
+  if (blocked) return fail(blockedTopicMessage(blocked));
 
   let files: VerifiedFile[] = [];
   try {
@@ -145,6 +153,9 @@ export async function updateNeed(
   const parsed = needSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
 
+  const blocked = await findBlockedTopic(parsed.data.title, parsed.data.description);
+  if (blocked) return fail(blockedTopicMessage(blocked));
+
   const attachments = options.attachments ?? [];
   let files: VerifiedFile[] = [];
   try {
@@ -153,6 +164,7 @@ export async function updateNeed(
       include: { files: { select: { id: true, key: true } } },
     });
     if (!existing) return fail("Nie znaleziono projektu");
+    if (existing.sentAt) return fail(CLOSED_MESSAGE);
 
     const removed = existing.files.filter((f) => options.removeFileIds?.includes(f.id));
     if (existing.files.length - removed.length + attachments.length > NEED_FILES_MAX) {
@@ -192,6 +204,11 @@ export async function deleteNeed(id: string): Promise<ActionResult> {
   if (!session) return fail("Zaloguj się");
 
   try {
+    const current = await db.need.findFirst({
+      where: { id, ...accessibleNeedWhere(session.user.id) },
+      select: { sentAt: true },
+    });
+    if (current?.sentAt) return fail(CLOSED_MESSAGE);
     const files = await db.needFile.findMany({
       where: { needId: id, need: accessibleNeedWhere(session.user.id) },
       select: { key: true },
@@ -204,6 +221,91 @@ export async function deleteNeed(id: string): Promise<ActionResult> {
   } catch (error) {
     console.error(error);
     return fail("Nie udało się usunąć projekt");
+  }
+
+  revalidatePath("/dashboard/businesses", "layout");
+  revalidatePath("/dashboard/projects");
+  return ok();
+}
+
+// Duplikuje projekt (tytuł z dopiskiem „kopia”, opis i linki). Aspekty i pliki PDF nie są kopiowane.
+export async function duplicateNeed(id: string): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session) return fail("Zaloguj się");
+
+  try {
+    const source = await db.need.findFirst({
+      where: { id, ...accessibleNeedWhere(session.user.id) },
+    });
+    if (!source) return fail("Nie znaleziono projektu");
+    await db.need.create({
+      data: {
+        businessId: source.businessId,
+        title: `${source.title} (kopia)`.slice(0, 150),
+        expectedOutcome: source.expectedOutcome,
+        description: source.description,
+        linkUrls: source.linkUrls,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return fail("Nie udało się zduplikować projektu");
+  }
+
+  revalidatePath("/dashboard/businesses", "layout");
+  revalidatePath("/dashboard/projects");
+  return ok();
+}
+
+// Wysyła raport projektu do właściciela i wszystkich członków organizacji i zamyka projekt do edycji.
+export async function sendNeedReport(id: string): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session) return fail("Zaloguj się");
+
+  try {
+    const need = await db.need.findFirst({
+      where: { id, ...accessibleNeedWhere(session.user.id) },
+      include: {
+        business: {
+          select: {
+            name: true,
+            owner: { select: { email: true } },
+            members: { select: { user: { select: { email: true } } } },
+          },
+        },
+        searches: { select: { _count: { select: { results: true } } } },
+      },
+    });
+    if (!need) return fail("Nie znaleziono projektu");
+    if (need.sentAt) return fail("Raport tego projektu został już wysłany");
+    if (need.searches.length === 0) {
+      return fail("Dodaj przynajmniej jeden aspekt, zanim wyślesz raport");
+    }
+
+    // zamykamy projekt warunkowo, żeby podwójne kliknięcie nie wysłało maili dwa razy
+    const closed = await db.need.updateMany({
+      where: { id, sentAt: null },
+      data: { sentAt: new Date() },
+    });
+    if (closed.count === 0) return fail("Raport tego projektu został już wysłany");
+
+    const recipients = [
+      ...new Set([need.business.owner.email, ...need.business.members.map((m) => m.user.email)]),
+    ];
+    const data = {
+      projectTitle: need.title,
+      projectNumber: projectNumber(need.createdAt),
+      businessName: need.business.name,
+      senderName: session.user.name,
+      aspects: need.searches.length,
+      results: need.searches.reduce((sum, s) => sum + s._count.results, 0),
+      url: `${env.BETTER_AUTH_URL}/dashboard/projects/${id}/report`,
+    };
+    const sent = await Promise.allSettled(recipients.map((to) => sendReportEmail(to, data)));
+    for (const result of sent) if (result.status === "rejected") console.error(result.reason);
+  } catch (error) {
+    console.error(error);
+    return fail("Nie udało się wysłać raportu");
   }
 
   revalidatePath("/dashboard/businesses", "layout");
