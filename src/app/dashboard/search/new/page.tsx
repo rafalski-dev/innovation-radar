@@ -5,8 +5,12 @@ import { getMyNeeds } from "@/queries/need";
 
 export const metadata: Metadata = { title: "Nowe wyszukiwanie" };
 
-export default async function NewSearchPage() {
-  const needs = await getMyNeeds();
+export default async function NewSearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ need?: string }>;
+}) {
+  const [needs, { need }] = await Promise.all([getMyNeeds(), searchParams]);
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -15,6 +19,7 @@ export default async function NewSearchPage() {
         description="Opisz, czego szukasz. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
       />
       <SearchForm
+        initialNeedId={need}
         needs={needs.map((n) => ({
           id: n.id,
           title: n.title,

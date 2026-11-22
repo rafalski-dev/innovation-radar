@@ -31,23 +31,37 @@ export default async function NeedsPage() {
       ) : (
         <ul className="grid gap-3">
           {needs.map((need) => (
-            <li
-              key={need.id}
-              className="flex items-start justify-between gap-4 rounded-lg border p-4"
-            >
-              <div className="min-w-0 space-y-1">
-                <div className="font-medium">{need.title}</div>
-                <p className="line-clamp-2 text-sm text-muted-foreground">{need.description}</p>
-                <NeedAttachments need={need} />
+            <li key={need.id} className="rounded-lg border">
+              <div className="flex items-start justify-between gap-4 p-4">
+                <div className="min-w-0 space-y-1">
+                  <div className="font-medium">{need.title}</div>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{need.description}</p>
+                  <NeedAttachments need={need} />
+                  <Link
+                    href={`/dashboard/businesses?org=${need.business.id}`}
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline"
+                  >
+                    <BuildingIcon className="size-3" />
+                    {need.business.name}
+                  </Link>
+                </div>
+                <NeedRowActions need={need} />
+              </div>
+              <div className="flex items-center justify-between gap-3 border-t px-4 py-3">
                 <Link
-                  href={`/dashboard/businesses?org=${need.business.id}`}
-                  className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:underline"
+                  href="/dashboard/search"
+                  className="text-sm text-muted-foreground hover:underline"
                 >
-                  <BuildingIcon className="size-3" />
-                  {need.business.name}
+                  Wyszukiwania: {need._count.searches}
+                </Link>
+                <Link
+                  href={`/dashboard/search/new?need=${need.id}`}
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                >
+                  <PlusIcon />
+                  Dodaj wyszukiwanie
                 </Link>
               </div>
-              <NeedRowActions need={need} />
             </li>
           ))}
         </ul>

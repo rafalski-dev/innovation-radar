@@ -59,11 +59,18 @@ async function requestResults(
 }
 
 // Formularz nowego wyszukiwania: wybór projektu (opcjonalny) + opis tego, czego szukamy.
-export function SearchForm({ needs }: { needs: SearchNeedOption[] }) {
+export function SearchForm({
+  needs,
+  initialNeedId,
+}: {
+  needs: SearchNeedOption[];
+  initialNeedId?: string; // projekt wybrany z góry (np. z listy projektów)
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [needId, setNeedId] = useState("");
-  const [query, setQuery] = useState("");
+  const initialNeed = needs.find((n) => n.id === initialNeedId);
+  const [needId, setNeedId] = useState(initialNeed?.id ?? "");
+  const [query, setQuery] = useState(initialNeed?.description ?? "");
   const [error, setError] = useState<string>();
   const [phrases, setPhrases] = useState<Phrases>();
   const [hint, setHint] = useState("");

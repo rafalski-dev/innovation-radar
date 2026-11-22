@@ -29,6 +29,7 @@ export async function getMyNeeds() {
     where: accessibleNeedWhere(session.user.id),
     include: {
       business: { select: { id: true, name: true } },
+      _count: { select: { searches: true } },
       files: { select: { id: true, fileName: true, size: true }, orderBy: { createdAt: "asc" } },
     },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
