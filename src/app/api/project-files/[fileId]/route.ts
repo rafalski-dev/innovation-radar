@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { createDownloadUrl, isR2Configured } from "@/lib/r2";
 import { getSession } from "@/lib/session";
-import { accessibleNeedWhere } from "@/queries/need";
+import { accessibleProjectWhere } from "@/queries/project";
 
 // Pobranie PDF przy potrzebie: tylko dla osób z dostępem do organizacji. Plik leży w prywatnym
 // buckecie R2, więc po sprawdzeniu dostępu przekierowujemy na krótko ważny podpisany adres.
@@ -11,8 +11,8 @@ export async function GET(_request: Request, ctx: RouteContext<"/api/project-fil
   if (!isR2Configured()) return new Response("Pliki nie są skonfigurowane", { status: 503 });
 
   const { fileId } = await ctx.params;
-  const file = await db.needFile.findFirst({
-    where: { id: fileId, need: accessibleNeedWhere(session.user.id) },
+  const file = await db.projectFile.findFirst({
+    where: { id: fileId, project: accessibleProjectWhere(session.user.id) },
   });
   if (!file) return new Response("Nie znaleziono pliku", { status: 404 });
 

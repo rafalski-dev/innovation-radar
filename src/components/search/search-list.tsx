@@ -14,8 +14,8 @@ export type SearchRow = {
   label: string | null; // numer aspektu, np. PRJ-…/A2
   createdAt: string; // ISO
   createdLabel: string;
-  needId: string | null;
-  needTitle: string | null;
+  projectId: string | null;
+  projectTitle: string | null;
   businessName: string | null;
   resultsCount: number;
 };
@@ -28,13 +28,13 @@ const selectClass =
 // Lista aspektów z filtrami (tekst, projekt, tylko z wynikami) i sortowaniem.
 export function SearchList({ rows }: { rows: SearchRow[] }) {
   const [text, setText] = useState("");
-  const [needId, setNeedId] = useState("");
+  const [projectId, setProjectId] = useState("");
   const [onlyWithResults, setOnlyWithResults] = useState(false);
   const [sort, setSort] = useState<SortKey>("newest");
 
   const projects = useMemo(() => {
     const map = new Map<string, string>();
-    for (const r of rows) if (r.needId && r.needTitle) map.set(r.needId, r.needTitle);
+    for (const r of rows) if (r.projectId && r.projectTitle) map.set(r.projectId, r.projectTitle);
     return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1], "pl"));
   }, [rows]);
 
@@ -43,10 +43,10 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
     const filtered = rows.filter(
       (r) =>
         (!q ||
-          `${r.title ?? ""} ${r.query} ${r.needTitle ?? ""} ${r.label ?? ""}`
+          `${r.title ?? ""} ${r.query} ${r.projectTitle ?? ""} ${r.label ?? ""}`
             .toLowerCase()
             .includes(q)) &&
-        (!needId || r.needId === needId) &&
+        (!projectId || r.projectId === projectId) &&
         (!onlyWithResults || r.resultsCount > 0),
     );
     return [...filtered].sort((a, b) => {
@@ -54,12 +54,12 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
       if (sort === "results") return b.resultsCount - a.resultsCount;
       if (sort === "project")
         return (
-          (a.needTitle ?? "").localeCompare(b.needTitle ?? "", "pl") ||
+          (a.projectTitle ?? "").localeCompare(b.projectTitle ?? "", "pl") ||
           b.createdAt.localeCompare(a.createdAt)
         );
       return b.createdAt.localeCompare(a.createdAt);
     });
-  }, [rows, text, needId, onlyWithResults, sort]);
+  }, [rows, text, projectId, onlyWithResults, sort]);
 
   return (
     <div className="space-y-4">
@@ -70,7 +70,11 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
           placeholder="Szukaj w aspektach…"
           className="max-w-56"
         />
-        <select value={needId} onChange={(e) => setNeedId(e.target.value)} className={selectClass}>
+        <select
+          value={projectId}
+          onChange={(e) => setProjectId(e.target.value)}
+          className={selectClass}
+        >
           <option value="">Wszystkie projekty</option>
           {projects.map(([id, title]) => (
             <option key={id} value={id}>
@@ -129,10 +133,10 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
                 {s.title && <p className="line-clamp-1 text-xs text-muted-foreground">{s.query}</p>}
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   <time dateTime={s.createdAt}>{s.createdLabel}</time>
-                  {s.needTitle && (
+                  {s.projectTitle && (
                     <span className="inline-flex items-center gap-1">
                       <BuildingIcon className="size-3" />
-                      {s.needTitle} · {s.businessName}
+                      {s.projectTitle} · {s.businessName}
                     </span>
                   )}
                   <span>Wyniki: {s.resultsCount}</span>
@@ -141,7 +145,7 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
               <div className="relative z-10">
                 <SearchRowActions
                   id={s.id}
-                  name={s.title ?? s.needTitle ?? "aspekt"}
+                  name={s.title ?? s.projectTitle ?? "aspekt"}
                   canChange={s.canChange}
                 />
               </div>

@@ -7,23 +7,23 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileTextIcon, PlusIcon, SparklesIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
-import { createNeed, createNeedFileUpload, updateNeed } from "@/actions/need";
+import { createProject, createProjectFileUpload, updateProject } from "@/actions/project";
 import { FormField } from "@/components/form-field";
 import { Button, buttonVariants } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
 import { Textarea } from "@/components/shadcn/textarea";
 import { cn } from "@/lib/utils";
-import type { NeedRow } from "@/queries/need";
+import type { ProjectRow } from "@/queries/project";
 import {
-  NEED_FILE_MAX_BYTES,
-  NEED_FILE_MAX_MB,
-  NEED_FILES_MAX,
-  NEED_LINKS_MAX,
+  PROJECT_FILE_MAX_BYTES,
+  PROJECT_FILE_MAX_MB,
+  PROJECT_FILES_MAX,
+  PROJECT_LINKS_MAX,
   type DescriptionSuggestion,
-  type NeedAttachmentInput,
-  type NeedInput,
-  needSchema,
-} from "@/validation/need";
+  type ProjectAttachmentInput,
+  type ProjectInput,
+  projectSchema,
+} from "@/validation/project";
 
 function formatSize(bytes: number) {
   return bytes < 1024 * 1024
@@ -33,16 +33,16 @@ function formatSize(bytes: number) {
 
 type BusinessOption = { id: string; name: string; city: string | null; nip: string | null };
 
-// brak need = dodawanie, jest = edycja
+// brak project = dodawanie, jest = edycja
 // `businesses` (zamiast `businessId`) = dodawanie z listy potrzeb: organizację wybiera się w formularzu
-export function NeedForm({
+export function ProjectForm({
   businessId,
   businesses,
-  need,
+  project,
 }: {
   businessId?: string;
   businesses?: BusinessOption[];
-  need?: NeedRow;
+  project?: ProjectRow;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -58,22 +58,22 @@ export function NeedForm({
   const [removedIds, setRemovedIds] = useState<string[]>([]); // zapisane pliki do usunięcia
   // po zapisie zawsze lista projektów; „Anuluj” wraca tam, skąd użytkownik przyszedł
   const backHref =
-    need || businesses ? "/dashboard/projects" : `/dashboard/businesses/${businessId}`;
-  const form = useForm<NeedInput>({
-    resolver: zodResolver(needSchema),
+    project || businesses ? "/dashboard/projects" : `/dashboard/businesses/${businessId}`;
+  const form = useForm<ProjectInput>({
+    resolver: zodResolver(projectSchema),
     defaultValues: {
-      title: need?.title ?? "",
-      description: need?.description ?? "",
-      linkUrls: need?.linkUrls.length ? need.linkUrls : [""],
+      title: project?.title ?? "",
+      description: project?.description ?? "",
+      linkUrls: project?.linkUrls.length ? project.linkUrls : [""],
     },
   });
   const { errors } = form.formState;
   const links = useWatch({ control: form.control, name: "linkUrls" });
 
-  const savedFiles = (need?.files ?? []).filter((f) => !removedIds.includes(f.id));
+  const savedFiles = (project?.files ?? []).filter((f) => !removedIds.includes(f.id));
   const filesCount = savedFiles.length + newFiles.length;
 
-  // Input zawsze widoczny: każdy wybór dopisuje pliki do listy pod nim (do NEED_FILES_MAX).
+  // Input zawsze widoczny: każdy wybór dopisuje pliki do listy pod nim (do PROJECT_FILES_MAX).
   function onPickFiles(event: React.ChangeEvent<HTMLInputElement>) {
     const picked = Array.from(event.target.files ?? []);
     event.target.value = ""; // pozwala wybrać ten sam plik ponownie
@@ -82,9 +82,9 @@ export function NeedForm({
     let error: string | undefined;
     for (const file of picked) {
       if (file.type !== "application/pdf") error = `„${file.name}”: dozwolone są tylko pliki PDF`;
-      else if (file.size > NEED_FILE_MAX_BYTES)
-        error = `„${file.name}” jest za duży (maksymalnie ${NEED_FILE_MAX_MB} MB)`;
-      else if (count >= NEED_FILES_MAX) error = `Maksymalnie ${NEED_FILES_MAX} pliki PDF`;
+      else if (file.size > PROJECT_FILE_MAX_BYTES)
+        error = `„${file.name}” jest za duży (maksymalnie ${PROJECT_FILE_MAX_MB} MB)`;
+      else if (count >= PROJECT_FILES_MAX) error = `Maksymalnie ${PROJECT_FILES_MAX} pliki PDF`;
       else if (newFiles.some((f) => f.name === file.name && f.size === file.size)) continue;
       else {
         accepted.push(file);
@@ -100,7 +100,7 @@ export function NeedForm({
     const { title, description } = form.getValues();
     setExpanding(true);
     try {
-      const response = await fetch("/api/needs/expand-description", {
+      const response = await fetch("/api/projects/expand-description", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, description }),
@@ -134,17 +134,17 @@ export function NeedForm({
 
   // Organizacja jest poza RHF, więc jej błąd ustawiamy tu, od razu razem z błędami pozostałych pól.
   function onFormSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (!need && !selectedId) setOrgError("Wybierz organizację");
+    if (!project && !selectedId) setOrgError("Wybierz organizację");
     return form.handleSubmit(onSubmit)(event);
   }
 
-  function onSubmit(values: NeedInput) {
-    if (!need && !selectedId) return;
+  function onSubmit(values: ProjectInput) {
+    if (!project && !selectedId) return;
     startTransition(async () => {
       // opcjonalne PDF-y najpierw jadą prosto do R2 (podpisane adresy), potem zapisujemy potrzebę
-      const attachments: NeedAttachmentInput[] = [];
+      const attachments: ProjectAttachmentInput[] = [];
       for (const file of newFiles) {
-        const upload = await createNeedFileUpload({
+        const upload = await createProjectFileUpload({
           fileName: file.name,
           size: file.size,
           type: file.type,
@@ -168,14 +168,14 @@ export function NeedForm({
         attachments.push({ key: upload.data.key, fileName: file.name });
       }
 
-      const result = need
-        ? await updateNeed(need.id, values, { attachments, removeFileIds: removedIds })
-        : await createNeed(selectedId, values, attachments);
+      const result = project
+        ? await updateProject(project.id, values, { attachments, removeFileIds: removedIds })
+        : await createProject(selectedId, values, attachments);
       if (!result.success) {
         toast.error(result.error);
         return;
       }
-      toast.success(need ? "Zapisano zmiany" : "Dodano projekt");
+      toast.success(project ? "Zapisano zmiany" : "Dodano projekt");
       router.push("/dashboard/projects");
       router.refresh();
     });
@@ -292,7 +292,7 @@ export function NeedForm({
           Materiały dodatkowe: możesz dołączyć linki i/lub pliki PDF.
         </p>
 
-        <FormField label={`Linki (opcjonalnie, do ${NEED_LINKS_MAX})`} htmlFor="n-link-0">
+        <FormField label={`Linki (opcjonalnie, do ${PROJECT_LINKS_MAX})`} htmlFor="n-link-0">
           <div className="grid gap-2">
             {links.map((url, i) => (
               <div key={i} className="grid gap-1">
@@ -335,7 +335,7 @@ export function NeedForm({
                 )}
               </div>
             ))}
-            {links.length < NEED_LINKS_MAX && (
+            {links.length < PROJECT_LINKS_MAX && (
               <Button
                 type="button"
                 variant="outline"
@@ -356,12 +356,12 @@ export function NeedForm({
             type="file"
             multiple
             accept="application/pdf,.pdf"
-            disabled={filesCount >= NEED_FILES_MAX}
+            disabled={filesCount >= PROJECT_FILES_MAX}
             aria-invalid={!!fileError}
             onChange={onPickFiles}
           />
           <p className="text-xs text-muted-foreground">
-            Dodano {filesCount} z {NEED_FILES_MAX} (każdy do {NEED_FILE_MAX_MB} MB).
+            Dodano {filesCount} z {PROJECT_FILES_MAX} (każdy do {PROJECT_FILE_MAX_MB} MB).
           </p>
           {filesCount > 0 && (
             <ul className="divide-y rounded-xl border text-sm">
@@ -423,7 +423,7 @@ export function NeedForm({
           Anuluj
         </Link>
         <Button type="submit" disabled={pending}>
-          {pending ? "Zapisywanie…" : need ? "Zapisz" : "Dodaj projekt"}
+          {pending ? "Zapisywanie…" : project ? "Zapisz" : "Dodaj projekt"}
         </Button>
       </div>
     </form>

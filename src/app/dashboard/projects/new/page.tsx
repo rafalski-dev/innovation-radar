@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { NeedForm } from "@/components/need/need-form";
+import { ProjectForm } from "@/components/project/project-form";
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/shadcn/button";
 import { getMyBusinesses } from "@/queries/business";
 
 export const metadata: Metadata = { title: "Nowy projekt" };
 
-export default async function NewNeedPage() {
+export default async function NewProjectPage() {
   const businesses = await getMyBusinesses();
 
   return (
@@ -25,7 +25,7 @@ export default async function NewNeedPage() {
           </Link>
         </div>
       ) : (
-        <NeedForm
+        <ProjectForm
           businesses={businesses.map((b) => ({ id: b.id, name: b.name, city: b.city, nip: b.nip }))}
         />
       )}

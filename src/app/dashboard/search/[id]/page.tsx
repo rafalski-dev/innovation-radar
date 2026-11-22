@@ -21,8 +21,8 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
   const phrases = phrasesSchema.safeParse(search.phrases);
   const phraseList = phrases.success ? phrases.data : [];
   const status = search.status as SearchStatusValue;
-  const label = aspectLabel(search.number, search.need?.createdAt);
-  const closed = !!search.need?.sentAt;
+  const label = aspectLabel(search.number, search.project?.createdAt);
+  const closed = !!search.project?.sentAt;
   const range = trlRange(search.results.map((r) => r.trl));
 
   return (
@@ -32,26 +32,26 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
         Wszystkie aspekty
       </Link>
       <PageHeader
-        title={search.title ?? search.need?.title ?? "Aspekt"}
+        title={search.title ?? search.project?.title ?? "Aspekt"}
         description={[
           label,
-          search.title && search.need ? search.need.title : null,
-          search.need ? search.need.business.name : search.query,
+          search.title && search.project ? search.project.title : null,
+          search.project ? search.project.business.name : search.query,
         ]
           .filter(Boolean)
           .join(" · ")}
         action={
           <SearchRowActions
             id={search.id}
-            name={search.title ?? search.need?.title ?? "aspekt"}
-            canChange={!!search.need && !closed}
+            name={search.title ?? search.project?.title ?? "aspekt"}
+            canChange={!!search.project && !closed}
             redirectAfterDelete="/dashboard/search"
           />
         }
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        {search.need &&
+        {search.project &&
           (closed ? (
             <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
               Raport projektu został wysłany, więc nie można dodawać, kopiować ani edytować
@@ -59,7 +59,7 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
             </p>
           ) : (
             <Link
-              href={`/dashboard/search/new?need=${search.need.id}`}
+              href={`/dashboard/search/new?project=${search.project.id}`}
               className={buttonVariants({ variant: "outline" })}
             >
               <PlusIcon />

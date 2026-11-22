@@ -4,7 +4,7 @@ import { phrasesKeyFor, runSearchAgent } from "@/lib/search-agent";
 import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
 import { getSession } from "@/lib/session";
 import { getNumberSetting } from "@/lib/settings";
-import { accessibleNeedWhere } from "@/queries/need";
+import { accessibleProjectWhere } from "@/queries/project";
 import { generateResultsSchema, type AgentStats, type Candidate } from "@/validation/search";
 
 // Agent szuka kilkadziesiąt sekund.
@@ -24,7 +24,7 @@ type ResultsData = {
 const respond = (result: ActionResult<ResultsData>, status = 200) =>
   Response.json(result, { status });
 
-// POST /api/search/results  { needId, phrases, sources }  →  { success, data: { candidates, cached, stats } }
+// POST /api/search/results  { projectId, phrases, sources }  →  { success, data: { candidates, cached, stats } }
 // Uruchamia agenta dla podanych fraz. Niczego nie zapisuje (poza licznikiem limitu):
 // użytkownik ocenia listę i zatwierdza ją razem z frazami przy zapisie wyszukiwania.
 export async function POST(request: Request) {
@@ -35,17 +35,21 @@ export async function POST(request: Request) {
   if (!body.success) return respond(fail(body.error.issues[0]?.message ?? "Niepoprawne dane"), 400);
 
   try {
-    const need = await db.need.findFirst({
-      where: { id: body.data.needId, ...accessibleNeedWhere(session.user.id) },
+    const project = await db.project.findFirst({
+      where: { id: body.data.projectId, ...accessibleProjectWhere(session.user.id) },
       select: { title: true, description: true },
     });
-    if (!need) return respond(fail("Nie znaleziono projektu"), 404);
-    const blocked = await findBlockedTopic(need.title, need.description, ...body.data.phrases);
+    if (!project) return respond(fail("Nie znaleziono projektu"), 404);
+    const blocked = await findBlockedTopic(
+      project.title,
+      project.description,
+      ...body.data.phrases,
+    );
     if (blocked) return respond(fail(blockedTopicMessage(blocked)), 400);
 
     // cache: te same frazy dla tego samego projektu w ciągu 7 dni = zapisany wynik, bez kosztu
     const phrasesKey = phrasesKeyFor(
-      body.data.needId,
+      body.data.projectId,
       body.data.phrases,
       body.data.sources,
       body.data.limit,
@@ -103,8 +107,8 @@ export async function POST(request: Request) {
 
     try {
       const output = await runSearchAgent({
-        title: need.title,
-        description: need.description,
+        title: project.title,
+        description: project.description,
         phrases: body.data.phrases,
         sources: body.data.sources,
         exclude: body.data.exclude,

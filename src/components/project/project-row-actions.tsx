@@ -5,20 +5,20 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { CopyIcon, PencilIcon } from "lucide-react";
 import { toast } from "sonner";
-import { deleteNeed, duplicateNeed } from "@/actions/need";
+import { deleteProject, duplicateProject } from "@/actions/project";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { Button, buttonVariants } from "@/components/shadcn/button";
-import type { NeedRow } from "@/queries/need";
+import type { ProjectRow } from "@/queries/project";
 
 // Akcje przy projekcie: duplikuj, edytuj, usuń. Po wysłaniu raportu projekt jest zamknięty
 // do edycji i usuwania, zostaje tylko duplikowanie.
-export function NeedRowActions({ need }: { need: NeedRow }) {
+export function ProjectRowActions({ project }: { project: ProjectRow }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   function duplicate() {
     startTransition(async () => {
-      const result = await duplicateNeed(need.id);
+      const result = await duplicateProject(project.id);
       if (!result.success) {
         toast.error(result.error);
         return;
@@ -34,16 +34,19 @@ export function NeedRowActions({ need }: { need: NeedRow }) {
         <CopyIcon />
         <span className="sr-only">Duplikuj projekt</span>
       </Button>
-      {!need.sentAt && (
+      {!project.sentAt && (
         <>
           <Link
-            href={`/dashboard/businesses/${need.businessId}/projects/${need.id}/edit`}
+            href={`/dashboard/businesses/${project.businessId}/projects/${project.id}/edit`}
             className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
           >
             <PencilIcon />
             <span className="sr-only">Edytuj</span>
           </Link>
-          <ConfirmDeleteButton itemName={need.title} onConfirm={() => deleteNeed(need.id)} />
+          <ConfirmDeleteButton
+            itemName={project.title}
+            onConfirm={() => deleteProject(project.id)}
+          />
         </>
       )}
     </div>

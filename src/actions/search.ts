@@ -7,7 +7,7 @@ import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
 import { phrasesKeyFor } from "@/lib/search-agent";
 import { aspectTitle } from "@/lib/numbering";
 import { getSession } from "@/lib/session";
-import { accessibleNeedWhere } from "@/queries/need";
+import { accessibleProjectWhere } from "@/queries/project";
 import { searchSchema, type SearchInput } from "@/validation/search";
 
 const CLOSED_MESSAGE = "Raport projektu został wysłany, projekt jest zamknięty do edycji";
@@ -34,24 +34,24 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
   if (blocked) return fail(blockedTopicMessage(blocked));
 
   try {
-    if (parsed.data.needId) {
-      const need = await db.need.findFirst({
-        where: { id: parsed.data.needId, ...accessibleNeedWhere(session.user.id) },
+    if (parsed.data.projectId) {
+      const project = await db.project.findFirst({
+        where: { id: parsed.data.projectId, ...accessibleProjectWhere(session.user.id) },
         select: { id: true, sentAt: true },
       });
-      if (!need) return fail("Nie znaleziono projektu");
-      if (need.sentAt) return fail(CLOSED_MESSAGE);
+      if (!project) return fail("Nie znaleziono projektu");
+      if (project.sentAt) return fail(CLOSED_MESSAGE);
     }
 
     const { results, stats, phrases, sources, limit } = parsed.data;
     // numer aspektu: kolejny w projekcie (lub wśród aspektów bez projektu)
-    const number = await nextNumber(parsed.data.needId || null, session.user.id);
+    const number = await nextNumber(parsed.data.projectId || null, session.user.id);
 
     const search = await db.search.create({
       data: {
         title: parsed.data.title,
         query: parsed.data.query,
-        needId: parsed.data.needId || null,
+        projectId: parsed.data.projectId || null,
         phrases,
         number,
         userId: session.user.id,
@@ -59,7 +59,7 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
           status: "DONE" as const,
           startedAt: new Date(),
           phrasesKey: phrases?.length
-            ? phrasesKeyFor(parsed.data.needId || parsed.data.query, phrases, sources, limit)
+            ? phrasesKeyFor(parsed.data.projectId || parsed.data.query, phrases, sources, limit)
             : null,
           webSearches: stats?.webSearches,
           inputTokens: stats?.inputTokens,
@@ -107,10 +107,10 @@ export async function updateSearch(id: string, input: SearchInput): Promise<Acti
   try {
     const current = await db.search.findFirst({
       where: { id, userId: session.user.id },
-      select: { needId: true, need: { select: { sentAt: true } } },
+      select: { projectId: true, project: { select: { sentAt: true } } },
     });
     if (!current) return fail("Nie znaleziono aspektu");
-    if (current.need?.sentAt) return fail(CLOSED_MESSAGE);
+    if (current.project?.sentAt) return fail(CLOSED_MESSAGE);
 
     const { results, stats, phrases, sources, limit } = parsed.data;
     await db.$transaction([
@@ -124,7 +124,7 @@ export async function updateSearch(id: string, input: SearchInput): Promise<Acti
           ...(results && {
             status: "DONE" as const,
             phrasesKey: phrases?.length
-              ? phrasesKeyFor(current.needId || parsed.data.query, phrases, sources, limit)
+              ? phrasesKeyFor(current.projectId || parsed.data.query, phrases, sources, limit)
               : null,
             webSearches: stats?.webSearches,
             inputTokens: stats?.inputTokens,
@@ -164,26 +164,26 @@ export async function copySearch(id: string): Promise<ActionResult<{ id: string 
     const source = await db.search.findFirst({
       where: { id, userId: session.user.id },
       include: {
-        need: { select: { sentAt: true } },
+        project: { select: { sentAt: true } },
         results: { orderBy: { position: "asc" } },
       },
     });
     if (!source) return fail("Nie znaleziono aspektu");
-    if (source.need?.sentAt) return fail(CLOSED_MESSAGE);
+    if (source.project?.sentAt) return fail(CLOSED_MESSAGE);
 
     const copy = await db.search.create({
       data: {
         title: `${source.title ?? aspectTitle(null, source.number)} (kopia)`.slice(0, 150),
         query: source.query,
         phrases: source.phrases ?? undefined,
-        number: await nextNumber(source.needId, session.user.id),
+        number: await nextNumber(source.projectId, session.user.id),
         status: source.status,
         startedAt: source.startedAt,
         webSearches: source.webSearches,
         inputTokens: source.inputTokens,
         outputTokens: source.outputTokens,
         userId: session.user.id,
-        needId: source.needId,
+        projectId: source.projectId,
         // bez phrasesKey, żeby kopia nie dublowała wpisu w cache wyszukiwań
         results: {
           create: source.results.map((r) => ({
@@ -209,10 +209,10 @@ export async function copySearch(id: string): Promise<ActionResult<{ id: string 
 }
 
 // Kolejny numer aspektu w projekcie (lub wśród aspektów użytkownika bez projektu).
-async function nextNumber(needId: string | null, userId: string) {
+async function nextNumber(projectId: string | null, userId: string) {
   const last = await db.search.aggregate({
     _max: { number: true },
-    where: needId ? { needId } : { userId, needId: null },
+    where: projectId ? { projectId } : { userId, projectId: null },
   });
   return (last._max.number ?? 0) + 1;
 }
@@ -226,9 +226,9 @@ export async function deleteSearch(id: string): Promise<ActionResult> {
     // aspektów projektu z wysłanym raportem nie usuwamy (raport jest zamknięty)
     const current = await db.search.findFirst({
       where: { id, userId: session.user.id },
-      select: { need: { select: { sentAt: true } } },
+      select: { project: { select: { sentAt: true } } },
     });
-    if (current?.need?.sentAt) return fail(CLOSED_MESSAGE);
+    if (current?.project?.sentAt) return fail(CLOSED_MESSAGE);
     const { count } = await db.search.deleteMany({ where: { id, userId: session.user.id } });
     if (count === 0) return fail("Nie znaleziono aspektu");
     revalidateAspects();

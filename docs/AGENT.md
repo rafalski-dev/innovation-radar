@@ -1,13 +1,13 @@
 # Agent wyszukujący innowacje: specyfikacja
 
-> Plan działania agenta, który dla projektu firmy (encja `Need`) szuka innowacji w polskich źródłach,
+> Plan działania agenta, który dla projektu firmy (encja `Project`) szuka innowacji w polskich źródłach,
 > ocenia je i rekomenduje kontakt. Powiązane: [`PROJECT.md`](PROJECT.md), wytyczne [`CHALLENGE.md`](CHALLENGE.md)
 > (scenariusz demo a–e, sekcja 6). Status: **projekt, do akceptacji**.
 
 ## Przepływ w skrócie
 
 ```
-Projekt firmy (Need: tytuł, opis, link, PDF)
+Projekt firmy (Project: tytuł, opis, link, PDF)
   │  użytkownik klika „Szukaj innowacji”
   ▼
 KROK 1  Profil wyszukiwania (AI)          → słowa kluczowe, zapytania, czego nie szukamy
@@ -49,7 +49,7 @@ Pomijamy na start: UPRP i PBN (słabo indeksowane przez wyszukiwarkę; w prezent
 
 **Kiedy:** użytkownik klika „Szukaj innowacji” przy projekcie (lub na stronie Wyszukiwania wybiera projekt).
 
-**Wejście:** `Need.title`, `Need.description`, `Need.linkUrls`, pliki PDF z `NeedFile` (Claude czyta PDF bezpośrednio).
+**Wejście:** `Project.title`, `Project.description`, `Project.linkUrls`, pliki PDF z `ProjectFile` (Claude czyta PDF bezpośrednio).
 
 **Jak:** jedno wywołanie modelu z wymuszonym formatem odpowiedzi (`generateObject` + schemat Zod).
 Bez wyszukiwania w internecie. Koszt: grosze.

@@ -6,10 +6,10 @@ import { PencilIcon, PlusIcon } from "lucide-react";
 import { deleteBusiness } from "@/actions/business";
 import { BusinessMembers } from "@/components/business/business-members";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
-import { NeedAttachments } from "@/components/need/need-attachments";
-import { NeedRowActions } from "@/components/need/need-row-actions";
+import { ProjectAttachments } from "@/components/project/project-attachments";
+import { ProjectRowActions } from "@/components/project/project-row-actions";
 import { buttonVariants } from "@/components/shadcn/button";
-import type { BusinessWithNeeds } from "@/queries/business";
+import type { BusinessWithProjects } from "@/queries/business";
 import { cn } from "@/lib/utils";
 
 // Organizacje jako radio group (nie lista): wybrana pokazuje swoje dane i potrzeby na tej samej stronie.
@@ -17,7 +17,7 @@ export function BusinessPicker({
   businesses,
   initialId,
 }: {
-  businesses: BusinessWithNeeds[];
+  businesses: BusinessWithProjects[];
   initialId?: string;
 }) {
   const [selectedId, setSelectedId] = useState(initialId ?? businesses[0]?.id);
@@ -134,23 +134,25 @@ export function BusinessPicker({
               Nowy projekt
             </Link>
           </div>
-          {selected.needs.length === 0 ? (
+          {selected.projects.length === 0 ? (
             <p className="rounded-2xl border border-dashed py-8 text-center text-sm text-muted-foreground">
               Ta organizacja nie ma jeszcze żadnego projektu. Opisz pierwszą.
             </p>
           ) : (
             <ul className="grid gap-3">
-              {selected.needs.map((need) => (
+              {selected.projects.map((project) => (
                 <li
-                  key={need.id}
+                  key={project.id}
                   className="flex items-start justify-between gap-4 rounded-xl border p-4"
                 >
                   <div className="min-w-0 space-y-1">
-                    <div className="font-medium">{need.title}</div>
-                    <p className="line-clamp-2 text-sm text-muted-foreground">{need.description}</p>
-                    <NeedAttachments need={need} />
+                    <div className="font-medium">{project.title}</div>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
+                      {project.description}
+                    </p>
+                    <ProjectAttachments project={project} />
                   </div>
-                  <NeedRowActions need={need} />
+                  <ProjectRowActions project={project} />
                 </li>
               ))}
             </ul>

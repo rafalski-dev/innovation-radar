@@ -23,7 +23,7 @@ export default async function DashboardPage() {
 
   const metrics = [
     ["Organizacje", overview.businesses, "/dashboard/businesses"],
-    ["Projekty", overview.needs, "/dashboard/projects"],
+    ["Projekty", overview.projects, "/dashboard/projects"],
     ["Aspekty", overview.searches, "/dashboard/search"],
     ["Wyniki", overview.results, "/dashboard/search"],
     [
@@ -107,25 +107,24 @@ export default async function DashboardPage() {
                   Wszystkie →
                 </Link>
               </div>
-              {overview.recentNeeds.length === 0 ? (
+              {overview.recentProjects.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">
                   Nie masz jeszcze żadnego projektu.
                 </p>
               ) : (
                 <ul className="divide-y">
-                  {overview.recentNeeds.map((need) => (
-                    <li key={need.id} className="py-2.5 first:pt-0 last:pb-0">
-                      <Link
-                        href={`/dashboard/projects/${need.id}/report`}
-                        className="group block space-y-0.5"
-                      >
+                  {overview.recentProjects.map((project) => (
+                    <li key={project.id} className="py-2.5 first:pt-0 last:pb-0">
+                      <Link href="/dashboard/projects" className="group block space-y-0.5">
                         <p className="font-mono text-[11px] text-muted-foreground">
-                          {projectNumber(need.createdAt)}
+                          {projectNumber(project.createdAt)}
                         </p>
-                        <p className="text-sm font-medium group-hover:text-brand">{need.title}</p>
+                        <p className="text-sm font-medium group-hover:text-brand">
+                          {project.title}
+                        </p>
                         <p className="text-xs text-muted-foreground">
-                          {need.business.name} · aspekty: {need._count.searches}
-                          {need.sentAt && " · raport wysłany"}
+                          {project.business.name} · aspekty: {project._count.searches}
+                          {project.sentAt && " · raport wysłany"}
                         </p>
                       </Link>
                     </li>
@@ -163,13 +162,13 @@ export default async function DashboardPage() {
                         href={`/dashboard/search/${search.id}`}
                         className="group block space-y-0.5"
                       >
-                        {aspectLabel(search.number, search.need?.createdAt) && (
+                        {aspectLabel(search.number, search.project?.createdAt) && (
                           <p className="font-mono text-[11px] text-muted-foreground">
-                            {aspectLabel(search.number, search.need?.createdAt)}
+                            {aspectLabel(search.number, search.project?.createdAt)}
                           </p>
                         )}
                         <p className="line-clamp-1 text-sm font-medium group-hover:text-brand">
-                          {search.title ?? search.need?.title ?? search.query}
+                          {search.title ?? search.project?.title ?? search.query}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {dateFormat.format(search.createdAt)} · wyniki: {search._count.results}

@@ -6,7 +6,7 @@ import { env } from "@/lib/env";
 import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
 import { getSession } from "@/lib/session";
 import { getSetting } from "@/lib/settings";
-import { accessibleNeedWhere } from "@/queries/need";
+import { accessibleProjectWhere } from "@/queries/project";
 import { generatePhrasesSchema, phrasesSchema, type Phrases } from "@/validation/search";
 
 // Limit generowań na użytkownika w oknie 30 minut (kontrola kosztów API).
@@ -20,7 +20,7 @@ function respond(result: ActionResult<Phrases>, status = 200) {
   return Response.json(result, { status });
 }
 
-// POST /api/search/phrases  { needId, hint }  →  { success, data: string[] } | { success: false, error }
+// POST /api/search/phrases  { projectId, hint }  →  { success, data: string[] } | { success: false, error }
 // Generuje 3-5 fraz do wyszukiwarki na podstawie opisu projektu. Niczego nie zapisuje:
 // użytkownik edytuje wynik i zatwierdza go dopiero przy zapisie wyszukiwania.
 export async function POST(request: Request) {
@@ -34,12 +34,12 @@ export async function POST(request: Request) {
     return respond(fail("Brak klucza ANTHROPIC_API_KEY na serwerze"), 503);
 
   try {
-    const need = await db.need.findFirst({
-      where: { id: body.data.needId, ...accessibleNeedWhere(session.user.id) },
+    const project = await db.project.findFirst({
+      where: { id: body.data.projectId, ...accessibleProjectWhere(session.user.id) },
       select: { title: true, description: true, linkUrls: true },
     });
-    if (!need) return respond(fail("Nie znaleziono projektu"), 404);
-    const blocked = await findBlockedTopic(need.title, need.description);
+    if (!project) return respond(fail("Nie znaleziono projektu"), 404);
+    const blocked = await findBlockedTopic(project.title, project.description);
     if (blocked) return respond(fail(blockedTopicMessage(blocked)), 400);
     const extra = await getSetting("phrasesPromptExtra");
 
@@ -79,8 +79,8 @@ export async function POST(request: Request) {
           {
             role: "user",
             content:
-              `Projekt: ${need.title}\n\nOpis:\n${need.description}` +
-              (need.linkUrls.length ? `\n\nLinki: ${need.linkUrls.join(", ")}` : "") +
+              `Projekt: ${project.title}\n\nOpis:\n${project.description}` +
+              (project.linkUrls.length ? `\n\nLinki: ${project.linkUrls.join(", ")}` : "") +
               (single && existing.length
                 ? `\n\nFrazy już na liście (nie powtarzaj ich): ${existing.join("; ")}`
                 : "") +

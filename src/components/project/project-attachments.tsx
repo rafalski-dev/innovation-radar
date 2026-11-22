@@ -1,18 +1,18 @@
 import { ExternalLinkIcon, FileTextIcon } from "lucide-react";
 
 type Props = {
-  need: {
+  project: {
     linkUrls: string[];
     files: { id: string; fileName: string }[];
   };
 };
 
 // Opcjonalne materiały przy potrzebie: linki i/lub pliki PDF.
-export function NeedAttachments({ need }: Props) {
-  if (need.linkUrls.length === 0 && need.files.length === 0) return null;
+export function ProjectAttachments({ project }: Props) {
+  if (project.linkUrls.length === 0 && project.files.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-      {need.linkUrls.map((url) => (
+      {project.linkUrls.map((url) => (
         <a
           key={url}
           href={url}
@@ -24,7 +24,7 @@ export function NeedAttachments({ need }: Props) {
           <span className="max-w-64 truncate">{url.replace(/^https?:\/\//, "")}</span>
         </a>
       ))}
-      {need.files.map((file) => (
+      {project.files.map((file) => (
         <a
           key={file.id}
           href={`/api/project-files/${file.id}`}

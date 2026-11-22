@@ -1,15 +1,15 @@
 import { z } from "zod";
 
 // PDF przy potrzebie leży w Cloudflare R2 (wysyłka z przeglądarki, bez udziału serwera Next).
-export const NEED_FILE_MAX_BYTES = 20 * 1024 * 1024;
+export const PROJECT_FILE_MAX_BYTES = 20 * 1024 * 1024;
 // maksymalna liczba plików PDF przy jednej potrzebie
-export const NEED_FILES_MAX = 3;
+export const PROJECT_FILES_MAX = 3;
 // maksymalna liczba linków przy jednej potrzebie
-export const NEED_LINKS_MAX = 3;
-export const NEED_FILE_MAX_MB = NEED_FILE_MAX_BYTES / (1024 * 1024);
+export const PROJECT_LINKS_MAX = 3;
+export const PROJECT_FILE_MAX_MB = PROJECT_FILE_MAX_BYTES / (1024 * 1024);
 
 // Plik już wysłany do R2, który dołączamy do potrzeby.
-export type NeedAttachmentInput = { key: string; fileName: string };
+export type ProjectAttachmentInput = { key: string; fileName: string };
 
 function isHttpUrl(value: string) {
   try {
@@ -20,7 +20,7 @@ function isHttpUrl(value: string) {
   }
 }
 
-export const needSchema = z.object({
+export const projectSchema = z.object({
   title: z
     .string()
     .trim()
@@ -28,7 +28,7 @@ export const needSchema = z.object({
     .max(150, "Tytuł może mieć maksymalnie 150 znaków"),
   // wymagane: organizacja (poza schematem), tytuł i opis; link i pliki PDF są opcjonalne
   description: z.string().trim().min(1, "Opisz projekt").max(4000, "Maksymalnie 4000 znaków"),
-  // opcjonalne linki (do NEED_LINKS_MAX); puste pola są pomijane przy zapisie
+  // opcjonalne linki (do PROJECT_LINKS_MAX); puste pola są pomijane przy zapisie
   linkUrls: z
     .array(
       z
@@ -37,14 +37,14 @@ export const needSchema = z.object({
         .max(500, "Maksymalnie 500 znaków")
         .refine((v) => v === "" || isHttpUrl(v), "Podaj poprawny adres, np. https://example.com"),
     )
-    .max(NEED_LINKS_MAX, `Maksymalnie ${NEED_LINKS_MAX} linki`),
+    .max(PROJECT_LINKS_MAX, `Maksymalnie ${PROJECT_LINKS_MAX} linki`),
 });
-// Niepuste, bez duplikatów, do NEED_LINKS_MAX: postać zapisywana w bazie.
+// Niepuste, bez duplikatów, do PROJECT_LINKS_MAX: postać zapisywana w bazie.
 export function cleanLinks(links: string[]) {
-  return [...new Set(links.filter(Boolean))].slice(0, NEED_LINKS_MAX);
+  return [...new Set(links.filter(Boolean))].slice(0, PROJECT_LINKS_MAX);
 }
 
-export type NeedInput = z.infer<typeof needSchema>;
+export type ProjectInput = z.infer<typeof projectSchema>;
 
 // Propozycje AI do opisu: lista fragmentów, z których użytkownik dodaje wybrane przyciskami.
 export const MAX_SUGGESTIONS = 6;

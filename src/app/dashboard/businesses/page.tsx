@@ -4,13 +4,13 @@ import { PlusIcon } from "lucide-react";
 import { BusinessPicker } from "@/components/business/business-picker";
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/shadcn/button";
-import { getMyBusinessesWithNeeds } from "@/queries/business";
+import { getMyBusinessesWithProjects } from "@/queries/business";
 
 export const metadata: Metadata = { title: "Moje organizacje" };
 
 export default async function BusinessesPage({ searchParams }: PageProps<"/dashboard/businesses">) {
   const { org } = await searchParams;
-  const businesses = await getMyBusinessesWithNeeds();
+  const businesses = await getMyBusinessesWithProjects();
 
   return (
     <div className="space-y-6">

@@ -10,7 +10,7 @@ import {
 // Nawigacja dashboardu: jedno miejsce. Kolejne sekcje (potrzeby, wyniki, listy, panel
 // administracji) dojdą tu jako osobne pozycje.
 // Liczniki przy pozycjach menu (wartości z `getNavCounts`).
-export type NavCounts = { businesses: number; needs: number; searches: number };
+export type NavCounts = { businesses: number; projects: number; searches: number };
 
 export type DashboardNavItem = {
   href: string;
@@ -22,7 +22,7 @@ export type DashboardNavItem = {
 export const dashboardNav: DashboardNavItem[] = [
   { href: "/dashboard", label: "Panel", icon: LayoutDashboardIcon },
   { href: "/dashboard/businesses", label: "Organizacje", icon: BuildingIcon, count: "businesses" },
-  { href: "/dashboard/projects", label: "Projekty", icon: ClipboardListIcon, count: "needs" },
+  { href: "/dashboard/projects", label: "Projekty", icon: ClipboardListIcon, count: "projects" },
   { href: "/dashboard/search", label: "Aspekty", icon: SearchIcon, count: "searches" },
   { href: "/dashboard/profile", label: "Profil", icon: UserIcon },
 ];

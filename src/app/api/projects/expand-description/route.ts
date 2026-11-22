@@ -11,7 +11,7 @@ import {
   descriptionSuggestionsSchema,
   expandDescriptionSchema,
   MAX_SUGGESTIONS,
-} from "@/validation/need";
+} from "@/validation/project";
 
 // Limit generowań na użytkownika w oknie 30 minut (kontrola kosztów API).
 const WINDOW_LIMIT = 10;
@@ -23,7 +23,7 @@ function respond(result: ActionResult<DescriptionSuggestion[]>, status = 200) {
   return Response.json(result, { status });
 }
 
-// POST /api/needs/expand-description  { title, description }  →  { success, data: {label, text}[] } | { success: false, error }
+// POST /api/projects/expand-description  { title, description }  →  { success, data: {label, text}[] } | { success: false, error }
 // Na podstawie tytułu i wpisanego opisu proponuje uzupełnienia. Niczego nie zapisuje:
 // użytkownik dodaje wybrane propozycje do opisu przyciskami w formularzu.
 export async function POST(request: Request) {

@@ -5,15 +5,15 @@ import { accessibleBusinessWhere } from "@/queries/business";
 
 // Potrzebę widzi i zmienia administrator organizacji oraz osoby do niej przypisane.
 // Reguła w jednym miejscu (używają jej też akcje).
-export function accessibleNeedWhere(userId: string) {
+export function accessibleProjectWhere(userId: string) {
   return { business: accessibleBusinessWhere(userId) };
 }
 
-export async function getNeedsForBusiness(businessId: string) {
+export async function getProjectsForBusiness(businessId: string) {
   await connection();
   const session = await requireSession();
-  return db.need.findMany({
-    where: { businessId, ...accessibleNeedWhere(session.user.id) },
+  return db.project.findMany({
+    where: { businessId, ...accessibleProjectWhere(session.user.id) },
     include: {
       files: {
         select: { id: true, fileName: true, size: true },
@@ -25,14 +25,21 @@ export async function getNeedsForBusiness(businessId: string) {
 }
 
 // Wszystkie potrzeby ze wszystkich dostępnych organizacji (strona /dashboard/projects).
-export async function getMyNeeds() {
+export async function getMyProjects() {
   await connection();
   const session = await requireSession();
-  return db.need.findMany({
-    where: accessibleNeedWhere(session.user.id),
+  return db.project.findMany({
+    where: accessibleProjectWhere(session.user.id),
     include: {
-      business: { select: { id: true, name: true } },
-      searches: { select: { _count: { select: { results: true } } } },
+      business: { select: { id: true, name: true, owner: { select: { email: true } } } },
+      author: { select: { email: true } },
+      searches: {
+        select: {
+          _count: { select: { results: true } },
+          user: { select: { email: true } },
+          results: { select: { trl: true, sourceName: true } },
+        },
+      },
       files: {
         select: { id: true, fileName: true, size: true },
         orderBy: { createdAt: "asc" },
@@ -42,11 +49,11 @@ export async function getMyNeeds() {
   });
 }
 
-export async function getMyNeed(id: string, businessId: string) {
+export async function getMyProject(id: string, businessId: string) {
   await connection();
   const session = await requireSession();
-  return db.need.findFirst({
-    where: { id, businessId, ...accessibleNeedWhere(session.user.id) },
+  return db.project.findFirst({
+    where: { id, businessId, ...accessibleProjectWhere(session.user.id) },
     include: {
       files: {
         select: { id: true, fileName: true, size: true },
@@ -57,11 +64,11 @@ export async function getMyNeed(id: string, businessId: string) {
 }
 
 // Dane raportu zbiorczego projektu: projekt, organizacja, pliki oraz aspekty z wynikami.
-export async function getNeedReport(id: string) {
+export async function getProjectReport(id: string) {
   await connection();
   const session = await requireSession();
-  return db.need.findFirst({
-    where: { id, ...accessibleNeedWhere(session.user.id) },
+  return db.project.findFirst({
+    where: { id, ...accessibleProjectWhere(session.user.id) },
     include: {
       business: { select: { id: true, name: true, nip: true, city: true } },
       files: {
@@ -76,4 +83,4 @@ export async function getNeedReport(id: string) {
   });
 }
 
-export type NeedRow = Awaited<ReturnType<typeof getNeedsForBusiness>>[number];
+export type ProjectRow = Awaited<ReturnType<typeof getProjectsForBusiness>>[number];

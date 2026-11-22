@@ -89,7 +89,7 @@ async function main() {
   }
 
   // projekty demo: dodajemy tylko brakujące (po tytule), istniejących nie ruszamy
-  const demoNeeds = [
+  const demoProjects = [
     {
       title: "Automatyczna kontrola jakości na linii",
       expectedOutcome: "Zmniejszyć liczbę reklamacji o połowę w ciągu roku.",
@@ -116,29 +116,32 @@ async function main() {
         "projekty badawczo-rozwojowe z tej dziedziny, które można wdrożyć lub rozwijać razem z partnerem naukowym.",
     },
   ];
-  for (const need of demoNeeds) {
-    const exists = await db.need.findFirst({
-      where: { businessId: business.id, title: need.title },
+  for (const project of demoProjects) {
+    const exists = await db.project.findFirst({
+      where: { businessId: business.id, title: project.title },
       select: { id: true },
     });
     if (exists) {
-      console.log(`Need: pominięto (projekt „${need.title}” już istnieje)`);
+      console.log(`Project: pominięto (projekt „${project.title}” już istnieje)`);
       continue;
     }
-    await db.need.create({ data: { businessId: business.id, ...need } });
-    console.log(`Need: dodano projekt demo „${need.title}”`);
+    await db.project.create({ data: { businessId: business.id, ...project } });
+    console.log(`Project: dodano projekt demo „${project.title}”`);
   }
 
   // przykładowy aspekt z wynikami (oznaczone „Przykład”), żeby od razu zobaczyć raport, TRL i liczniki
-  const batteryNeed = await db.need.findFirst({
+  const batteryProject = await db.project.findFirst({
     where: { businessId: business.id, title: "Recykling zużytych baterii litowo-jonowych" },
     select: { id: true },
   });
-  if (batteryNeed && (await db.search.count({ where: { needId: batteryNeed.id } })) === 0) {
+  if (
+    batteryProject &&
+    (await db.search.count({ where: { projectId: batteryProject.id } })) === 0
+  ) {
     await db.search.create({
       data: {
         query: "Recykling zużytych baterii litowo-jonowych",
-        needId: batteryNeed.id,
+        projectId: batteryProject.id,
         userId: user.id,
         number: 1,
         status: "DONE",

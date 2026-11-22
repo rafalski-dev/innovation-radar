@@ -9,7 +9,7 @@ export async function getMySearches() {
   return db.search.findMany({
     where: { userId: session.user.id },
     include: {
-      need: {
+      project: {
         select: {
           id: true,
           title: true,
@@ -31,7 +31,7 @@ export async function getSearch(id: string) {
   return db.search.findFirst({
     where: { id, userId: session.user.id },
     include: {
-      need: {
+      project: {
         select: {
           id: true,
           title: true,

@@ -23,13 +23,13 @@ export async function getMyBusinesses() {
 }
 
 // Organizacje użytkownika z potrzebami i osobami (widok wyboru na stronie „Moje organizacje”).
-export async function getMyBusinessesWithNeeds() {
+export async function getMyBusinessesWithProjects() {
   await connection();
   const session = await requireSession();
   const businesses = await db.business.findMany({
     where: accessibleBusinessWhere(session.user.id),
     include: {
-      needs: {
+      projects: {
         include: {
           files: {
             select: { id: true, fileName: true, size: true },
@@ -63,5 +63,5 @@ export async function getAccessibleBusiness(id: string) {
   return db.business.findFirst({ where: { id, ...accessibleBusinessWhere(session.user.id) } });
 }
 
-export type BusinessWithNeeds = Awaited<ReturnType<typeof getMyBusinessesWithNeeds>>[number];
+export type BusinessWithProjects = Awaited<ReturnType<typeof getMyBusinessesWithProjects>>[number];
 export type BusinessRow = Awaited<ReturnType<typeof getMyBusinesses>>[number];

@@ -41,6 +41,7 @@ model User {
   phraseGenerations      PhraseGeneration[]
   descriptionGenerations DescriptionGeneration[]
   agentRuns              AgentRun[]
+  authoredProjects          Project[]                  @relation("ProjectAuthor")
 }
 
 model Session {
@@ -102,7 +103,7 @@ model Business {
   description String?
   ownerId     String
   owner       User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  needs       Need[]
+  projects       Project[]
   members     BusinessMember[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
@@ -113,35 +114,38 @@ model Business {
 // ---------- Potrzeby ----------
 // Projekt należy do biznesu: tytuł + opis (na razie jedno pole). Podstawa zapytań do agenta.
 
-model Need {
+model Project {
   id              String     @id @default(cuid())
   title           String
   expectedOutcome String? // wycofane z formularza (na razie jeden opis); stare wpisy zachowują wartość
   description     String // opis projektu: używany przez wyszukiwarkę i generowanie fraz
   linkUrls        String[]   @default([]) // opcjonalne linki do materiałów (do 3)
   sentAt          DateTime? // raport wysłany do członków organizacji: projekt zamknięty do edycji
-  files           NeedFile[]
+  files           ProjectFile[]
   searches        Search[]
   businessId      String
   business        Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  authorId        String? // autor projektu (null = stare wpisy: wtedy pokazujemy właściciela organizacji)
+  author          User?      @relation("ProjectAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
   @@index([businessId])
+  @@index([authorId])
 }
 
-// Opcjonalne pliki PDF przy potrzebie (do NEED_FILES_MAX). Sama zawartość leży w Cloudflare R2 pod kluczem `key`;
+// Opcjonalne pliki PDF przy potrzebie (do PROJECT_FILES_MAX). Sama zawartość leży w Cloudflare R2 pod kluczem `key`;
 // pobieranie przez /api/project-files/[fileId] (sprawdza dostęp i przekierowuje na podpisany adres).
-model NeedFile {
+model ProjectFile {
   id        String   @id @default(cuid())
-  needId    String
-  need      Need     @relation(fields: [needId], references: [id], onDelete: Cascade)
+  projectId    String
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   fileName  String
   size      Int
   key       String   @unique
   createdAt DateTime @default(now())
 
-  @@index([needId])
+  @@index([projectId])
 }
 
 // Osoby przypisane do organizacji. Właściciel (Business.ownerId) jest jej administratorem
@@ -174,15 +178,16 @@ model Search {
   webSearches  Int?
   inputTokens  Int?
   outputTokens Int?
+  sharedAt     DateTime? // kolumna istnieje już w bazie (spoza tego repo); zachowana, żeby db:push jej nie usunął
   results      SearchResult[]
   userId       String
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  needId       String?
-  need         Need?          @relation(fields: [needId], references: [id], onDelete: SetNull)
+  projectId       String?
+  project         Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdAt    DateTime       @default(now())
 
   @@index([userId, createdAt])
-  @@index([needId])
+  @@index([projectId])
 }
 
 // Licznik generowań fraz przez AI: służy do limitu na użytkownika (koszt API), nie do historii.

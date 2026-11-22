@@ -12,12 +12,12 @@ import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import type { BusinessWithNeeds } from "@/queries/business";
+import type { BusinessWithProjects } from "@/queries/business";
 import { type AddMemberInput, addMemberSchema } from "@/validation/business";
 
 // Osoby organizacji: administrator (właściciel) + przypisani członkowie.
 // Dodawać i usuwać może tylko administrator.
-export function BusinessMembers({ business }: { business: BusinessWithNeeds }) {
+export function BusinessMembers({ business }: { business: BusinessWithProjects }) {
   const [pending, startTransition] = useTransition();
   const form = useForm<AddMemberInput>({
     resolver: zodResolver(addMemberSchema),

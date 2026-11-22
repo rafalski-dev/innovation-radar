@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import { DEFAULT_TRL } from "@/lib/trl";
 import { accessibleBusinessWhere } from "@/queries/business";
-import { accessibleNeedWhere } from "@/queries/need";
+import { accessibleProjectWhere } from "@/queries/project";
 
 // Liczniki przy pozycjach menu: organizacje, projekty (z dostępnych organizacji) i aspekty użytkownika.
 // Te same reguły dostępu co listy, na które prowadzą pozycje menu.
@@ -11,12 +11,12 @@ export async function getNavCounts() {
   await connection();
   const session = await requireSession();
   const userId = session.user.id;
-  const [businesses, needs, searches] = await Promise.all([
+  const [businesses, projects, searches] = await Promise.all([
     db.business.count({ where: accessibleBusinessWhere(userId) }),
-    db.need.count({ where: accessibleNeedWhere(userId) }),
+    db.project.count({ where: accessibleProjectWhere(userId) }),
     db.search.count({ where: { userId } }),
   ]);
-  return { businesses, needs, searches };
+  return { businesses, projects, searches };
 }
 
 // Dane strony głównej panelu: liczniki oraz ostatnie projekty i aspekty zalogowanego użytkownika.
@@ -24,12 +24,12 @@ export async function getDashboardOverview() {
   await connection();
   const session = await requireSession();
   const userId = session.user.id;
-  const needWhere = accessibleNeedWhere(userId);
+  const projectWhere = accessibleProjectWhere(userId);
 
-  const [businesses, needs, searches, results, trlStats, recentNeeds, recentSearches] =
+  const [businesses, projects, searches, results, trlStats, recentProjects, recentSearches] =
     await Promise.all([
       db.business.count({ where: accessibleBusinessWhere(userId) }),
-      db.need.count({ where: needWhere }),
+      db.project.count({ where: projectWhere }),
       db.search.count({ where: { userId } }),
       db.searchResult.count({ where: { search: { userId } } }),
       db.searchResult.aggregate({
@@ -37,8 +37,8 @@ export async function getDashboardOverview() {
         _count: { _all: true, trl: true },
         where: { search: { userId } },
       }),
-      db.need.findMany({
-        where: needWhere,
+      db.project.findMany({
+        where: projectWhere,
         take: 4,
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         select: {
@@ -60,7 +60,7 @@ export async function getDashboardOverview() {
           title: true,
           query: true,
           createdAt: true,
-          need: { select: { title: true, createdAt: true } },
+          project: { select: { title: true, createdAt: true } },
           _count: { select: { results: true } },
         },
       }),
@@ -73,11 +73,11 @@ export async function getDashboardOverview() {
 
   return {
     businesses,
-    needs,
+    projects,
     searches,
     results,
     avgTrl,
-    recentNeeds,
+    recentProjects,
     recentSearches,
   };
 }

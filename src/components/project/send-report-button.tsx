@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { SendIcon } from "lucide-react";
 import { toast } from "sonner";
-import { sendNeedReport } from "@/actions/need";
+import { sendProjectReport } from "@/actions/project";
 import { Button } from "@/components/shadcn/button";
 import {
   Dialog,
@@ -18,11 +18,11 @@ import {
 
 // Wysyła raport do właściciela i członków organizacji. To zamyka projekt do edycji (po potwierdzeniu).
 export function SendReportButton({
-  needId,
+  projectId,
   title,
   size = "sm",
 }: {
-  needId: string;
+  projectId: string;
   title: string;
   size?: "sm" | "default";
 }) {
@@ -31,7 +31,7 @@ export function SendReportButton({
 
   function confirm() {
     startTransition(async () => {
-      const result = await sendNeedReport(needId);
+      const result = await sendProjectReport(projectId);
       if (result.success) {
         toast.success("Wysłano raport do członków organizacji. Projekt jest zamknięty do edycji");
         setOpen(false);

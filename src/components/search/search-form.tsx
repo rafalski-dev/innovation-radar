@@ -33,7 +33,7 @@ import {
   type SourceOption,
 } from "@/validation/search";
 
-export type SearchNeedOption = {
+export type SearchProjectOption = {
   id: string;
   title: string;
   description: string;
@@ -47,14 +47,14 @@ export type EditingAspect = {
   title: string;
   query: string;
   phrases: string[];
-  needId: string;
-  needTitle: string;
+  projectId: string;
+  projectTitle: string;
   results: Candidate[];
 };
 
 // POST /api/search/phrases: AI zwraca 3-5 fraz (nic nie zapisuje).
 async function requestPhrases(
-  needId: string,
+  projectId: string,
   hint: string,
   existing?: string[], // podane = AI zwraca jedną nową frazę
 ): Promise<ActionResult<Phrases>> {
@@ -62,7 +62,7 @@ async function requestPhrases(
     const response = await fetch("/api/search/phrases", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ needId, hint, existing }),
+      body: JSON.stringify({ projectId, hint, existing }),
     });
     return (await response.json()) as ActionResult<Phrases>;
   } catch {
@@ -93,7 +93,7 @@ function plural(n: number, one: string, few: string, many: string) {
 
 // POST /api/search/results: agent szuka w źródłach dla podanych fraz (nic nie zapisuje).
 async function requestResults(
-  needId: string,
+  projectId: string,
   phrases: Phrases,
   sources: string[],
   limit: number,
@@ -103,7 +103,7 @@ async function requestResults(
     const response = await fetch("/api/search/results", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ needId, phrases, sources, limit, exclude }),
+      body: JSON.stringify({ projectId, phrases, sources, limit, exclude }),
     });
     return (await response.json()) as ActionResult<ApiResultsData>;
   } catch {
@@ -113,24 +113,24 @@ async function requestResults(
 
 // Formularz nowego wyszukiwania: wybór projektu (opcjonalny) + opis tego, czego szukamy.
 export function SearchForm({
-  needs,
+  projects,
   sourceOptions,
-  initialNeedId,
+  initialProjectId,
   editing,
 }: {
-  needs: SearchNeedOption[];
+  projects: SearchProjectOption[];
   sourceOptions: SourceOption[]; // aktywne źródła z bazy
 
-  initialNeedId?: string; // projekt wybrany z góry (np. z listy projektów)
+  initialProjectId?: string; // projekt wybrany z góry (np. z listy projektów)
   editing?: EditingAspect; // edytowany aspekt: dane przepisane, projekt zablokowany
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const initialNeed = needs.find((n) => n.id === (editing?.needId ?? initialNeedId));
-  const [needId, setNeedId] = useState(initialNeed?.id ?? "");
+  const initialProject = projects.find((n) => n.id === (editing?.projectId ?? initialProjectId));
+  const [projectId, setProjectId] = useState(initialProject?.id ?? "");
   const [title, setTitle] = useState(editing?.title ?? "");
   const [titleError, setTitleError] = useState<string>();
-  const [query, setQuery] = useState(initialNeed?.description ?? editing?.query ?? "");
+  const [query, setQuery] = useState(initialProject?.description ?? editing?.query ?? "");
   const [error, setError] = useState<string>();
   const [phrases, setPhrases] = useState<Phrases | undefined>(
     editing && editing.phrases.length > 0 ? editing.phrases : undefined,
@@ -184,14 +184,14 @@ export function SearchForm({
   // more = „Znajdź więcej”: dokładamy kolejne materiały, pomijając już znalezione adresy
   function searchSources(more = false) {
     const list = cleanPhrases();
-    if (!needId || list.length === 0) {
+    if (!projectId || list.length === 0) {
       setError("Wybierz projekt i wygeneruj frazy");
       return;
     }
     setError(undefined);
     const known = more ? (results?.candidates.map((c) => c.sourceUrl) ?? []) : undefined;
     startSearching(async () => {
-      const result = await requestResults(needId, list, sources, limit, known);
+      const result = await requestResults(projectId, list, sources, limit, known);
       if (!result.success) {
         toast.error(result.error);
         return;
@@ -223,13 +223,13 @@ export function SearchForm({
   }
 
   function generate() {
-    if (!needId) {
+    if (!projectId) {
       setError("Wybierz projekt, z którego mam wygenerować frazy");
       return;
     }
     setError(undefined);
     startGenerating(async () => {
-      const result = await requestPhrases(needId, hint);
+      const result = await requestPhrases(projectId, hint);
       if (!result.success) {
         toast.error(result.error);
         return;
@@ -240,10 +240,10 @@ export function SearchForm({
 
   // Dopisuje jedną nową frazę wygenerowaną na podstawie wskazówki, bez ruszania pozostałych.
   function generateOne() {
-    if (!needId || !phrases) return;
+    if (!projectId || !phrases) return;
     setError(undefined);
     startGenerating(async () => {
-      const result = await requestPhrases(needId, hint, cleanPhrases());
+      const result = await requestPhrases(projectId, hint, cleanPhrases());
       if (!result.success) {
         toast.error(result.error);
         return;
@@ -267,15 +267,15 @@ export function SearchForm({
     setResults(undefined);
   }
 
-  function selectNeed(id: string) {
-    if (id !== needId) {
+  function selectProject(id: string) {
+    if (id !== projectId) {
       setPhrases(undefined);
       setApproved(false);
       setResults(undefined);
     }
-    setNeedId(id);
-    const need = needs.find((n) => n.id === id);
-    if (need && !query.trim()) setQuery(need.description);
+    setProjectId(id);
+    const project = projects.find((n) => n.id === id);
+    if (project && !query.trim()) setQuery(project.description);
   }
 
   function onSubmit(event: React.FormEvent) {
@@ -293,7 +293,7 @@ export function SearchForm({
     const input = {
       title,
       query,
-      needId,
+      projectId,
       phrases: cleaned,
       results: chosen,
       stats: results?.stats,
@@ -342,7 +342,7 @@ export function SearchForm({
               Edytujesz aspekt{editing.label ? ` ${editing.label}` : ""}
               <span className="font-normal text-muted-foreground">
                 {" "}
-                · projekt: {editing.needTitle}
+                · projekt: {editing.projectTitle}
               </span>
             </p>
             <p className="text-xs text-muted-foreground">
@@ -353,19 +353,19 @@ export function SearchForm({
           </div>
         </div>
       )}
-      {needs.length > 0 && !editing && (
+      {projects.length > 0 && !editing && (
         <FormField label="Projekt (opcjonalnie)" error={error}>
           <div className="grid gap-2 sm:grid-cols-2">
-            {needs.map((n) => (
+            {projects.map((n) => (
               <label
                 key={n.id}
                 className="flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-foreground/30 has-[:checked]:border-foreground/60 has-[:checked]:bg-muted/70 has-[:checked]:ring-1 has-[:checked]:ring-foreground/15"
               >
                 <input
                   type="radio"
-                  name="need"
-                  checked={n.id === needId}
-                  onChange={() => selectNeed(n.id)}
+                  name="project"
+                  checked={n.id === projectId}
+                  onChange={() => selectProject(n.id)}
                   className="mt-1 accent-current"
                 />
                 <span className="grid min-w-0 gap-0.5">
@@ -458,7 +458,7 @@ export function SearchForm({
         )}
       </div>
       {/* bez wyboru projektu (zastępowanie) błędy nie mają się gdzie pokazać, więc są tutaj */}
-      {error && (editing || needs.length === 0) && (
+      {error && (editing || projects.length === 0) && (
         <p className="text-xs text-destructive">{error}</p>
       )}
       {approved && (

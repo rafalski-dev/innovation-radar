@@ -49,7 +49,7 @@ export const sourceIdsSchema = z
   .max(MAX_SOURCES, `Możesz wybrać maksymalnie ${MAX_SOURCES} źródła`);
 
 export const generateResultsSchema = z.object({
-  needId: z.string().trim().min(1, "Wybierz projekt"),
+  projectId: z.string().trim().min(1, "Wybierz projekt"),
   phrases: phrasesSchema.min(1, "Najpierw wygeneruj frazy"),
   sources: sourceIdsSchema,
   // ile wyników ma zwrócić agent w tym uruchomieniu
@@ -71,7 +71,7 @@ export const searchSchema = z.object({
     .min(10, "Opisz, czego szukasz (min. 10 znaków)")
     .max(4000, "Maksymalnie 4000 znaków"),
   // opcjonalny projekt, którego dotyczy wyszukiwanie; pusty string = brak
-  needId: z.string().trim(),
+  projectId: z.string().trim(),
   // zatwierdzone frazy (opcjonalne)
   phrases: phrasesSchema.optional(),
   // zatwierdzona lista wyników agenta (opcjonalna) i statystyki jej wygenerowania
@@ -85,7 +85,7 @@ export const searchSchema = z.object({
 export type SearchInput = z.infer<typeof searchSchema>;
 
 export const generatePhrasesSchema = z.object({
-  needId: z.string().trim().min(1, "Wybierz projekt"),
+  projectId: z.string().trim().min(1, "Wybierz projekt"),
   // opcjonalna wskazówka przy ponownym generowaniu, np. „bardziej technicznie”
   hint: z.string().trim().max(300, "Maksymalnie 300 znaków"),
   // gdy podane: AI generuje JEDNĄ nową frazę, inną niż te już na liście

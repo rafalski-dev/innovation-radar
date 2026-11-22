@@ -85,8 +85,8 @@ export async function deleteBusiness(id: string): Promise<ActionResult> {
 
   try {
     // pliki potrzeb leżą w R2: zbieramy klucze przed kaskadowym usunięciem z bazy
-    const files = await db.needFile.findMany({
-      where: { need: { businessId: id, business: ownedBusinessWhere(session.user.id) } },
+    const files = await db.projectFile.findMany({
+      where: { project: { businessId: id, business: ownedBusinessWhere(session.user.id) } },
       select: { key: true },
     });
     const result = await db.business.deleteMany({

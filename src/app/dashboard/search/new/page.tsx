@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
 import { SearchForm } from "@/components/search/search-form";
-import { getMyNeeds } from "@/queries/need";
+import { getMyProjects } from "@/queries/project";
 import { getActiveSources } from "@/queries/source";
 
 export const metadata: Metadata = { title: "Nowy aspekt" };
@@ -9,10 +9,10 @@ export const metadata: Metadata = { title: "Nowy aspekt" };
 export default async function NewSearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ need?: string }>;
+  searchParams: Promise<{ project?: string }>;
 }) {
-  const [needs, sourceOptions, { need }] = await Promise.all([
-    getMyNeeds(),
+  const [projects, sourceOptions, { project }] = await Promise.all([
+    getMyProjects(),
     getActiveSources(),
     searchParams,
   ]);
@@ -25,9 +25,9 @@ export default async function NewSearchPage({
         description="Wybierz projekt, zatwierdź frazy i źródła, a agent znajdzie pasujące materiały i uzasadni dopasowanie."
       />
       <SearchForm
-        initialNeedId={need}
+        initialProjectId={project}
         sourceOptions={sourceOptions}
-        needs={needs.map((n) => ({
+        projects={projects.map((n) => ({
           id: n.id,
           title: n.title,
           description: n.description,

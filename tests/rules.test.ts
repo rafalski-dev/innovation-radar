@@ -5,7 +5,7 @@ import { pickNextStep, summarizeAspect } from "../src/lib/report";
 import { reportFileName } from "../src/lib/report-file-name";
 import { DEFAULT_TRL, effectiveTrl, formatTrlRange, trlRange } from "../src/lib/trl";
 import { businessSchema, normalizeNip } from "../src/validation/business";
-import { cleanLinks, needSchema } from "../src/validation/need";
+import { cleanLinks, projectSchema } from "../src/validation/project";
 import { candidateSchema, searchSchema, webSearchesFor } from "../src/validation/search";
 
 const candidate = {
@@ -41,7 +41,11 @@ describe("wynik agenta (candidateSchema)", () => {
 });
 
 describe("zapis aspektu (searchSchema)", () => {
-  const base = { title: "Odzysk metali", query: "Recykling baterii litowo-jonowych", needId: "" };
+  const base = {
+    title: "Odzysk metali",
+    query: "Recykling baterii litowo-jonowych",
+    projectId: "",
+  };
 
   it("przyjmuje poprawne dane", () => {
     assert.equal(searchSchema.safeParse(base).success, true);
@@ -66,22 +70,22 @@ describe("zapis aspektu (searchSchema)", () => {
   });
 });
 
-describe("projekt (needSchema, cleanLinks)", () => {
+describe("projekt (projectSchema, cleanLinks)", () => {
   const base = { title: "Projekt", description: "Opis", linkUrls: [] };
 
   it("wymaga tytułu i opisu", () => {
-    assert.equal(needSchema.safeParse(base).success, true);
-    assert.equal(needSchema.safeParse({ ...base, title: "ab" }).success, false);
-    assert.equal(needSchema.safeParse({ ...base, description: "" }).success, false);
+    assert.equal(projectSchema.safeParse(base).success, true);
+    assert.equal(projectSchema.safeParse({ ...base, title: "ab" }).success, false);
+    assert.equal(projectSchema.safeParse({ ...base, description: "" }).success, false);
   });
 
   it("akceptuje tylko linki http(s)", () => {
     assert.equal(
-      needSchema.safeParse({ ...base, linkUrls: ["https://example.com"] }).success,
+      projectSchema.safeParse({ ...base, linkUrls: ["https://example.com"] }).success,
       true,
     );
     assert.equal(
-      needSchema.safeParse({ ...base, linkUrls: ["javascript:alert(1)"] }).success,
+      projectSchema.safeParse({ ...base, linkUrls: ["javascript:alert(1)"] }).success,
       false,
     );
   });

@@ -41,13 +41,13 @@ oraz dodaje i usuwa osoby (po e-mailu **istniejącego konta**, tabela `BusinessM
 jednym miejscu: `accessibleBusinessWhere` w `src/queries/business.ts`. Do zrobienia: zaproszenie
 osoby, która nie ma jeszcze konta, oraz przekazanie administracji.
 
-**Potrzeba** (kroki 3-4): `Need` należy do organizacji (tytuł, oczekiwany efekt, zapotrzebowanie).
+**Potrzeba** (kroki 3-4): `Project` należy do organizacji (tytuł, oczekiwany efekt, zapotrzebowanie).
 Strona organizacji `/dashboard/businesses/[id]` pokazuje jego potrzeby; dodawanie i edycja to osobne
-strony (`.../needs/new`, `.../needs/[needId]/edit`). Potrzebę widzi i zmienia tylko właściciel
+strony (`.../projects/new`, `.../projects/[projectId]/edit`). Potrzebę widzi i zmienia tylko właściciel
 organizacji. Do potrzeby będą przypisywane **zapytania** do agenta (kroki 5-6).
-Potrzeba ma opcjonalnie do 3 **linków** (`linkUrls`) i do 3 **plików PDF** (każdy do 20 MB): `NeedFile` trzyma tylko nazwę,
+Potrzeba ma opcjonalnie do 3 **linków** (`linkUrls`) i do 3 **plików PDF** (każdy do 20 MB): `ProjectFile` trzyma tylko nazwę,
 rozmiar i klucz, a plik leży w prywatnym buckecie **Cloudflare R2** (`src/lib/r2.ts`, zmienne `R2_*`).
-Wysyłka idzie z przeglądarki prosto do R2 (podpisany adres), pobranie przez `/api/need-files/[fileId]`.
+Wysyłka idzie z przeglądarki prosto do R2 (podpisany adres), pobranie przez `/api/project-files/[fileId]`.
 
 **Aspekt** (kroki 5-6): `Search` należy do projektu i ma tytuł (`title`, wymagany przy zapisie; stare wpisy go nie mają),
 frazy i wyniki z oceną TRL. „Maksymalna liczba wyników” w formularzu to górny limit, nie gwarancja: agent zwraca tylko
@@ -140,7 +140,7 @@ Górny nagłówek zostaje na linki publiczne, konto i wylogowanie.
 | Zespoły         | `/dashboard/teams`   | USER     | tworzenie zespołu, członkowie (po e-mailu), pomysły |
 | Profil          | `/dashboard/profile` | wszyscy  | edycja danych, zmiana hasła                         |
 | Do oceny        | `/dashboard/review`  | OFFICIAL | później                                             |
-| Zapotrzebowania | `/dashboard/needs`   | BUSINESS | później                                             |
+| Zapotrzebowania | `/dashboard/projects`   | BUSINESS | później                                             |
 
 Formularze tworzenia i edycji to osobne strony (nie dialogi): `/dashboard/ideas/new`,
 `/dashboard/ideas/[number]/edit`, `/dashboard/teams/new`. Usuwanie zostaje potwierdzeniem w oknie.
