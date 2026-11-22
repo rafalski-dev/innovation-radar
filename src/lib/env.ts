@@ -14,7 +14,7 @@ const envSchema = z.object({
   ADMIN_EMAILS: z.string().optional(),
   // E-mail (Resend). Bez klucza wiadomości trafiają tylko do konsoli serwera.
   RESEND_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().default("Horyzont innowacji <contact@rafalski.dev>"),
+  EMAIL_FROM: z.string().default("Horyzont Innowacji <contact@rafalski.dev>"),
   // "true" = agent zwraca przykładowych kandydatów bez wywołania API (testy UI za darmo)
   AGENT_MOCK: z.string().optional(),
   // Cloudflare R2 (pliki PDF przy potrzebach). Opcjonalne: bez nich aplikacja działa, a dodawanie plików jest wyłączone.

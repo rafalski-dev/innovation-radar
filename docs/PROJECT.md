@@ -1,4 +1,4 @@
-# Opis projektu: Horyzont innowacji
+# Opis projektu: Horyzont Innowacji
 
 > Projekt na hackathon PCI. Wytyczne organizatorów: [`CHALLENGE.md`](CHALLENGE.md).
 > Claude czyta ten plik na początku każdego zadania, a `/start-project` buduje z niego plan encji.
@@ -106,7 +106,7 @@ tickety zalogowanego użytkownika; filtr trzymamy w jednym miejscu (`src/queries
 
 ## Etap 1 (zrobiony)
 
-1. `src/lib/site.ts`: nazwa „Horyzont innowacji”, opis, nawigacja.
+1. `src/lib/site.ts`: nazwa „Horyzont Innowacji”, opis, nawigacja.
 2. Strona główna `/`: hasło, 4 kroki procesu (Zgłoś → Ocena → Rekomendacja → Partner),
    przyciski „Załóż konto” i „Zaloguj się”.
 3. Better Auth: `/register` (imię, e-mail, hasło, rola), `/login`, wylogowanie w nagłówku,
@@ -279,7 +279,7 @@ Ustalone:
 
 - Wagi kryteriów: **równe, po 20%**.
 - Model AI: **Anthropic**.
-- Nazwa aplikacji: **Horyzont innowacji**.
+- Nazwa aplikacji: **Horyzont Innowacji**.
 - Logowanie: **Better Auth**, 3 role (`USER`, `OFFICIAL`, `BUSINESS`); w etapie 1 tylko `USER`.
 - UI dashboardu inspirowany **Jirą**.
 

@@ -3,7 +3,7 @@ export type FaqItem = { question: string; answer: string };
 
 export const faq: FaqItem[] = [
   {
-    question: "Czym jest Horyzont innowacji?",
+    question: "Czym jest Horyzont Innowacji?",
     answer:
       "To aplikacja, w której opisujesz swoje zapotrzebowanie, a agent AI przeszukuje wskazane publiczne bazy (patenty, publikacje, projekty badawcze). Każdy wynik dostaje uzasadnienie, ocenę gotowości technologicznej (TRL) i link do źródła.",
   },
@@ -144,7 +144,7 @@ export const articles: Article[] = [
         heading: "Jak dobrać źródło do etapu TRL",
         paragraphs: [
           "Na niskich poziomach gotowości (TRL 1–3) najlepiej pasują granty badawcze i współpraca z nauką. Przy prototypie (TRL 4–6) sięga się po dotacje na prace rozwojowe i ulgi podatkowe. Wdrożenie (TRL 7–9) finansuje się częściej kredytem, inwestorem lub dotacją inwestycyjną.",
-          "Zanim złożysz wniosek, zbierz dowody dojrzałości technologii: wyniki badań, opisy prototypów i linki do źródeł. Raport z Horyzontu innowacji z oceną TRL każdego wyniku ułatwia to przygotowanie.",
+          "Zanim złożysz wniosek, zbierz dowody dojrzałości technologii: wyniki badań, opisy prototypów i linki do źródeł. Raport z Horyzontu Innowacji z oceną TRL każdego wyniku ułatwia to przygotowanie.",
         ],
       },
     ],

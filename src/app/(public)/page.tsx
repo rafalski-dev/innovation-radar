@@ -226,12 +226,12 @@ export default async function Home() {
       </section>
 
       <section className="space-y-4 text-center">
-        <h2 className="text-xl font-medium tracking-tight">Poleć Horyzont innowacji</h2>
+        <h2 className="text-xl font-medium tracking-tight">Poleć Horyzont Innowacji</h2>
         <p className="text-sm text-muted-foreground">
           Znasz firmę, której przyda się takie narzędzie? Podziel się linkiem.
         </p>
         <ShareButtons
-          title="Horyzont innowacji: agent AI szuka gotowych innowacji dla Twojej firmy"
+          title="Horyzont Innowacji: agent AI szuka gotowych innowacji dla Twojej firmy"
           className="justify-center"
         />
       </section>

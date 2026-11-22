@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/screenshots/01-home-hero.jpg" alt="Horyzont innowacji: strona główna" width="100%" />
+<img src="docs/screenshots/01-home-hero.jpg" alt="Horyzont Innowacji: strona główna" width="100%" />
 
-# 📡 Horyzont innowacji
+# 📡 Horyzont Innowacji
 
 **Transfer innowacji dla każdego.**
 
@@ -31,7 +31,7 @@ Agent AI przeszukuje publiczne bazy patentów, publikacji i projektów badawczyc
 
 Rozwiązanie często **już istnieje**, tylko leży w bazie, której nikt nie przeszukał. Firmy budują od zera rzeczy, które od lat opisują projekty NCBiR, publikacje naukowe czy patenty. Horyzont robi to przeszukiwanie za nich, a **człowiek decyduje**, co zostaje.
 
-Horyzont innowacji powstał jako prototyp na **HackNation 2026 w Bydgoszczy** z inicjatywy [Podkarpackiego Centrum Innowacji](https://pcinn.org/). Użytkownik opisuje swój problem, AI proponuje frazy do wyszukiwarki, a agent przeszukuje wybrane publiczne bazy (NCBiR, RAD-on, Mapa Dotacji UE, Interreg) i pokazuje wyniki, które można zebrać w raport dla zespołu.
+Horyzont Innowacji powstał jako prototyp na **HackNation 2026 w Bydgoszczy** z inicjatywy [Podkarpackiego Centrum Innowacji](https://pcinn.org/). Użytkownik opisuje swój problem, AI proponuje frazy do wyszukiwarki, a agent przeszukuje wybrane publiczne bazy (NCBiR, RAD-on, Mapa Dotacji UE, Interreg) i pokazuje wyniki, które można zebrać w raport dla zespołu.
 
 ## 🧭 Jak to działa
 
