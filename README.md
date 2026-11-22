@@ -37,14 +37,6 @@ Horyzont innowacji powstał jako prototyp na **HackNation 2026 w Bydgoszczy** z 
 
 Praca jest uporządkowana w pięciu poziomach. Wielu użytkowników może współtworzyć jeden projekt, dodając do niego własne aspekty.
 
-```mermaid
-flowchart LR
-    O["🏢 Organizacje<br/><sub>wiele, z osobami</sub>"] --> P["📁 Projekty<br/><sub>wiele w organizacji</sub>"]
-    P --> A["🧩 Aspekty<br/><sub>wycinki problemu</sub>"]
-    A --> S["🔎 Wyszukiwania<br/><sub>wyniki z TRL i źródłem</sub>"]
-    S --> R["📄 Raport PDF<br/><sub>dla całego zespołu</sub>"]
-```
-
 1. **Opisz projekt.** Tytuł, opis, do 3 linków i do 3 plików PDF. AI proponuje uzupełnienia opisu.
 2. **Zatwierdź frazy.** AI proponuje 3–5 fraz dla danego aspektu. Poprawiasz je, usuwasz, dodajesz własne i dopiero potem zatwierdzasz.
 3. **Wybierz źródła.** Do dwóch baz na aspekt i liczba wyników. Agent szuka tylko tam, gdzie mu pozwolisz.
