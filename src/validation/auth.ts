@@ -1,13 +1,11 @@
 import { z } from "zod";
 
-export const USER_ROLES = ["USER", "OFFICIAL", "BUSINESS", "ADMIN"] as const;
+export const USER_ROLES = ["USER", "ADMIN"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
 export const userRoleLabels: Record<UserRole, string> = {
   USER: "Użytkownik",
-  OFFICIAL: "Urzędnik",
-  BUSINESS: "Reprezentant biznesu",
-  ADMIN: "Administrator radaru",
+  ADMIN: "Administrator Horyzontu",
 };
 
 export const loginSchema = z.object({

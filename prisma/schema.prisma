@@ -14,9 +14,7 @@ datasource db {
 
 enum UserRole {
   USER
-  OFFICIAL
-  BUSINESS
-  ADMIN // administrator radaru (panel /dashboard/admin)
+  ADMIN // administrator Horyzontu (panel /dashboard/admin)
 }
 
 model User {
@@ -28,9 +26,7 @@ model User {
   emailVerified          Boolean                 @default(false)
   image                  String?
   role                   UserRole                @default(USER)
-  organization           String?
   position               String?
-  interests              String?
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   sessions               Session[]
@@ -118,7 +114,6 @@ model Business {
 model Project {
   id              String     @id @default(cuid())
   title           String
-  expectedOutcome String? // wycofane z formularza (na razie jeden opis); stare wpisy zachowują wartość
   description     String // opis projektu: używany przez wyszukiwarkę i generowanie fraz
   linkUrls        String[]   @default([]) // opcjonalne linki do materiałów (do 3)
   sentAt          DateTime? // raport wysłany do członków organizacji: projekt zamknięty do edycji
@@ -179,7 +174,6 @@ model Search {
   webSearches  Int?
   inputTokens  Int?
   outputTokens Int?
-  sharedAt     DateTime? // kolumna istnieje już w bazie (spoza tego repo); zachowana, żeby db:push jej nie usunął
   results      SearchResult[]
   userId       String
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -245,7 +239,7 @@ model DescriptionGeneration {
   @@index([userId, createdAt])
 }
 
-// ---------- Panel administratora radaru ----------
+// ---------- Panel administratora Horyzontu ----------
 
 // Źródła, w których może szukać agent (admin dodaje i edytuje; użytkownik wybiera do 2).
 model Source {
@@ -283,7 +277,7 @@ model Setting {
 // ---------- Pomoc ----------
 
 enum FeedbackType {
-  RADAR_PROBLEM // zgłoszenie problemu z radarem
+  RADAR_PROBLEM // zgłoszenie problemu z Horyzontem
   SOURCE_PROBLEM // zgłoszenie problemu ze źródłem
   CHANGE_PROPOSAL // propozycja zmiany
 }

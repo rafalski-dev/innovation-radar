@@ -57,7 +57,7 @@ async function main() {
     console.log(`User: pominięto (konto ${DEMO_EMAIL} już istnieje)`);
   }
 
-  // konto demo jest też administratorem radaru (tylko lokalny development): widzi /dashboard/admin
+  // konto demo jest też administratorem Horyzontu (tylko lokalny development): widzi /dashboard/admin
   if (user.role !== "ADMIN") {
     await db.user.update({ where: { id: user.id }, data: { role: "ADMIN" } });
     console.log("User: nadano rolę ADMIN kontu demo");
@@ -92,15 +92,12 @@ async function main() {
   const demoProjects = [
     {
       title: "Automatyczna kontrola jakości na linii",
-      expectedOutcome: "Zmniejszyć liczbę reklamacji o połowę w ciągu roku.",
       description:
         "Szukamy rozwiązania do wizyjnej kontroli detali na taśmie. Budżet do 200 tys. zł, wdrożenie w 6 miesięcy.",
     },
     {
       // temat dobrze pokryty w projektach NCBiR i RAD-on: agent powinien znaleźć wyniki
       title: "Recykling zużytych baterii litowo-jonowych",
-      expectedOutcome:
-        "Odzyskiwać z zużytych baterii metale (lit, kobalt, nikiel) i ograniczyć odpady.",
       description:
         "Szukamy technologii recyklingu zużytych baterii litowo-jonowych z pojazdów elektrycznych i urządzeń przenośnych. " +
         "Interesuje nas odzysk metali (lit, kobalt, nikiel, mangan) metodami hydrometalurgicznymi lub mechanicznymi oraz " +
@@ -108,8 +105,6 @@ async function main() {
     },
     {
       title: "Magazynowanie energii z fotowoltaiki w małym zakładzie produkcyjnym",
-      expectedOutcome:
-        "Zwiększyć autokonsumpcję energii z własnej instalacji PV i obniżyć rachunki.",
       description:
         "Szukamy rozwiązania do magazynowania energii z instalacji fotowoltaicznej (ok. 200 kWp) w zakładzie produkcyjnym. " +
         "Interesują nas magazyny energii (akumulatory, rozwiązania hybrydowe), systemy zarządzania energią oraz sprawdzone " +

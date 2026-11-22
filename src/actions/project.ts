@@ -246,7 +246,6 @@ export async function duplicateProject(id: string): Promise<ActionResult> {
         businessId: source.businessId,
         authorId: session.user.id,
         title: `${source.title} (kopia)`.slice(0, 150),
-        expectedOutcome: source.expectedOutcome,
         description: source.description,
         linkUrls: source.linkUrls,
       },
