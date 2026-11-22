@@ -17,8 +17,8 @@ export default async function SearchesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Aspekty"
-        description="Historia Twoich aspektów. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
+        accent="Aspekty"
+        description="Historia Twoich aspektów: frazy, źródła i wyniki znalezione przez agenta wraz z uzasadnieniem dopasowania."
         action={
           <Link href="/dashboard/search/new" className={buttonVariants()}>
             <PlusIcon />
@@ -27,7 +27,7 @@ export default async function SearchesPage() {
         }
       />
       {searches.length === 0 ? (
-        <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed py-8 text-center text-sm text-muted-foreground">
           Nie masz jeszcze żadnego aspektu. Dodaj pierwszy przyciskiem „Nowy aspekt”.
         </p>
       ) : (

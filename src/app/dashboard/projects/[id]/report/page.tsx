@@ -146,8 +146,8 @@ export default async function NeedReportPage({
                           <span className="font-medium text-foreground">Dlaczego pasuje: </span>
                           {r.why}
                         </p>
-                        <p className="text-xs break-all text-muted-foreground">
-                          {r.sourceName}
+                        <p className="rounded-lg border border-brand/30 bg-brand/5 px-3 py-1.5 text-xs break-all text-muted-foreground">
+                          <span className="font-semibold text-brand">Źródło: {r.sourceName}</span>
                           {r.organization && ` · ${r.organization}`} · {r.sourceUrl}
                         </p>
                       </li>

@@ -122,20 +122,20 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Wszystkie przyciski na stronach publicznych są okrągłe (pigułki, jak w sekcji hero).
+/* Wszystkie przyciski w aplikacji są okrągłe (pigułki, jak w sekcji hero).
    Reguła poza warstwą, więc wygrywa z klasami rounded-* z komponentu Button. */
-.theme-landing .group\/button {
+.theme-app .group\/button {
   border-radius: 9999px;
 }
 
-/* Pierścień focusu w kolorze akcentu na stronach publicznych. */
-.theme-landing {
+/* Pierścień focusu w kolorze akcentu w całej aplikacji. */
+.theme-app {
   --ring: color-mix(in oklab, var(--brand) 70%, transparent);
 }
 
-/* Ciemny, techniczny wygląd stron publicznych (landing, logowanie, rejestracja):
-   prawie czarne tło, ciemne karty i delikatne obramowania. Tylko w ciemnym motywie. */
-.dark .theme-landing {
+/* Ciemny, techniczny wygląd całej aplikacji (strony publiczne i panel): prawie czarne tło,
+   ciemne karty i delikatne obramowania. Klasa jest na <body>, więc obejmuje też okna dialogowe. */
+.dark .theme-app {
   --background: #07080a;
   --foreground: #f5f4f0;
   --card: #0d0e11;
@@ -146,6 +146,19 @@
   --accent: #15161a;
   --border: rgb(255 255 255 / 8%);
   --input: rgb(255 255 255 / 12%);
+}
+
+/* Raport do PDF drukujemy zawsze jasno, niezależnie od motywu. */
+@media print {
+  .theme-app,
+  .dark .theme-app {
+    --background: #ffffff;
+    --foreground: #111111;
+    --card: #ffffff;
+    --muted: #f4f4f5;
+    --muted-foreground: #52525b;
+    --border: #e4e4e7;
+  }
 }
 
 /* Delikatna siatka w tle sekcji hero, zanikająca ku brzegom. */

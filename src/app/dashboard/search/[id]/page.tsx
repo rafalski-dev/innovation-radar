@@ -23,7 +23,7 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
   const closed = !!search.need?.sentAt;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
       <Link href="/dashboard/search" className={buttonVariants({ variant: "ghost", size: "sm" })}>
         <ArrowLeftIcon />
         Wszystkie aspekty
@@ -85,11 +85,11 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
           </p>
         </div>
         {status === "DONE" && search.results.length === 0 ? (
-          <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">
+          <p className="rounded-2xl border border-dashed py-6 text-center text-sm text-muted-foreground">
             Agent nie znalazł pasujących wyników w wybranych źródłach.
           </p>
         ) : search.results.length === 0 ? (
-          <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">
+          <p className="rounded-2xl border border-dashed py-6 text-center text-sm text-muted-foreground">
             Do tego aspektu nie zapisano listy wyników.
           </p>
         ) : (

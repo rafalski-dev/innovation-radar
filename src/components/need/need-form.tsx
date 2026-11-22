@@ -191,8 +191,8 @@ export function NeedForm({
               <label
                 key={b.id}
                 className={cn(
-                  "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50",
-                  b.id === selectedId && "border-primary bg-muted/50",
+                  "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50",
+                  b.id === selectedId && "border-brand bg-brand/10",
                 )}
               >
                 <input
@@ -286,7 +286,7 @@ export function NeedForm({
         )}
       </FormField>
 
-      <div className="grid gap-4 rounded-lg border p-4">
+      <div className="grid gap-4 rounded-2xl border bg-card p-4">
         <p className="text-sm text-muted-foreground">
           Materiały dodatkowe: możesz dołączyć linki i/lub pliki PDF.
         </p>
@@ -363,7 +363,7 @@ export function NeedForm({
             Dodano {filesCount} z {NEED_FILES_MAX} (każdy do {NEED_FILE_MAX_MB} MB).
           </p>
           {filesCount > 0 && (
-            <ul className="divide-y rounded-md border text-sm">
+            <ul className="divide-y rounded-xl border text-sm">
               {savedFiles.map((file) => (
                 <li key={file.id} className="flex items-center justify-between gap-2 px-3 py-2">
                   <a

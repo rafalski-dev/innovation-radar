@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Nowa organizacja" };
 export default function NewBusinessPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Nowa organizacja" />
+      <PageHeader title="Nowa" accent="organizacja" />
       <BusinessForm />
     </div>
   );

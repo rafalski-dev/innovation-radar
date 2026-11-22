@@ -12,9 +12,13 @@ export default async function NewNeedPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Nowy projekt" description="Wybierz organizację i opisz, czego szukasz." />
+      <PageHeader
+        title="Nowy"
+        accent="projekt"
+        description="Wybierz organizację i opisz, czego szukasz."
+      />
       {businesses.length === 0 ? (
-        <div className="space-y-3 rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
+        <div className="space-y-3 rounded-2xl border border-dashed py-8 text-center text-sm text-muted-foreground">
           <p>Projekt należy do organizacji. Najpierw dodaj swoją pierwszą organizację.</p>
           <Link href="/dashboard/businesses/new" className={buttonVariants({ size: "sm" })}>
             Nowa organizacja

@@ -15,7 +15,8 @@ export default async function BusinessesPage({ searchParams }: PageProps<"/dashb
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Moje organizacje"
+        title="Moje"
+        accent="organizacje"
         description="Wybierz organizację, aby zobaczyć jej dane i projekty, dla których szukamy rozwiązań."
         action={
           <Link href="/dashboard/businesses/new" className={buttonVariants()}>

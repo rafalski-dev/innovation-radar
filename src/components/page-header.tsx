@@ -1,14 +1,22 @@
+import type { ReactNode } from "react";
+
 type PageHeaderProps = {
-  title: string;
+  title?: string;
+  // słowo wyróżnione kursywą szeryfową w kolorze akcentu (jak w nagłówkach strony głównej)
+  accent?: string;
   description?: string;
-  action?: React.ReactNode;
+  action?: ReactNode;
 };
 
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export function PageHeader({ title, accent, description, action }: PageHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0 flex-1 space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-3xl font-medium tracking-tight">
+          {title}
+          {title && accent && " "}
+          {accent && <em className="font-serif font-normal text-brand italic">{accent}</em>}
+        </h1>
         {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

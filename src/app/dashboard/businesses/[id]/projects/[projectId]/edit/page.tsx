@@ -15,7 +15,7 @@ export default async function EditNeedPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Edytuj projekt" />
+      <PageHeader title="Edytuj" accent="projekt" />
       <NeedForm businessId={id} need={need} />
     </div>
   );

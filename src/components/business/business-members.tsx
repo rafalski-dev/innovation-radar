@@ -49,7 +49,7 @@ export function BusinessMembers({ business }: { business: BusinessWithNeeds }) {
     <div className="space-y-3 border-t pt-4">
       <h3 className="text-sm font-semibold text-muted-foreground">Osoby</h3>
 
-      <ul className="divide-y rounded-lg border">
+      <ul className="divide-y rounded-2xl border bg-card">
         <li className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
           <div className="min-w-0">
             <div className="truncate font-medium">{business.owner.name}</div>

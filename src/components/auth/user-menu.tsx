@@ -21,7 +21,7 @@ export function UserMenu({ name }: { name: string }) {
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className="font-medium">{name}</span>
-      <Button variant="ghost" size="sm" onClick={logout} disabled={pending}>
+      <Button variant="outline" size="sm" onClick={logout} disabled={pending}>
         <LogOutIcon />
         Wyloguj
       </Button>

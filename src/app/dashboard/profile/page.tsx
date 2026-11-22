@@ -14,7 +14,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Profil" description={user.email} />
+      <PageHeader accent="Profil" description={user.email} />
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground">Dane</h2>
         <ProfileForm

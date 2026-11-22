@@ -18,10 +18,11 @@ export default async function NewSearchPage({
   ]);
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="space-y-6">
       <PageHeader
-        title="Nowy aspekt"
-        description="Opisz, czego szukasz. Agent przeszuka patenty, publikacje i projekty (UPRP, EPO, PBN, Interreg, NCBiR) i uzasadni dopasowanie."
+        title="Nowy"
+        accent="aspekt"
+        description="Wybierz projekt, zatwierdź frazy i źródła, a agent znajdzie pasujące materiały i uzasadni dopasowanie."
       />
       <SearchForm
         initialNeedId={need}

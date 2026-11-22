@@ -267,7 +267,7 @@ export function SearchForm({
             {needs.map((n) => (
               <label
                 key={n.id}
-                className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 has-[:checked]:border-primary"
+                className="flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50 has-[:checked]:border-brand has-[:checked]:bg-brand/10"
               >
                 <input
                   type="radio"
@@ -285,7 +285,7 @@ export function SearchForm({
           </div>
         </FormField>
       )}
-      <div className="space-y-4 rounded-lg border p-4">
+      <div className="space-y-4 rounded-2xl border bg-card p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-sm font-medium">Krok 1. Frazy do wyszukiwarki</p>
@@ -350,7 +350,7 @@ export function SearchForm({
         )}
       </div>
       {approved && (
-        <div className="space-y-4 rounded-lg border p-4">
+        <div className="space-y-4 rounded-2xl border bg-card p-4">
           <div>
             <p className="text-sm font-medium">Krok 2. Lista wyników ze źródeł</p>
             <p className="text-xs text-muted-foreground">
@@ -367,7 +367,7 @@ export function SearchForm({
                 <label
                   key={source.slug}
                   className={cn(
-                    "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-muted/50",
+                    "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50 has-[:checked]:border-brand has-[:checked]:bg-brand/10 has-[:checked]:bg-muted/50",
                     locked && "cursor-not-allowed opacity-50 hover:bg-transparent",
                   )}
                 >
@@ -395,7 +395,7 @@ export function SearchForm({
               value={limit}
               onChange={(e) => setLimit(Number(e.target.value))}
               disabled={searching}
-              className="h-9 rounded-md border bg-background px-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="h-9 rounded-full border bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {Array.from({ length: MAX_TOTAL_RESULTS }, (_, i) => i + 1).map((n) => (
                 <option key={n} value={n}>
@@ -430,7 +430,7 @@ export function SearchForm({
           </div>
           {results &&
             (results.candidates.length === 0 ? (
-              <p className="rounded-lg border border-dashed py-4 text-center text-sm text-muted-foreground">
+              <p className="rounded-2xl border border-dashed py-4 text-center text-sm text-muted-foreground">
                 Agent nie znalazł wyników. Zmień frazy i spróbuj ponownie.
               </p>
             ) : (

@@ -26,7 +26,7 @@ export function BusinessPicker({
 
   if (!selected) {
     return (
-      <p className="rounded-lg border border-dashed py-12 text-center text-sm text-muted-foreground">
+      <p className="rounded-2xl border border-dashed py-12 text-center text-sm text-muted-foreground">
         Nie masz jeszcze żadnej organizacji. Dodaj pierwszą.
       </p>
     );
@@ -45,8 +45,8 @@ export function BusinessPicker({
           <label
             key={b.id}
             className={cn(
-              "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50",
-              b.id === selected.id && "border-primary bg-muted/50",
+              "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50",
+              b.id === selected.id && "border-brand bg-brand/10",
             )}
           >
             <input
@@ -67,7 +67,7 @@ export function BusinessPicker({
         ))}
       </fieldset>
 
-      <section className="space-y-4 rounded-lg border p-5">
+      <section className="space-y-4 rounded-2xl border bg-card p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <h2 className="text-xl font-semibold tracking-tight">{selected.name}</h2>
@@ -135,7 +135,7 @@ export function BusinessPicker({
             </Link>
           </div>
           {selected.needs.length === 0 ? (
-            <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
+            <p className="rounded-2xl border border-dashed py-8 text-center text-sm text-muted-foreground">
               Ta organizacja nie ma jeszcze żadnego projektu. Opisz pierwszą.
             </p>
           ) : (
@@ -143,7 +143,7 @@ export function BusinessPicker({
               {selected.needs.map((need) => (
                 <li
                   key={need.id}
-                  className="flex items-start justify-between gap-4 rounded-lg border p-4"
+                  className="flex items-start justify-between gap-4 rounded-xl border p-4"
                 >
                   <div className="min-w-0 space-y-1">
                     <div className="font-medium">{need.title}</div>

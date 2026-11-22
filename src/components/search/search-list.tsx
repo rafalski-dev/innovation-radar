@@ -21,7 +21,7 @@ export type SearchRow = {
 type SortKey = "newest" | "oldest" | "results" | "project";
 
 const selectClass =
-  "h-9 rounded-md border bg-background px-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
+  "h-9 rounded-full border bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
 
 // Lista aspektów z filtrami (tekst, projekt, tylko z wynikami) i sortowaniem.
 export function SearchList({ rows }: { rows: SearchRow[] }) {
@@ -99,7 +99,7 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
         )}
       </div>
       {visible.length === 0 ? (
-        <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed py-8 text-center text-sm text-muted-foreground">
           Żaden aspekt nie spełnia filtrów.
         </p>
       ) : (
@@ -107,7 +107,7 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
           {visible.map((s) => (
             <li
               key={s.id}
-              className="relative flex items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+              className="relative flex items-start gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-brand/50"
             >
               <div className="min-w-0 flex-1 space-y-1">
                 {s.label && <p className="font-mono text-xs text-muted-foreground">{s.label}</p>}

@@ -15,7 +15,7 @@ export default async function NewNeedPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Nowy projekt" description={`Organizacja: ${business.name}`} />
+      <PageHeader title="Nowy" accent="projekt" description={`Organizacja: ${business.name}`} />
       <NeedForm businessId={business.id} />
     </div>
   );

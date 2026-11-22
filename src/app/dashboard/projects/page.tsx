@@ -19,7 +19,7 @@ export default async function NeedsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Projekty"
+        accent="Projekty"
         description="Lista projektów ze wszystkich Twoich organizacji. Na ich podstawie agent wyszuka patenty i rozwiązania problemów."
         action={
           <Link href="/dashboard/projects/new" className={buttonVariants()}>
@@ -29,13 +29,13 @@ export default async function NeedsPage() {
         }
       />
       {needs.length === 0 ? (
-        <p className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed py-8 text-center text-sm text-muted-foreground">
           Nie masz jeszcze żadnego projektu. Dodaj pierwszą przyciskiem „Nowy projekt”.
         </p>
       ) : (
         <ul className="grid gap-3">
           {needs.map((need) => (
-            <li key={need.id} className="rounded-lg border">
+            <li key={need.id} className="rounded-2xl border bg-card">
               <div className="flex items-start justify-between gap-4 p-4">
                 <div className="min-w-0 space-y-1">
                   <p className="font-mono text-xs text-muted-foreground">

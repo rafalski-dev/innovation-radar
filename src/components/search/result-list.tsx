@@ -38,17 +38,26 @@ export function TrlBadge({ trl }: { trl?: number | null }) {
   return (
     <span
       title={`TRL ${trl}: ${TRL_LABELS[trl]}`}
-      className="rounded-full border bg-muted px-2 py-0.5 text-xs font-medium"
+      className="rounded-full border border-brand/40 bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand"
     >
       TRL {trl}/9
     </span>
   );
 }
 
+// Sama domena adresu źródła (bez https:// i ścieżki), do wyświetlenia pod nazwą źródła.
+function hostOf(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
 type SortKey = "default" | "trl-desc" | "trl-asc" | "title";
 
 const selectClass =
-  "h-8 rounded-md border bg-background px-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
+  "h-8 rounded-full border bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
 
 // Lista wyników agenta (karty z opisem, uzasadnieniem, TRL i linkiem do źródła).
 // `selection` włącza checkboxy (wykluczanie nieadekwatnych wyników przed zatwierdzeniem aspektu).
@@ -134,7 +143,7 @@ export function ResultList({
         </div>
       )}
       {visible.length === 0 ? (
-        <p className="rounded-lg border border-dashed py-4 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed py-4 text-center text-sm text-muted-foreground">
           Żaden wynik nie spełnia filtrów.
         </p>
       ) : (
@@ -145,7 +154,7 @@ export function ResultList({
               <li
                 key={r.sourceUrl}
                 className={cn(
-                  "space-y-2 rounded-lg border p-4 transition-opacity",
+                  "space-y-2 rounded-2xl border bg-card p-4 transition-opacity",
                   selection && !checked && "opacity-50",
                 )}
               >
@@ -169,16 +178,28 @@ export function ResultList({
                       <span className="font-medium text-foreground">Dlaczego pasuje: </span>
                       {r.why}
                     </p>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span>{r.sourceName}</span>
-                      {r.organization && <span>{r.organization}</span>}
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand/30 bg-brand/5 px-3 py-2">
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                          Źródło
+                        </p>
+                        <p className="flex flex-wrap items-center gap-x-2 text-sm">
+                          <span className="font-semibold text-brand">{r.sourceName}</span>
+                          {r.organization && (
+                            <span className="text-muted-foreground">{r.organization}</span>
+                          )}
+                        </p>
+                        <p className="truncate text-[11px] text-muted-foreground">
+                          {hostOf(r.sourceUrl)}
+                        </p>
+                      </div>
                       <a
                         href={r.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-primary hover:underline"
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand/50 px-3 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand hover:text-white"
                       >
-                        Źródło
+                        Otwórz źródło
                         <ExternalLinkIcon className="size-3" />
                       </a>
                     </div>
