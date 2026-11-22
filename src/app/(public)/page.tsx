@@ -1,76 +1,72 @@
 import Link from "next/link";
 import {
   ArrowRightIcon,
-  BookmarkIcon,
+  BuildingIcon,
   FileTextIcon,
-  MessageSquareIcon,
+  GaugeIcon,
   PencilLineIcon,
   SearchCheckIcon,
-  SendIcon,
+  SparklesIcon,
 } from "lucide-react";
 import { HeroRadar } from "@/components/landing/hero-radar";
+import { HowItWorksCarousel } from "@/components/landing/how-it-works-carousel";
+import { BrandGradientText, FeatureCard, ShinyLabel } from "@/components/landing/themed-react-bits";
 import { buttonVariants } from "@/components/shadcn/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card";
 import { getSession } from "@/lib/session";
+import { getActiveSources } from "@/queries/source";
 
-const steps = [
+const features = [
   {
-    icon: PencilLineIcon,
-    title: "Opisz, czego potrzebujesz",
-    text: "Podaj oczekiwany efekt i swoje zapotrzebowanie. Możesz działać jako firma albo indywidualnie.",
+    icon: BuildingIcon,
+    title: "Organizacje i zespół",
+    text: "Prowadź projekty w imieniu firmy i dodawaj do niej osoby. Cały zespół widzi te same projekty i aspekty.",
   },
   {
-    icon: MessageSquareIcon,
-    title: "Doprecyzuj w rozmowie",
-    text: "Asystent zadaje pytania pomocnicze, żeby opis był na tyle konkretny, by dało się go dopasować.",
+    icon: PencilLineIcon,
+    title: "Projekty z materiałami",
+    text: "Opis, do 3 linków i pliki PDF w jednym miejscu. Każdy projekt ma własny numer, a AI pomaga rozwinąć opis.",
+  },
+  {
+    icon: SparklesIcon,
+    title: "Frazy pod kontrolą",
+    text: "AI proponuje frazy do wyszukiwarki, a Ty je poprawiasz, dopisujesz kolejne z własną wskazówką i zatwierdzasz.",
   },
   {
     icon: SearchCheckIcon,
-    title: "Dostań dopasowane wyniki",
-    text: "Agent przeszukuje źródła publiczne i pokazuje wyniki wraz z uzasadnieniem. Historia aspektów jest zapamiętana.",
+    title: "Aspekty i wybór źródeł",
+    text: "Jeden projekt, wiele aspektów. Do każdego wybierasz do dwóch źródeł i liczbę wyników, a nieadekwatne odznaczasz.",
   },
   {
-    icon: BookmarkIcon,
-    title: "Zapisz do list tematycznych",
-    text: "Dodawaj wyniki do ulubionych albo do list przypisanych do konkretnych projektów.",
-  },
-  {
-    icon: SendIcon,
-    title: "Skontaktuj się i oceń kontakt",
-    text: "Napisz do autorów rozwiązań. Po dniu i po miesiącu poprosimy Cię o krótką informację zwrotną.",
+    icon: GaugeIcon,
+    title: "Ocena gotowości (TRL)",
+    text: "Przy każdym wyniku skala gotowości technologicznej 1–9, oceniana wyłącznie na podstawie opisu w źródle.",
   },
   {
     icon: FileTextIcon,
-    title: "Wygeneruj raport",
-    text: "Z listy tematycznej powstaje raport z wybranymi rozwiązaniami i uzasadnieniem.",
+    title: "Raport do PDF",
+    text: "Zbiorcze opracowanie projektu z wszystkimi aspektami i wynikami. Możesz je wysłać zespołowi.",
   },
 ];
 
-const sources = [
-  { name: "Patenty UPRP", text: "Urząd Patentowy RP" },
-  { name: "Patenty EPO", text: "Europejski Urząd Patentowy" },
-  { name: "Publikacje naukowe", text: "PBN, PPM, BazTech" },
-  { name: "Projekty UE", text: "Interreg" },
-  { name: "Projekty NCBiR", text: "Wyszukiwarka sukcesów beneficjentów" },
-];
-
 export default async function Home() {
-  const session = await getSession();
+  const [session, sources] = await Promise.all([getSession(), getActiveSources()]);
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-20">
       <section className="relative isolate overflow-hidden rounded-3xl border">
         <HeroRadar />
         <div className="relative z-10 space-y-5 px-4 py-20 text-center sm:py-32">
-          <p className="text-sm font-medium text-muted-foreground">
-            Dla firm szukających rozwiązań
+          <p className="text-sm font-medium">
+            <ShinyLabel>Dla firm szukających rozwiązań</ShinyLabel>
           </p>
           <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-            Znajdź gotową innowację, zanim zbudujesz ją od zera
+            Znajdź <BrandGradientText>gotową innowację</BrandGradientText>, zanim zbudujesz ją od
+            zera
           </h1>
           <p className="mx-auto max-w-2xl text-muted-foreground">
             Opisz swoje zapotrzebowanie. Agent AI przeszuka patenty, publikacje naukowe i projekty
-            badawcze, a Ty dostaniesz dopasowane wyniki z uzasadnieniem i kontaktem do autorów.
+            badawcze, a Ty dostaniesz dopasowane wyniki z uzasadnieniem, oceną gotowości
+            technologicznej i linkiem do źródła.
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             {session ? (
@@ -93,19 +89,29 @@ export default async function Home() {
       </section>
 
       <section className="space-y-6">
-        <h2 className="text-center text-2xl font-semibold tracking-tight">Jak to działa</h2>
+        <div className="space-y-2 text-center">
+          <h2 className="text-2xl font-semibold tracking-tight">Zobacz, jak to działa</h2>
+          <p className="mx-auto max-w-2xl text-sm text-muted-foreground">
+            Od opisu projektu do raportu dla zespołu w pięciu krokach. Przewiń strzałkami albo
+            palcem.
+          </p>
+        </div>
+        <HowItWorksCarousel />
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-center text-2xl font-semibold tracking-tight">Co dostajesz</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {steps.map((step, index) => (
-            <Card key={step.title}>
-              <CardHeader>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <step.icon className="size-4" />
-                  Krok {index + 1}
-                </div>
-                <CardTitle>{step.title}</CardTitle>
-                <CardDescription>{step.text}</CardDescription>
-              </CardHeader>
-            </Card>
+          {features.map((feature) => (
+            <FeatureCard key={feature.title}>
+              <div className="space-y-3">
+                <span className="inline-flex size-9 items-center justify-center rounded-lg bg-brand-blue/10 text-brand-blue">
+                  <feature.icon className="size-5" />
+                </span>
+                <h3 className="font-medium">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.text}</p>
+              </div>
+            </FeatureCard>
           ))}
         </div>
       </section>
@@ -115,17 +121,23 @@ export default async function Home() {
           <h2 className="text-2xl font-semibold tracking-tight">Skąd bierzemy dane</h2>
           <p className="mx-auto max-w-2xl text-sm text-muted-foreground">
             Nie przeszukujemy zgłoszeń użytkowników platformy. Agent zbiera i porządkuje informacje
-            z publicznych baz.
+            z publicznych baz, a kolejne źródła dodaje administrator.
           </p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {sources.map((source) => (
-            <div key={source.name} className="rounded-lg border p-4 text-sm">
-              <div className="font-medium">{source.name}</div>
-              <div className="text-xs text-muted-foreground">{source.text}</div>
+            <div key={source.slug} className="rounded-lg border p-4 text-sm">
+              <div className="flex items-center gap-2 font-medium">
+                <span className="size-2 rounded-full bg-brand-green" />
+                {source.name}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">{source.description}</div>
             </div>
           ))}
         </div>
+        <p className="text-center text-xs text-muted-foreground">
+          W planach: patenty UPRP i EPO oraz publikacje (PBN, PPM, BazTech).
+        </p>
       </section>
 
       {!session && (
