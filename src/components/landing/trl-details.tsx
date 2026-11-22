@@ -13,7 +13,7 @@ export function TrlDetails() {
         <p className="text-muted-foreground">
           TRL (Technology Readiness Level) to dziewięciostopniowa skala gotowości technologicznej:
           od pierwszej obserwacji zjawiska po rozwiązanie sprawdzone w codziennej eksploatacji.
-          Radar ocenia w niej każdy wynik, więc od razu widać, co można wdrożyć, a co dopiero
+          Horyzont ocenia w niej każdy wynik, więc od razu widać, co można wdrożyć, a co dopiero
           rozwijać z partnerem naukowym.
         </p>
         {TRL_BANDS.map((band) => (

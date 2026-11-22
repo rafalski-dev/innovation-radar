@@ -34,7 +34,7 @@ export const dashboardNav: DashboardNavItem[] = [
   { href: "/dashboard/profile", label: "Profil", icon: UserIcon },
 ];
 
-// Pozycja widoczna tylko dla administratora radaru.
+// Pozycja widoczna tylko dla administratora Horyzontu.
 export const adminNavItem: DashboardNavItem = {
   href: "/dashboard/admin",
   label: "Panel admina",

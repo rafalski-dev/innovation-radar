@@ -23,7 +23,7 @@ export default async function AdminPage() {
     <div className="space-y-8">
       <PageHeader
         title="Panel administratora"
-        accent="radaru"
+        accent="Horyzontu"
         description="Źródła agenta, czarne listy i zakres promptów. Zmiany działają od razu dla wszystkich użytkowników."
       />
 

@@ -3,12 +3,12 @@ export type FaqItem = { question: string; answer: string };
 
 export const faq: FaqItem[] = [
   {
-    question: "Czym jest Radar innowacji?",
+    question: "Czym jest Horyzont innowacji?",
     answer:
       "To aplikacja, w której opisujesz swoje zapotrzebowanie, a agent AI przeszukuje wskazane publiczne bazy (patenty, publikacje, projekty badawcze). Każdy wynik dostaje uzasadnienie, ocenę gotowości technologicznej (TRL) i link do źródła.",
   },
   {
-    question: "Skąd Radar bierze wyniki?",
+    question: "Skąd Horyzont bierze wyniki?",
     answer:
       "Wyłącznie z publicznych baz, które widzisz na stronie głównej i w formularzu aspektu. Dla jednego aspektu wybierasz do dwóch źródeł, a agent szuka tylko tam, gdzie mu pozwolisz.",
   },
@@ -40,7 +40,7 @@ export const faq: FaqItem[] = [
   {
     question: "Jak zgłosić błąd albo propozycję?",
     answer:
-      "Przyciskiem „Pomoc” w prawym dolnym rogu każdej strony. Możesz zgłosić problem z radarem, problem ze źródłem lub zaproponować zmianę.",
+      "Przyciskiem „Pomoc” w prawym dolnym rogu każdej strony. Możesz zgłosić problem z Horyzontem, problem ze źródłem lub zaproponować zmianę.",
   },
 ];
 
@@ -144,7 +144,7 @@ export const articles: Article[] = [
         heading: "Jak dobrać źródło do etapu TRL",
         paragraphs: [
           "Na niskich poziomach gotowości (TRL 1–3) najlepiej pasują granty badawcze i współpraca z nauką. Przy prototypie (TRL 4–6) sięga się po dotacje na prace rozwojowe i ulgi podatkowe. Wdrożenie (TRL 7–9) finansuje się częściej kredytem, inwestorem lub dotacją inwestycyjną.",
-          "Zanim złożysz wniosek, zbierz dowody dojrzałości technologii: wyniki badań, opisy prototypów i linki do źródeł. Raport z Radaru innowacji z oceną TRL każdego wyniku ułatwia to przygotowanie.",
+          "Zanim złożysz wniosek, zbierz dowody dojrzałości technologii: wyniki badań, opisy prototypów i linki do źródeł. Raport z Horyzontu innowacji z oceną TRL każdego wyniku ułatwia to przygotowanie.",
         ],
       },
     ],

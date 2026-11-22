@@ -20,4 +20,4 @@ export async function findBlockedTopic(...texts: (string | null | undefined)[]) 
 }
 
 export const blockedTopicMessage = (phrase: string) =>
-  `Temat jest niedozwolony w Radarze innowacji (fraza: „${phrase}”)`;
+  `Temat jest niedozwolony w Horyzoncie innowacji (fraza: „${phrase}”)`;

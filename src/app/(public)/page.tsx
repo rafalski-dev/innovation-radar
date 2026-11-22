@@ -46,9 +46,9 @@ export default async function Home() {
             <div className="mx-auto w-fit rounded-full border bg-card/60 px-4 py-1.5 text-sm backdrop-blur">
               <ShinyLabel>Dla firm, które szukają rozwiązań</ShinyLabel>
             </div>
-            <h1 className="mx-auto max-w-3xl text-4xl font-medium tracking-tight sm:text-6xl">
-              Znajdź gotową <em className="font-serif font-normal text-brand italic">innowację</em>,
-              zanim zbudujesz ją od zera
+            <h1 className="mx-auto max-w-3xl text-4xl font-medium tracking-tight text-balance sm:text-6xl">
+              Transfer <em className="font-serif font-normal text-brand italic">innowacji</em> dla
+              każdego
             </h1>
             <p className="mx-auto max-w-2xl text-muted-foreground">
               Opisz swoje zapotrzebowanie. Agent AI przeszuka patenty, publikacje naukowe i projekty
@@ -112,7 +112,7 @@ export default async function Home() {
         <Eyebrow>Problem</Eyebrow>
         <p className="text-2xl leading-snug font-medium tracking-tight text-muted-foreground sm:text-4xl">
           Rozwiązanie często <span className="text-foreground">już istnieje</span>, tylko leży w
-          bazie, której nikt nie przeszukał. Radar robi to za Ciebie, a{" "}
+          bazie, której nikt nie przeszukał. Horyzont robi to za Ciebie, a{" "}
           <span className="text-foreground">Ty decydujesz</span>, co zostaje.
         </p>
       </section>
@@ -140,7 +140,7 @@ export default async function Home() {
             Od organizacji do <em className="font-serif font-normal text-brand italic">raportu</em>
           </h2>
           <p className="text-muted-foreground">
-            Radar porządkuje pracę w pięciu poziomach, które łączą wiele osób i wiele projektów.
+            Horyzont porządkuje pracę w pięciu poziomach, które łączą wiele osób i wiele projektów.
           </p>
         </div>
         <StructureSection />
@@ -165,7 +165,8 @@ export default async function Home() {
               Losowe aspekty <ShuffleIcon aria-hidden className="size-6 text-brand" />
             </h2>
             <p className="text-muted-foreground">
-              Przykłady aspektów, które można zbadać w radarze. Odśwież stronę, żeby zobaczyć inne.
+              Przykłady aspektów, które można zbadać w Horyzoncie. Odśwież stronę, żeby zobaczyć
+              inne.
             </p>
           </div>
           <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -211,12 +212,12 @@ export default async function Home() {
       </section>
 
       <section className="space-y-4 text-center">
-        <h2 className="text-xl font-medium tracking-tight">Poleć Radar innowacji</h2>
+        <h2 className="text-xl font-medium tracking-tight">Poleć Horyzont innowacji</h2>
         <p className="text-sm text-muted-foreground">
           Znasz firmę, której przyda się takie narzędzie? Podziel się linkiem.
         </p>
         <ShareButtons
-          title="Radar innowacji: agent AI szuka gotowych innowacji dla Twojej firmy"
+          title="Horyzont innowacji: agent AI szuka gotowych innowacji dla Twojej firmy"
           className="justify-center"
         />
       </section>

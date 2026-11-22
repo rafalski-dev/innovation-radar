@@ -35,7 +35,7 @@ const steps = [
   },
 ];
 
-// Wyjaśnienie struktury radaru: organizacje → projekty → aspekty → wyszukiwania → raport.
+// Wyjaśnienie struktury Horyzontu: organizacje → projekty → aspekty → wyszukiwania → raport.
 export function StructureSection() {
   return (
     <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

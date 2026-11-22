@@ -2,7 +2,7 @@
 export type NavItem = { href: string; label: string };
 
 export const site = {
-  name: "Radar innowacji",
+  name: "Horyzont innowacji",
   description:
     "Znajdź gotowe innowacje, patenty i projekty dla swojej firmy. Asystent AI przeszukuje źródła publiczne i uzasadnia dopasowanie.",
   nav: [{ href: "/", label: "Start" }] satisfies NavItem[],

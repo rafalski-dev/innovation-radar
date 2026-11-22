@@ -167,7 +167,7 @@ export function Bento() {
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 font-medium">
                   <RadarIcon className="size-3.5 text-brand" />
-                  Radar innowacji
+                  Horyzont innowacji
                 </span>
                 <span className="font-mono text-muted-foreground">3 wyniki</span>
               </div>

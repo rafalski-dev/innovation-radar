@@ -5,7 +5,7 @@ export const FEEDBACK_TYPES = ["RADAR_PROBLEM", "SOURCE_PROBLEM", "CHANGE_PROPOS
 export type FeedbackKind = (typeof FEEDBACK_TYPES)[number];
 
 export const FEEDBACK_LABELS: Record<FeedbackKind, string> = {
-  RADAR_PROBLEM: "Zgłoś problem z radarem",
+  RADAR_PROBLEM: "Zgłoś problem z Horyzontem",
   SOURCE_PROBLEM: "Zgłoś problem ze źródłem",
   CHANGE_PROPOSAL: "Zaproponuj zmianę",
 };

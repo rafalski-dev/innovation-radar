@@ -1,4 +1,4 @@
-# Opis projektu: Radar innowacji
+# Opis projektu: Horyzont innowacji
 
 > Projekt na hackathon PCI. Wytyczne organizatorów: [`CHALLENGE.md`](CHALLENGE.md).
 > Claude czyta ten plik na początku każdego zadania, a `/start-project` buduje z niego plan encji.
@@ -106,7 +106,7 @@ tickety zalogowanego użytkownika; filtr trzymamy w jednym miejscu (`src/queries
 
 ## Etap 1 (zrobiony)
 
-1. `src/lib/site.ts`: nazwa „Radar innowacji”, opis, nawigacja.
+1. `src/lib/site.ts`: nazwa „Horyzont innowacji”, opis, nawigacja.
 2. Strona główna `/`: hasło, 4 kroki procesu (Zgłoś → Ocena → Rekomendacja → Partner),
    przyciski „Załóż konto” i „Zaloguj się”.
 3. Better Auth: `/register` (imię, e-mail, hasło, rola), `/login`, wylogowanie w nagłówku,
@@ -133,14 +133,14 @@ Stan po etapie 1:
 Nawigacja dashboardu: boczny panel (sidebar) w `/dashboard`, pozycje zależne od `role`.
 Górny nagłówek zostaje na linki publiczne, konto i wylogowanie.
 
-| Sekcja          | Ścieżka              | Kto      | Zawartość                                           |
-| --------------- | -------------------- | -------- | --------------------------------------------------- |
-| Tablica         | `/dashboard`         | wszyscy  | tablica statusów                                    |
-| Moje pomysły    | `/dashboard/ideas`   | USER     | lista, edycja i usuwanie (tylko status „Zgłoszone”) |
-| Zespoły         | `/dashboard/teams`   | USER     | tworzenie zespołu, członkowie (po e-mailu), pomysły |
-| Profil          | `/dashboard/profile` | wszyscy  | edycja danych, zmiana hasła                         |
-| Do oceny        | `/dashboard/review`  | OFFICIAL | później                                             |
-| Zapotrzebowania | `/dashboard/projects`   | BUSINESS | później                                             |
+| Sekcja          | Ścieżka               | Kto      | Zawartość                                           |
+| --------------- | --------------------- | -------- | --------------------------------------------------- |
+| Tablica         | `/dashboard`          | wszyscy  | tablica statusów                                    |
+| Moje pomysły    | `/dashboard/ideas`    | USER     | lista, edycja i usuwanie (tylko status „Zgłoszone”) |
+| Zespoły         | `/dashboard/teams`    | USER     | tworzenie zespołu, członkowie (po e-mailu), pomysły |
+| Profil          | `/dashboard/profile`  | wszyscy  | edycja danych, zmiana hasła                         |
+| Do oceny        | `/dashboard/review`   | OFFICIAL | później                                             |
+| Zapotrzebowania | `/dashboard/projects` | BUSINESS | później                                             |
 
 Formularze tworzenia i edycji to osobne strony (nie dialogi): `/dashboard/ideas/new`,
 `/dashboard/ideas/[number]/edit`, `/dashboard/teams/new`. Usuwanie zostaje potwierdzeniem w oknie.
@@ -279,7 +279,7 @@ Ustalone:
 
 - Wagi kryteriów: **równe, po 20%**.
 - Model AI: **Anthropic**.
-- Nazwa aplikacji: **Radar innowacji**.
+- Nazwa aplikacji: **Horyzont innowacji**.
 - Logowanie: **Better Auth**, 3 role (`USER`, `OFFICIAL`, `BUSINESS`); w etapie 1 tylko `USER`.
 - UI dashboardu inspirowany **Jirą**.
 
