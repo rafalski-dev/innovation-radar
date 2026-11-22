@@ -49,7 +49,7 @@ Pomijamy na start: UPRP i PBN (słabo indeksowane przez wyszukiwarkę; w prezent
 
 **Kiedy:** użytkownik klika „Szukaj innowacji” przy projekcie (lub na stronie Wyszukiwania wybiera projekt).
 
-**Wejście:** `Need.title`, `Need.description`, `Need.linkUrl`, pliki PDF z `NeedFile` (Claude czyta PDF bezpośrednio).
+**Wejście:** `Need.title`, `Need.description`, `Need.linkUrls`, pliki PDF z `NeedFile` (Claude czyta PDF bezpośrednio).
 
 **Jak:** jedno wywołanie modelu z wymuszonym formatem odpowiedzi (`generateObject` + schemat Zod).
 Bez wyszukiwania w internecie. Koszt: grosze.

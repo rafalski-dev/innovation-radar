@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   try {
     const need = await db.need.findFirst({
       where: { id: body.data.needId, ...accessibleNeedWhere(session.user.id) },
-      select: { title: true, description: true, linkUrl: true },
+      select: { title: true, description: true, linkUrls: true },
     });
     if (!need) return respond(fail("Nie znaleziono projektu"), 404);
 
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
             role: "user",
             content:
               `Projekt: ${need.title}\n\nOpis:\n${need.description}` +
-              (need.linkUrl ? `\n\nLink: ${need.linkUrl}` : "") +
+              (need.linkUrls.length ? `\n\nLinki: ${need.linkUrls.join(", ")}` : "") +
               (body.data.hint ? `\n\nWskazówka użytkownika do tych fraz: ${body.data.hint}` : ""),
           },
         ],

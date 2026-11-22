@@ -45,7 +45,7 @@ osoby, która nie ma jeszcze konta, oraz przekazanie administracji.
 Strona organizacji `/dashboard/businesses/[id]` pokazuje jego potrzeby; dodawanie i edycja to osobne
 strony (`.../needs/new`, `.../needs/[needId]/edit`). Potrzebę widzi i zmienia tylko właściciel
 organizacji. Do potrzeby będą przypisywane **zapytania** do agenta (kroki 5-6).
-Potrzeba ma opcjonalnie **link** (`linkUrl`) i do 3 **plików PDF** (każdy do 20 MB): `NeedFile` trzyma tylko nazwę,
+Potrzeba ma opcjonalnie do 3 **linków** (`linkUrls`) i do 3 **plików PDF** (każdy do 20 MB): `NeedFile` trzyma tylko nazwę,
 rozmiar i klucz, a plik leży w prywatnym buckecie **Cloudflare R2** (`src/lib/r2.ts`, zmienne `R2_*`).
 Wysyłka idzie z przeglądarki prosto do R2 (podpisany adres), pobranie przez `/api/need-files/[fileId]`.
 

@@ -8,6 +8,7 @@ import { getSession } from "@/lib/session";
 import { accessibleBusinessWhere } from "@/queries/business";
 import { accessibleNeedWhere } from "@/queries/need";
 import {
+  cleanLinks,
   NEED_FILE_MAX_BYTES,
   NEED_FILE_MAX_MB,
   NEED_FILES_MAX,
@@ -116,7 +117,7 @@ export async function createNeed(
     await db.need.create({
       data: {
         ...parsed.data,
-        linkUrl: parsed.data.linkUrl || null,
+        linkUrls: cleanLinks(parsed.data.linkUrls),
         businessId,
         files: { create: files },
       },
@@ -167,7 +168,7 @@ export async function updateNeed(
         where: { id },
         data: {
           ...parsed.data,
-          linkUrl: parsed.data.linkUrl || null,
+          linkUrls: cleanLinks(parsed.data.linkUrls),
         },
       }),
       db.needFile.deleteMany({ where: { needId: id, id: { in: removed.map((f) => f.id) } } }),

@@ -26,6 +26,12 @@ async function main() {
     console.log(`User: pominięto (konto ${DEMO_EMAIL} już istnieje)`);
   }
 
+  // logowanie wymaga potwierdzonego e-maila, a konto demo nie ma prawdziwej skrzynki
+  if (!user.emailVerified) {
+    await db.user.update({ where: { id: user.id }, data: { emailVerified: true } });
+    console.log("User: oznaczono konto demo jako potwierdzone");
+  }
+
   let business = await db.business.findFirst({ where: { ownerId: user.id } });
   if (!business) {
     business = await db.business.create({

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileTextIcon, PlusIcon, SparklesIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ import {
   NEED_FILE_MAX_BYTES,
   NEED_FILE_MAX_MB,
   NEED_FILES_MAX,
+  NEED_LINKS_MAX,
   type DescriptionSuggestion,
   type NeedAttachmentInput,
   type NeedInput,
@@ -63,10 +64,11 @@ export function NeedForm({
     defaultValues: {
       title: need?.title ?? "",
       description: need?.description ?? "",
-      linkUrl: need?.linkUrl ?? "",
+      linkUrls: need?.linkUrls.length ? need.linkUrls : [""],
     },
   });
   const { errors } = form.formState;
+  const links = useWatch({ control: form.control, name: "linkUrls" });
 
   const savedFiles = (need?.files ?? []).filter((f) => !removedIds.includes(f.id));
   const filesCount = savedFiles.length + newFiles.length;
@@ -286,18 +288,65 @@ export function NeedForm({
 
       <div className="grid gap-4 rounded-lg border p-4">
         <p className="text-sm text-muted-foreground">
-          Materiały dodatkowe: możesz dołączyć link i/lub pliki PDF.
+          Materiały dodatkowe: możesz dołączyć linki i/lub pliki PDF.
         </p>
 
-        <FormField label="Link (opcjonalnie)" htmlFor="n-link" error={errors.linkUrl?.message}>
-          <Input
-            id="n-link"
-            type="url"
-            inputMode="url"
-            placeholder="https://"
-            aria-invalid={!!errors.linkUrl}
-            {...form.register("linkUrl")}
-          />
+        <FormField label={`Linki (opcjonalnie, do ${NEED_LINKS_MAX})`} htmlFor="n-link-0">
+          <div className="grid gap-2">
+            {links.map((url, i) => (
+              <div key={i} className="grid gap-1">
+                <div className="flex gap-2">
+                  <Input
+                    id={`n-link-${i}`}
+                    type="url"
+                    inputMode="url"
+                    placeholder="https://"
+                    value={url}
+                    aria-invalid={!!errors.linkUrls?.[i]}
+                    onChange={(event) =>
+                      form.setValue(
+                        "linkUrls",
+                        links.map((l, j) => (j === i ? event.target.value : l)),
+                        { shouldDirty: true, shouldValidate: form.formState.isSubmitted },
+                      )
+                    }
+                  />
+                  {links.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        form.setValue(
+                          "linkUrls",
+                          links.filter((_, j) => j !== i),
+                          { shouldDirty: true },
+                        )
+                      }
+                    >
+                      <XIcon />
+                      <span className="sr-only">Usuń link {i + 1}</span>
+                    </Button>
+                  )}
+                </div>
+                {errors.linkUrls?.[i]?.message && (
+                  <p className="text-sm text-destructive">{errors.linkUrls[i]?.message}</p>
+                )}
+              </div>
+            ))}
+            {links.length < NEED_LINKS_MAX && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="justify-self-start"
+                onClick={() => form.setValue("linkUrls", [...links, ""], { shouldDirty: true })}
+              >
+                <PlusIcon />
+                Dodaj kolejny link
+              </Button>
+            )}
+          </div>
         </FormField>
 
         <FormField label="Pliki PDF (opcjonalnie)" htmlFor="n-file" error={fileError}>

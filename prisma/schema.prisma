@@ -117,7 +117,7 @@ model Need {
   title           String
   expectedOutcome String? // wycofane z formularza (na razie jeden opis); stare wpisy zachowują wartość
   description     String // opis projektu: używany przez wyszukiwarkę i generowanie fraz
-  linkUrl         String? // opcjonalny link do materiałów (strona, artykuł, specyfikacja)
+  linkUrls        String[] @default([]) // opcjonalne linki do materiałów (do 3)
   files           NeedFile[]
   searches        Search[]
   businessId      String
