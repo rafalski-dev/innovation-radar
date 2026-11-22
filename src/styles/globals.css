@@ -148,6 +148,93 @@
   --input: rgb(255 255 255 / 12%);
 }
 
+/* ---------- Tryby dostępności (klasy na <html>, przełączane z menu „Ułatwienia dostępu”) ---------- */
+
+/* Tryb dla daltonistów: paleta Okabe-Ito. Niebieski (akcent) i pomarańczowy (błąd) zamiast
+   czerwieni i zieleni, a stany sukces/błąd w powiadomieniach różnią się też ikoną i treścią. */
+html.cb {
+  --brand: #0072b2;
+  --destructive: #d55e00;
+}
+html.cb.dark {
+  --brand: #56b4e9;
+  --destructive: #e69f00;
+}
+/* jasnoniebieski akcent w ciemnym motywie: tekst na przyciskach czarny, żeby kontrast był wysoki */
+html.cb.dark .bg-brand {
+  color: #000 !important;
+}
+html.cb [data-sonner-toast][data-type="success"] {
+  background: #0072b2 !important;
+  border-color: #0072b2 !important;
+  color: #fff !important;
+}
+html.cb [data-sonner-toast][data-type="error"] {
+  background: #d55e00 !important;
+  border-color: #d55e00 !important;
+  color: #fff !important;
+}
+
+/* Tryb WCAG (wysoki kontrast, AAA): tekst min. 7:1, wyraźne obramowania i fokus,
+   podkreślone linki, większa czcionka i brak animacji oraz ozdobnych teł. */
+html.hc {
+  font-size: 112.5%;
+}
+html.hc .theme-app {
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #efefef;
+  --muted-foreground: #333333;
+  --secondary: #efefef;
+  --accent: #efefef;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --border: #000000;
+  --input: #000000;
+  --ring: #000000;
+  --brand: #a02800;
+  --destructive: #a40000;
+}
+html.hc.dark .theme-app {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #000000;
+  --popover: #000000;
+  --muted: #1a1a1a;
+  --muted-foreground: #e6e6e6;
+  --secondary: #1a1a1a;
+  --accent: #1a1a1a;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --border: #ffffff;
+  --input: #ffffff;
+  --ring: #ffffff;
+  --brand: #ff8a5c;
+  --destructive: #ff9b9b;
+}
+html.hc a:not([class*="button"]):not([class*="rounded-full"]) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+html.hc *:focus-visible {
+  outline: 3px solid var(--foreground) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+html.hc *,
+html.hc *::before,
+html.hc *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+html.hc canvas,
+html.hc .bg-grid {
+  display: none !important;
+}
+
 /* Raport do PDF drukujemy zawsze jasno, niezależnie od motywu. */
 @media print {
   .theme-app,

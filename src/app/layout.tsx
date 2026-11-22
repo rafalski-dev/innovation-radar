@@ -37,6 +37,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
+      <head>
+        {/* tryby dostępności (daltonista, WCAG) nakładane przed pierwszym malowaniem, bez migotania */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var d=document.documentElement;['cb','hc'].forEach(function(k){if(localStorage.getItem('a11y-'+k)==='1')d.classList.add(k)})}catch(e){}",
+          }}
+        />
+      </head>
       <body className="theme-app flex min-h-full flex-col">
         <Providers>
           {children}

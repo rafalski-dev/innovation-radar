@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-export function SiteNav() {
+export function SiteNav({ vertical = false }: { vertical?: boolean }) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-1 items-center gap-4 text-sm">
+    <nav className={cn("flex text-sm", vertical ? "flex-col gap-3" : "flex-1 items-center gap-4")}>
       {site.nav.map((item) => {
         const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
         return (
