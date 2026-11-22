@@ -12,6 +12,7 @@ const WINDOW_LIMIT = 20;
 const WINDOW_MINUTES = 30;
 const WINDOW_MS = WINDOW_MINUTES * 60 * 1000;
 const outputSchema = z.object({ phrases: phrasesSchema });
+const singleOutputSchema = z.object({ phrases: phrasesSchema.max(1) });
 
 function respond(result: ActionResult<Phrases>, status = 200) {
   return Response.json(result, { status });
@@ -51,6 +52,9 @@ export async function POST(request: Request) {
     // liczymy próbę przed wywołaniem API, żeby szybkie powtórne kliknięcia też się wliczały
     await db.phraseGeneration.create({ data: { userId: session.user.id } });
 
+    const single = body.data.existing !== undefined;
+    const existing = (body.data.existing ?? []).filter(Boolean);
+
     // Messages API Anthropic wprost (bez SDK). Wymuszamy narzędzie, żeby dostać JSON zgodny ze schematem.
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -62,8 +66,12 @@ export async function POST(request: Request) {
       signal: AbortSignal.timeout(30_000),
       body: JSON.stringify({
         model: PHRASES_MODEL,
-        max_tokens: 500,
+        max_tokens: single ? 200 : 500,
         system:
+          (single
+            ? "Podaj dokładnie JEDNĄ nową frazę do wyszukiwarki (po polsku, do 8 słów), inną niż podane już frazy i " +
+              "zgodną ze wskazówką użytkownika, jeśli ją podał. "
+            : "") +
           "Jesteś ekspertem od wyszukiwania innowacji w bazach: patenty (UPRP, EPO), publikacje (PBN, PPM, BazTech), " +
           "projekty (NCBiR, Interreg, Mapa Dotacji UE). Na podstawie opisu projektu firmy podaj od 3 do 5 NAJBARDZIEJ " +
           "prawdopodobnych fraz, które warto wpisać w wyszukiwarkę, aby znaleźć pasujące rozwiązania. " +
@@ -75,6 +83,9 @@ export async function POST(request: Request) {
             content:
               `Projekt: ${need.title}\n\nOpis:\n${need.description}` +
               (need.linkUrls.length ? `\n\nLinki: ${need.linkUrls.join(", ")}` : "") +
+              (single && existing.length
+                ? `\n\nFrazy już na liście (nie powtarzaj ich): ${existing.join("; ")}`
+                : "") +
               (body.data.hint ? `\n\nWskazówka użytkownika do tych fraz: ${body.data.hint}` : ""),
           },
         ],
@@ -82,7 +93,9 @@ export async function POST(request: Request) {
           {
             name: "zapisz_frazy",
             description: "Zapisuje wygenerowane frazy do wyszukiwarki",
-            input_schema: z.toJSONSchema(outputSchema, { target: "draft-7" }),
+            input_schema: z.toJSONSchema(single ? singleOutputSchema : outputSchema, {
+              target: "draft-7",
+            }),
           },
         ],
         tool_choice: { type: "tool", name: "zapisz_frazy" },
@@ -94,7 +107,7 @@ export async function POST(request: Request) {
     }
     const data = (await response.json()) as { content: { type: string; input?: unknown }[] };
     const toolUse = data.content.find((block) => block.type === "tool_use");
-    const output = outputSchema.safeParse(toolUse?.input);
+    const output = (single ? singleOutputSchema : outputSchema).safeParse(toolUse?.input);
     if (!output.success) {
       return respond(fail("Model zwrócił niepoprawne frazy. Spróbuj ponownie"), 502);
     }

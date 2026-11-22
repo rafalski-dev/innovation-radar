@@ -11,7 +11,13 @@ import { PhrasesEditor } from "@/components/search/phrases-editor";
 import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
 import { ResultList } from "@/components/search/result-list";
-import { searchSchema, type AgentStats, type Candidate, type Phrases } from "@/validation/search";
+import {
+  MAX_PHRASES,
+  searchSchema,
+  type AgentStats,
+  type Candidate,
+  type Phrases,
+} from "@/validation/search";
 
 export type SearchNeedOption = {
   id: string;
@@ -21,12 +27,16 @@ export type SearchNeedOption = {
 };
 
 // POST /api/search/phrases: AI zwraca 3-5 fraz (nic nie zapisuje).
-async function requestPhrases(needId: string, hint: string): Promise<ActionResult<Phrases>> {
+async function requestPhrases(
+  needId: string,
+  hint: string,
+  existing?: string[], // podane = AI zwraca jedną nową frazę
+): Promise<ActionResult<Phrases>> {
   try {
     const response = await fetch("/api/search/phrases", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ needId, hint }),
+      body: JSON.stringify({ needId, hint, existing }),
     });
     return (await response.json()) as ActionResult<Phrases>;
   } catch {
@@ -133,6 +143,26 @@ export function SearchForm({
     });
   }
 
+  // Dopisuje jedną nową frazę wygenerowaną na podstawie wskazówki, bez ruszania pozostałych.
+  function generateOne() {
+    if (!needId || !phrases) return;
+    setError(undefined);
+    startGenerating(async () => {
+      const result = await requestPhrases(needId, hint, cleanPhrases());
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      const next = result.data[0]?.trim();
+      if (!next) {
+        toast.error("Nie udało się wygenerować frazy. Spróbuj ponownie");
+        return;
+      }
+      changePhrases([...phrases, next]);
+      setHint("");
+    });
+  }
+
   function selectNeed(id: string) {
     if (id !== needId) {
       setPhrases(undefined);
@@ -229,13 +259,18 @@ export function SearchForm({
               <Input
                 value={hint}
                 onChange={(e) => setHint(e.target.value)}
-                placeholder="Wskazówka do nowych fraz (opcjonalnie), np. „bardziej technicznie”"
+                placeholder="Wskazówka do nowej frazy (opcjonalnie), np. „bardziej technicznie”"
                 className="min-w-0 flex-1"
                 maxLength={300}
               />
-              <Button type="button" variant="outline" onClick={generate} disabled={generating}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={generateOne}
+                disabled={generating || (phrases?.length ?? 0) >= MAX_PHRASES}
+              >
                 <SparklesIcon />
-                {generating ? "Generuję…" : "Generuj ponownie"}
+                {generating ? "Generuję…" : "Generuj kolejną frazę"}
               </Button>
             </div>
             <Button type="button" onClick={approvePhrases} disabled={generating}>

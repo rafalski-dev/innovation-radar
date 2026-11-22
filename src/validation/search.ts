@@ -51,6 +51,8 @@ export const generatePhrasesSchema = z.object({
   needId: z.string().trim().min(1, "Wybierz projekt"),
   // opcjonalna wskazówka przy ponownym generowaniu, np. „bardziej technicznie”
   hint: z.string().trim().max(300, "Maksymalnie 300 znaków"),
+  // gdy podane: AI generuje JEDNĄ nową frazę, inną niż te już na liście
+  existing: z.array(z.string().trim().max(200)).max(MAX_PHRASES).optional(),
 });
 export type GeneratePhrasesInput = z.infer<typeof generatePhrasesSchema>;
 
