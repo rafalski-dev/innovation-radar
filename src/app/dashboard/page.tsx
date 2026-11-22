@@ -63,8 +63,7 @@ export default async function DashboardPage() {
               <BuildingIcon className="size-5" />
             </span>
             <h2 className="text-2xl font-medium tracking-tight">
-              Zacznij od dodania{" "}
-              <em className="font-serif font-normal text-brand italic">organizacji</em>
+              Zacznij od dodania <span className="text-brand">organizacji</span>
             </h2>
             <p className="text-sm text-muted-foreground">
               Projekty i aspekty należą do organizacji. Dodaj swoją firmę, a potem pierwszy projekt.

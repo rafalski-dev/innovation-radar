@@ -29,7 +29,7 @@ export function AuthCard({
             </span>
             <h1 className="text-3xl font-medium tracking-tight">
               {title && <>{title} </>}
-              <em className="font-serif font-normal text-brand italic">{accent}</em>
+              <span className="text-brand">{accent}</span>
             </h1>
           </div>
           <p className="text-sm text-muted-foreground">{description}</p>
