@@ -10,13 +10,14 @@ import { AdminSettings } from "@/components/admin/admin-settings";
 import { AdminSources } from "@/components/admin/admin-sources";
 import { PageHeader } from "@/components/page-header";
 import { requireAdmin } from "@/lib/admin";
+import { FEEDBACK_LABELS } from "@/validation/feedback";
 import { getAdminData } from "@/queries/admin";
 
 export const metadata: Metadata = { title: "Panel administratora" };
 
 export default async function AdminPage() {
   await requireAdmin();
-  const { sources, emails, topics, settings } = await getAdminData();
+  const { sources, emails, topics, settings, feedback } = await getAdminData();
 
   return (
     <div className="space-y-8">
@@ -67,6 +68,31 @@ export default async function AdminPage() {
           onRemove={removeBlockedTopic}
           emptyText="Czarna lista tematów jest pusta."
         />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-muted-foreground">
+          Zgłoszenia z przycisku „Pomoc” ({feedback.length})
+        </h2>
+        {feedback.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Brak zgłoszeń.</p>
+        ) : (
+          <ul className="grid gap-2">
+            {feedback.map((f) => (
+              <li key={f.id} className="space-y-1 rounded-2xl border bg-card p-3 text-sm">
+                <p className="font-medium">
+                  {FEEDBACK_LABELS[f.type]}
+                  {f.subject && <span className="text-muted-foreground"> · {f.subject}</span>}
+                </p>
+                <p className="whitespace-pre-line">{f.message}</p>
+                <p className="text-xs text-muted-foreground">
+                  {f.email ?? "anonimowo"} · {f.pageUrl} ·{" "}
+                  {f.createdAt.toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" })}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );

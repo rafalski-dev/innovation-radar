@@ -1,11 +1,17 @@
 import Link from "next/link";
-import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
+import { ArrowRightIcon, CheckCircle2Icon, ExternalLinkIcon, ShuffleIcon } from "lucide-react";
+import { ArticlesSection } from "@/components/landing/articles-section";
 import { Bento } from "@/components/landing/bento";
+import { Faq } from "@/components/landing/faq";
 import { HeroRadar } from "@/components/landing/hero-radar";
 import { HowItWorksCarousel } from "@/components/landing/how-it-works-carousel";
+import { StructureSection } from "@/components/landing/structure-section";
 import { ShinyLabel } from "@/components/landing/themed-react-bits";
+import { TrlDetails } from "@/components/landing/trl-details";
+import { ShareButtons } from "@/components/share-buttons";
 import { getSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
+import { getInspirationAspects } from "@/queries/inspiration";
 import { getActiveSources } from "@/queries/source";
 
 const primaryCta =
@@ -20,7 +26,11 @@ function Eyebrow({ children }: { children: string }) {
 }
 
 export default async function Home() {
-  const [session, sources] = await Promise.all([getSession(), getActiveSources()]);
+  const [session, sources, inspiration] = await Promise.all([
+    getSession(),
+    getActiveSources(),
+    getInspirationAspects(),
+  ]);
 
   return (
     <div className="space-y-24">
@@ -83,11 +93,16 @@ export default async function Home() {
         <p className="text-sm text-muted-foreground">Agent przeszukuje publiczne bazy</p>
         <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
           {sources.map((source) => (
-            <li
-              key={source.slug}
-              className="text-lg font-semibold tracking-tight text-muted-foreground"
-            >
-              {source.name}
+            <li key={source.slug}>
+              <a
+                href={`https://${source.domain}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-lg font-semibold tracking-tight text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {source.name}
+                <ExternalLinkIcon className="size-3.5" />
+              </a>
             </li>
           ))}
         </ul>
@@ -106,14 +121,29 @@ export default async function Home() {
         <div className="max-w-2xl space-y-3">
           <Eyebrow>Platforma</Eyebrow>
           <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">
-            Wszystko, czego potrzebuje projekt{" "}
-            <em className="font-serif font-normal text-brand italic">innowacyjny.</em> Nic ponad to.
+            Poznaj potencjał{" "}
+            <em className="font-serif font-normal text-brand italic">audytu innowacji</em> dla celów
+            swojej organizacji
           </h2>
           <p className="text-muted-foreground">
             Jedno miejsce na opis projektu, frazy, źródła, wyniki i raport dla zespołu.
           </p>
         </div>
         <Bento />
+        <TrlDetails />
+      </section>
+
+      <section className="space-y-8">
+        <div className="max-w-2xl space-y-3">
+          <Eyebrow>Struktura</Eyebrow>
+          <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">
+            Od organizacji do <em className="font-serif font-normal text-brand italic">raportu</em>
+          </h2>
+          <p className="text-muted-foreground">
+            Radar porządkuje pracę w pięciu poziomach, które łączą wiele osób i wiele projektów.
+          </p>
+        </div>
+        <StructureSection />
       </section>
 
       <section className="space-y-8">
@@ -125,6 +155,70 @@ export default async function Home() {
           </h2>
         </div>
         <HowItWorksCarousel />
+      </section>
+
+      {inspiration.length > 0 && (
+        <section className="space-y-8">
+          <div className="max-w-2xl space-y-3">
+            <Eyebrow>Inspiracje</Eyebrow>
+            <h2 className="flex items-center gap-3 text-3xl font-medium tracking-tight sm:text-4xl">
+              Losowe aspekty <ShuffleIcon aria-hidden className="size-6 text-brand" />
+            </h2>
+            <p className="text-muted-foreground">
+              Przykłady aspektów, które można zbadać w radarze. Odśwież stronę, żeby zobaczyć inne.
+            </p>
+          </div>
+          <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {inspiration.map((aspect) => (
+              <li key={aspect.id} className="space-y-3 rounded-2xl border bg-card/60 p-4">
+                <h3 className="font-medium">{aspect.title}</h3>
+                {aspect.phrases.length > 0 && (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {aspect.phrases.map((phrase) => (
+                      <li
+                        key={phrase}
+                        className="rounded-full border px-2.5 py-1 text-[11px] text-muted-foreground"
+                      >
+                        {phrase}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section id="artykuly" className="scroll-mt-20 space-y-8">
+        <div className="max-w-2xl space-y-3">
+          <Eyebrow>Wiedza</Eyebrow>
+          <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">
+            Innowacje w <em className="font-serif font-normal text-brand italic">biznesie</em>
+          </h2>
+        </div>
+        <ArticlesSection />
+      </section>
+
+      <section id="faq" className="scroll-mt-20 space-y-8">
+        <div className="mx-auto max-w-3xl space-y-3 text-center">
+          <Eyebrow>FAQ</Eyebrow>
+          <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">
+            Najczęstsze <em className="font-serif font-normal text-brand italic">pytania</em>
+          </h2>
+        </div>
+        <Faq />
+      </section>
+
+      <section className="space-y-4 text-center">
+        <h2 className="text-xl font-medium tracking-tight">Poleć Radar innowacji</h2>
+        <p className="text-sm text-muted-foreground">
+          Znasz firmę, której przyda się takie narzędzie? Podziel się linkiem.
+        </p>
+        <ShareButtons
+          title="Radar innowacji: agent AI szuka gotowych innowacji dla Twojej firmy"
+          className="justify-center"
+        />
       </section>
 
       {!session && (

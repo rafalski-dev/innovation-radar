@@ -42,6 +42,7 @@ model User {
   descriptionGenerations DescriptionGeneration[]
   agentRuns              AgentRun[]
   authoredProjects          Project[]                  @relation("ProjectAuthor")
+  feedback                  Feedback[]
 }
 
 model Session {
@@ -277,4 +278,27 @@ model Setting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// ---------- Pomoc ----------
+
+enum FeedbackType {
+  RADAR_PROBLEM // zgłoszenie problemu z radarem
+  SOURCE_PROBLEM // zgłoszenie problemu ze źródłem
+  CHANGE_PROPOSAL // propozycja zmiany
+}
+
+// Zgłoszenia z przycisku „Pomoc” (dostępnego na każdej stronie, także bez logowania).
+model Feedback {
+  id        String       @id @default(cuid())
+  type      FeedbackType
+  subject   String? // np. nazwa źródła przy zgłoszeniu problemu ze źródłem
+  message   String
+  email     String? // opcjonalny kontakt (przy zalogowanym: jego adres)
+  pageUrl   String
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime     @default(now())
+
+  @@index([createdAt])
 }

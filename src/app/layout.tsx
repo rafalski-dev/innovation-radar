@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { HelpWidget } from "@/components/help-widget";
 import { Providers } from "@/components/providers";
+import { getSession } from "@/lib/session";
 import { site } from "@/lib/site";
 import "@/styles/globals.css";
 
@@ -27,7 +29,8 @@ export const metadata: Metadata = {
   description: site.description,
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const session = await getSession();
   return (
     <html
       lang="pl"
@@ -35,7 +38,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="theme-app flex min-h-full flex-col">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <HelpWidget isLoggedIn={!!session} />
+        </Providers>
       </body>
     </html>
   );

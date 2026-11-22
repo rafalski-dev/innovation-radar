@@ -11,7 +11,7 @@ export async function SiteHeader() {
   const session = await getSession();
 
   return (
-    <header className="border-b">
+    <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-6 px-4">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <span className="flex size-7 items-center justify-center rounded-lg bg-brand text-white">

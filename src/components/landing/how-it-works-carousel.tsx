@@ -20,7 +20,7 @@ const slides = [
   },
   {
     title: "Frazy do wyszukiwarki pod kontrolą",
-    text: "AI proponuje 3–5 fraz na podstawie opisu. Poprawiasz je, usuwasz, dodajesz kolejną z własną wskazówką i dopiero potem zatwierdzasz.",
+    text: "AI proponuje 3–5 fraz na podstawie opisu dla danego aspektu projektu. Poprawiasz je, usuwasz, dodajesz kolejną z własną wskazówką i dopiero potem zatwierdzasz.",
     mock: <PhrasesMock />,
   },
   {

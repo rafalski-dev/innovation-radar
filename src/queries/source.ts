@@ -6,7 +6,7 @@ export async function getActiveSources() {
   await connection();
   return db.source.findMany({
     where: { active: true },
-    select: { slug: true, name: true, description: true },
+    select: { slug: true, name: true, description: true, domain: true },
     orderBy: [{ createdAt: "asc" }, { slug: "asc" }],
   });
 }
