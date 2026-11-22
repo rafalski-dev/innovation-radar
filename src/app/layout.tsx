@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { HelpWidget } from "@/components/help-widget";
 import { Providers } from "@/components/providers";
+import { env } from "@/lib/env";
 import { getSession } from "@/lib/session";
 import { site } from "@/lib/site";
 import "@/styles/globals.css";
@@ -24,9 +25,23 @@ const instrumentSerif = Instrument_Serif({
   style: "italic",
 });
 
+// Podgląd linku w social mediach (LinkedIn, Facebook, X): obraz z opengraph-image.jpg i twitter-image.jpg.
 export const metadata: Metadata = {
+  metadataBase: new URL(env.BETTER_AUTH_URL),
   title: { default: site.name, template: `%s · ${site.name}` },
   description: site.description,
+  openGraph: {
+    type: "website",
+    locale: "pl_PL",
+    siteName: site.name,
+    title: `${site.name}: Transfer innowacji dla każdego`,
+    description: site.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name}: Transfer innowacji dla każdego`,
+    description: site.description,
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
