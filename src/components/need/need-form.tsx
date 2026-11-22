@@ -56,7 +56,7 @@ export function NeedForm({
   const [added, setAdded] = useState<number[]>([]); // indeksy już dodanych propozycji
   const [newFiles, setNewFiles] = useState<File[]>([]); // wybrane, jeszcze niewysłane
   const [removedIds, setRemovedIds] = useState<string[]>([]); // zapisane pliki do usunięcia
-  // edycja i dodawanie z listy potrzeb wracają na /dashboard/projects; dodawanie ze strony organizacji na nią
+  // po zapisie zawsze lista projektów; „Anuluj” wraca tam, skąd użytkownik przyszedł
   const backHref =
     need || businesses ? "/dashboard/projects" : `/dashboard/businesses/${businessId}`;
   const form = useForm<NeedInput>({
@@ -176,7 +176,7 @@ export function NeedForm({
         return;
       }
       toast.success(need ? "Zapisano zmiany" : "Dodano projekt");
-      router.push(backHref);
+      router.push("/dashboard/projects");
       router.refresh();
     });
   }
