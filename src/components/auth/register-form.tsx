@@ -30,6 +30,7 @@ export function RegisterForm() {
         lastName: values.lastName,
         email: values.email,
         password: values.password,
+        callbackURL: "/dashboard",
       });
       if (error) {
         toast.error(
@@ -40,8 +41,7 @@ export function RegisterForm() {
         );
         return;
       }
-      router.push("/dashboard");
-      router.refresh();
+      router.push(`/confirm-email?email=${encodeURIComponent(values.email)}`);
     });
   }
 

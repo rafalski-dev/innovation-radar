@@ -24,8 +24,16 @@ export function LoginForm() {
 
   function onSubmit(values: LoginInput) {
     startTransition(async () => {
-      const { error } = await authClient.signIn.email(values);
+      const { error } = await authClient.signIn.email({
+        ...values,
+        callbackURL: "/dashboard",
+      });
       if (error) {
+        if (error.code === "EMAIL_NOT_VERIFIED") {
+          toast.error("Potwierdź adres e-mail. Wysłaliśmy link ponownie.");
+          router.push(`/confirm-email?email=${encodeURIComponent(values.email)}`);
+          return;
+        }
         toast.error("Niepoprawny e-mail lub hasło");
         return;
       }

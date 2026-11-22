@@ -12,17 +12,19 @@ export function PasswordInput(props: Omit<React.ComponentProps<typeof Input>, "t
   return (
     <div className="relative">
       <Input {...props} type={visible ? "text" : "password"} className="pr-10" />
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        className="absolute top-1/2 right-1 -translate-y-1/2"
-        onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Ukryj hasło" : "Pokaż hasło"}
-        aria-pressed={visible}
-      >
-        {visible ? <EyeOffIcon /> : <EyeIcon />}
-      </Button>
+      {/* Centrowanie flexem, bo Button ma active:translate-y-px, które nadpisałoby -translate-y-1/2 */}
+      <div className="absolute inset-y-0 right-1 flex items-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? "Ukryj hasło" : "Pokaż hasło"}
+          aria-pressed={visible}
+        >
+          {visible ? <EyeOffIcon /> : <EyeIcon />}
+        </Button>
+      </div>
     </div>
   );
 }
