@@ -26,6 +26,9 @@ function respond(result: ActionResult<DescriptionSuggestion[]>, status = 200) {
 // POST /api/projects/expand-description  { title, description }  →  { success, data: {label, text}[] } | { success: false, error }
 // Na podstawie tytułu i wpisanego opisu proponuje uzupełnienia. Niczego nie zapisuje:
 // użytkownik dodaje wybrane propozycje do opisu przyciskami w formularzu.
+// Wywołanie modelu ma limit 30 s; funkcja dostaje zapas, żeby Vercel nie ucinał jej wcześniej.
+export const maxDuration = 45;
+
 export async function POST(request: Request) {
   const session = await getSession();
   if (!session) return respond(fail("Zaloguj się"), 401);

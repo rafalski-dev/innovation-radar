@@ -9,6 +9,9 @@ import { getSetting } from "@/lib/settings";
 import { accessibleProjectWhere } from "@/queries/project";
 import { generatePhrasesSchema, phrasesSchema, type Phrases } from "@/validation/search";
 
+// Wywołanie modelu ma limit 30 s; funkcja dostaje zapas, żeby Vercel nie ucinał jej wcześniej.
+export const maxDuration = 45;
+
 // Limit generowań na użytkownika w oknie 30 minut (kontrola kosztów API).
 const WINDOW_LIMIT = 20;
 const WINDOW_MINUTES = 30;

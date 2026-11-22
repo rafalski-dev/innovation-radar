@@ -16,6 +16,10 @@ import {
 // bez czytania całych stron, max 2 wywołania API i max tyle kandydatów, ile wybrał użytkownik.
 // Im więcej wyników chce użytkownik, tym więcej wyszukań web_search (kontrola kosztów): `webSearchesFor`.
 const MAX_CALLS = 2;
+// Łączny budżet czasu agenta: trasa ma maxDuration = 60 s, więc kolejne wywołania dostają tylko pozostały czas
+// (wcześniej dwa wywołania po 55 s mogły przekroczyć limit funkcji i zakończyć się błędem 504 bez komunikatu).
+const TOTAL_BUDGET_MS = 54_000;
+const MIN_CALL_MS = 5_000;
 
 type AgentSource = { name: string; domain: string };
 
@@ -85,6 +89,7 @@ async function callApi(
   extra: string,
   exclude: string[],
   limit: number,
+  timeoutMs: number,
 ): Promise<MessagesResponse> {
   const result = await callAnthropic(
     {
@@ -105,7 +110,7 @@ async function callApi(
         },
       ],
     },
-    55_000,
+    timeoutMs,
   );
   if (!result.ok) throw new Error(`Anthropic API ${result.status}: ${result.error}`);
   return result.data;
@@ -197,8 +202,11 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
   let outputTokens = 0;
   let candidates: Candidate[] | undefined;
 
+  const deadline = Date.now() + TOTAL_BUDGET_MS;
   for (let call = 0; call < MAX_CALLS && !candidates; call++) {
-    const res = await callApi(messages, sources, extra, exclude, limit);
+    const remaining = deadline - Date.now();
+    if (call > 0 && remaining < MIN_CALL_MS) break; // brak czasu na kolejne wywołanie: zwracamy to, co jest
+    const res = await callApi(messages, sources, extra, exclude, limit, remaining);
     inputTokens += res.usage.input_tokens;
     outputTokens += res.usage.output_tokens;
     webSearches += res.usage.server_tool_use?.web_search_requests ?? 0;
