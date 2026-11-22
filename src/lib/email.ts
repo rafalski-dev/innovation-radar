@@ -30,6 +30,32 @@ export async function sendVerificationEmail(to: string, name: string, url: strin
   await sendEmail({ to, subject, html, text });
 }
 
+export async function sendResetPasswordEmail(to: string, name: string, url: string) {
+  const subject = `Reset hasła w ${site.name}`;
+  const text = `Cześć ${name},\n\nkliknij w link, aby ustawić nowe hasło (ważny przez godzinę):\n${url}\n\nJeśli to nie Ty prosiłeś(-aś) o reset hasła, zignoruj tę wiadomość: Twoje hasło pozostaje bez zmian.`;
+  const html = `<p>Cześć ${escapeHtml(name)},</p><p>kliknij w link, aby ustawić nowe hasło (ważny przez godzinę):</p><p><a href="${url}">Ustaw nowe hasło</a></p><p>Jeśli to nie Ty prosiłeś(-aś) o reset hasła, zignoruj tę wiadomość: Twoje hasło pozostaje bez zmian.</p>`;
+  await sendEmail({ to, subject, html, text });
+}
+
+export async function sendReportEmail(
+  to: string,
+  data: {
+    projectTitle: string;
+    projectNumber: string;
+    businessName: string;
+    senderName: string;
+    aspects: number;
+    results: number;
+    url: string;
+  },
+) {
+  const subject = `Raport projektu: ${data.projectTitle}`;
+  const summary = `Aspekty: ${data.aspects}, wyniki: ${data.results}`;
+  const text = `${data.senderName} wysłał(a) raport projektu „${data.projectTitle}” (${data.projectNumber}, ${data.businessName}).\n${summary}.\n\nOtwórz raport (możesz zapisać go jako PDF): ${data.url}`;
+  const html = `<p>${escapeHtml(data.senderName)} wysłał(a) raport projektu <strong>${escapeHtml(data.projectTitle)}</strong> (${escapeHtml(data.projectNumber)}, ${escapeHtml(data.businessName)}).</p><p>${escapeHtml(summary)}.</p><p><a href="${data.url}">Otwórz raport</a> (możesz zapisać go jako PDF).</p>`;
+  await sendEmail({ to, subject, html, text });
+}
+
 function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }

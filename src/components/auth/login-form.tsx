@@ -63,6 +63,12 @@ export function LoginForm() {
           {...form.register("password")}
         />
       </FormField>
+      <Link
+        href="/forgot-password"
+        className="-mt-2 justify-self-end text-sm text-muted-foreground hover:underline"
+      >
+        Nie pamiętam hasła
+      </Link>
       <Button type="submit" disabled={pending}>
         {pending ? "Logowanie…" : "Zaloguj się"}
       </Button>

@@ -1,6 +1,7 @@
 import {
   BuildingIcon,
   LayoutDashboardIcon,
+  ShieldIcon,
   ClipboardListIcon,
   SearchIcon,
   UserIcon,
@@ -21,3 +22,10 @@ export const dashboardNav: DashboardNavItem[] = [
   { href: "/dashboard/search", label: "Aspekty", icon: SearchIcon },
   { href: "/dashboard/profile", label: "Profil", icon: UserIcon },
 ];
+
+// Pozycja widoczna tylko dla administratora radaru.
+export const adminNavItem: DashboardNavItem = {
+  href: "/dashboard/admin",
+  label: "Panel admina",
+  icon: ShieldIcon,
+};

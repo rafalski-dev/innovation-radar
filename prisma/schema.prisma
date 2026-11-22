@@ -16,6 +16,7 @@ enum UserRole {
   USER
   OFFICIAL
   BUSINESS
+  ADMIN // administrator radaru (panel /dashboard/admin)
 }
 
 model User {
@@ -117,7 +118,8 @@ model Need {
   title           String
   expectedOutcome String? // wycofane z formularza (na razie jeden opis); stare wpisy zachowują wartość
   description     String // opis projektu: używany przez wyszukiwarkę i generowanie fraz
-  linkUrls        String[] @default([]) // opcjonalne linki do materiałów (do 3)
+  linkUrls        String[]   @default([]) // opcjonalne linki do materiałów (do 3)
+  sentAt          DateTime? // raport wysłany do członków organizacji: projekt zamknięty do edycji
   files           NeedFile[]
   searches        Search[]
   businessId      String
@@ -163,6 +165,7 @@ model Search {
   id           String         @id @default(cuid())
   query        String
   phrases      Json? // zatwierdzone frazy: lista 3-5 tekstów (po polsku)
+  number       Int            @default(0) // numer aspektu w projekcie (0 = stare wpisy bez numeru)
   status       SearchStatus   @default(DRAFT)
   error        String?
   phrasesKey   String? // hash projektu + fraz: ten sam klucz w ciągu 7 dni = wynik z cache, bez kosztu
@@ -210,6 +213,7 @@ model SearchResult {
   sourceName   String
   sourceUrl    String
   why          String
+  trl          Int? // skala gotowości technologicznej 1-9 (null = nie da się ocenić ze źródła)
 
   @@index([searchId])
 }
@@ -232,4 +236,39 @@ model DescriptionGeneration {
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+// ---------- Panel administratora radaru ----------
+
+// Źródła, w których może szukać agent (admin dodaje i edytuje; użytkownik wybiera do 2).
+model Source {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  domain      String
+  description String   @default("")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Czarna lista e-maili: pełny adres albo domena z "@" (np. @spam.com). Blokuje rejestrację.
+model BlockedEmail {
+  id        String   @id @default(cuid())
+  pattern   String   @unique
+  createdAt DateTime @default(now())
+}
+
+// Czarna lista tematów: fraza w tytule/opisie projektu lub frazach aspektu blokuje zapis.
+model BlockedTopic {
+  id        String   @id @default(cuid())
+  phrase    String   @unique
+  createdAt DateTime @default(now())
+}
+
+// Ustawienia admina (klucz-wartość): dodatkowe instrukcje do promptów, limity.
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }

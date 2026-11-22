@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { dashboardNav } from "@/lib/dashboard-nav";
+import { adminNavItem, dashboardNav } from "@/lib/dashboard-nav";
 import { cn } from "@/lib/utils";
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
 
   return (
     <nav className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
-      {dashboardNav.map((item) => {
+      {(isAdmin ? [...dashboardNav, adminNavItem] : dashboardNav).map((item) => {
         const active =
           item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
         return (
