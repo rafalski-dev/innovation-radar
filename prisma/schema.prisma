@@ -19,26 +19,27 @@ enum UserRole {
 }
 
 model User {
-  id                  String           @id
-  name                String
-  firstName           String?
-  lastName            String?
-  email               String           @unique
-  emailVerified       Boolean          @default(false)
-  image               String?
-  role                UserRole         @default(USER)
-  organization        String?
-  position            String?
-  interests           String?
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
-  sessions            Session[]
-  accounts            Account[]
-  businesses          Business[]
-  businessMemberships BusinessMember[]
-  searches            Search[]
-  phraseGenerations   PhraseGeneration[]
-  agentRuns           AgentRun[]
+  id                     String                  @id
+  name                   String
+  firstName              String?
+  lastName               String?
+  email                  String                  @unique
+  emailVerified          Boolean                 @default(false)
+  image                  String?
+  role                   UserRole                @default(USER)
+  organization           String?
+  position               String?
+  interests              String?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  sessions               Session[]
+  accounts               Account[]
+  businesses             Business[]
+  businessMemberships    BusinessMember[]
+  searches               Search[]
+  phraseGenerations      PhraseGeneration[]
+  descriptionGenerations DescriptionGeneration[]
+  agentRuns              AgentRun[]
 }
 
 model Session {
@@ -115,7 +116,7 @@ model Need {
   id              String     @id @default(cuid())
   title           String
   expectedOutcome String? // wycofane z formularza (na razie jeden opis); stare wpisy zachowują wartość
-  description     String
+  description     String // opis projektu: używany przez wyszukiwarkę i generowanie fraz
   linkUrl         String? // opcjonalny link do materiałów (strona, artykuł, specyfikacja)
   files           NeedFile[]
   searches        Search[]
@@ -159,22 +160,22 @@ model BusinessMember {
 // Wyniki agenta dojdą w osobnej tabeli, gdy agent powstanie.
 
 model Search {
-  id        String   @id @default(cuid())
-  query     String
-  phrases   Json? // zatwierdzone frazy: lista 3-5 tekstów (po polsku)
-  status    SearchStatus @default(DRAFT)
-  error     String?
-  phrasesKey String? // hash projektu + fraz: ten sam klucz w ciągu 7 dni = wynik z cache, bez kosztu
-  startedAt DateTime? // ustawiane tylko przy prawdziwym uruchomieniu agenta (limit na użytkownika)
+  id           String         @id @default(cuid())
+  query        String
+  phrases      Json? // zatwierdzone frazy: lista 3-5 tekstów (po polsku)
+  status       SearchStatus   @default(DRAFT)
+  error        String?
+  phrasesKey   String? // hash projektu + fraz: ten sam klucz w ciągu 7 dni = wynik z cache, bez kosztu
+  startedAt    DateTime? // ustawiane tylko przy prawdziwym uruchomieniu agenta (limit na użytkownika)
   webSearches  Int?
   inputTokens  Int?
   outputTokens Int?
-  results   SearchResult[]
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  needId    String?
-  need      Need?    @relation(fields: [needId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
+  results      SearchResult[]
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  needId       String?
+  need         Need?          @relation(fields: [needId], references: [id], onDelete: SetNull)
+  createdAt    DateTime       @default(now())
 
   @@index([userId, createdAt])
   @@index([needId])
@@ -199,9 +200,9 @@ enum SearchStatus {
 
 // Kandydat znaleziony przez agenta (zawsze z linkiem do źródła).
 model SearchResult {
-  id           String @id @default(cuid())
+  id           String  @id @default(cuid())
   searchId     String
-  search       Search @relation(fields: [searchId], references: [id], onDelete: Cascade)
+  search       Search  @relation(fields: [searchId], references: [id], onDelete: Cascade)
   position     Int
   title        String
   summary      String
@@ -215,6 +216,16 @@ model SearchResult {
 
 // Licznik uruchomień agenta (limit na użytkownika; sam wynik zapisuje się dopiero po zatwierdzeniu).
 model AgentRun {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// Licznik generowań rozszerzonego opisu projektu (limit na użytkownika, kontrola kosztów API).
+model DescriptionGeneration {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

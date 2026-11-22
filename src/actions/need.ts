@@ -165,7 +165,10 @@ export async function updateNeed(
     await db.$transaction([
       db.need.update({
         where: { id },
-        data: { ...parsed.data, linkUrl: parsed.data.linkUrl || null },
+        data: {
+          ...parsed.data,
+          linkUrl: parsed.data.linkUrl || null,
+        },
       }),
       db.needFile.deleteMany({ where: { needId: id, id: { in: removed.map((f) => f.id) } } }),
       db.needFile.createMany({ data: files.map((f) => ({ ...f, needId: id })) }),

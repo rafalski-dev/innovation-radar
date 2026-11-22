@@ -34,3 +34,27 @@ export const needSchema = z.object({
     .refine((v) => v === "" || isHttpUrl(v), "Podaj poprawny adres, np. https://example.com"),
 });
 export type NeedInput = z.infer<typeof needSchema>;
+
+// Propozycje AI do opisu: lista fragmentów, z których użytkownik dodaje wybrane przyciskami.
+export const MAX_SUGGESTIONS = 6;
+export const descriptionSuggestionsSchema = z
+  .array(
+    z.object({
+      label: z.string().trim().min(1).max(60),
+      text: z.string().trim().min(1).max(700),
+    }),
+  )
+  .min(1)
+  .max(MAX_SUGGESTIONS);
+export type DescriptionSuggestion = z.infer<typeof descriptionSuggestionsSchema>[number];
+
+// Wejście generatora: tytuł i to, co użytkownik już wpisał w opisie.
+export const expandDescriptionSchema = z.object({
+  title: z.string().trim().min(3, "Najpierw wpisz tytuł projektu").max(150),
+  description: z
+    .string()
+    .trim()
+    .min(15, "Wpisz kilka zdań opisu (min. 15 znaków), a AI zaproponuje uzupełnienia")
+    .max(4000, "Maksymalnie 4000 znaków"),
+});
+export type ExpandDescriptionInput = z.infer<typeof expandDescriptionSchema>;

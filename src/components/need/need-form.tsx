@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileTextIcon, XIcon } from "lucide-react";
+import { FileTextIcon, PlusIcon, SparklesIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { createNeed, createNeedFileUpload, updateNeed } from "@/actions/need";
 import { FormField } from "@/components/form-field";
@@ -18,6 +18,7 @@ import {
   NEED_FILE_MAX_BYTES,
   NEED_FILE_MAX_MB,
   NEED_FILES_MAX,
+  type DescriptionSuggestion,
   type NeedAttachmentInput,
   type NeedInput,
   needSchema,
@@ -49,6 +50,9 @@ export function NeedForm({
   );
   const [orgError, setOrgError] = useState<string>();
   const [fileError, setFileError] = useState<string>();
+  const [expanding, setExpanding] = useState(false);
+  const [suggestions, setSuggestions] = useState<DescriptionSuggestion[]>([]);
+  const [added, setAdded] = useState<number[]>([]); // indeksy już dodanych propozycji
   const [newFiles, setNewFiles] = useState<File[]>([]); // wybrane, jeszcze niewysłane
   const [removedIds, setRemovedIds] = useState<string[]>([]); // zapisane pliki do usunięcia
   // edycja i dodawanie z listy potrzeb wracają na /dashboard/projects; dodawanie ze strony organizacji na nią
@@ -87,6 +91,43 @@ export function NeedForm({
     }
     setNewFiles((prev) => [...prev, ...accepted]);
     setFileError(error);
+  }
+
+  // AI proponuje uzupełnienia opisu na podstawie tytułu i tego, co już wpisano. Niczego nie zapisujemy.
+  async function generateSuggestions() {
+    const { title, description } = form.getValues();
+    setExpanding(true);
+    try {
+      const response = await fetch("/api/needs/expand-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        { success: true; data: DescriptionSuggestion[] } | { success: false; error: string } | null;
+      if (!result?.success) {
+        toast.error(result?.error ?? "Nie udało się wygenerować propozycji");
+        return;
+      }
+      setSuggestions(result.data);
+      setAdded([]);
+    } catch (error) {
+      console.error(error);
+      toast.error("Nie udało się wygenerować propozycji");
+    } finally {
+      setExpanding(false);
+    }
+  }
+
+  // Dopisuje tekst propozycji na końcu opisu (nie nadpisuje tego, co już jest).
+  function addSuggestion(index: number) {
+    const current = form.getValues("description").trim();
+    const text = suggestions[index].text;
+    form.setValue("description", current ? `${current}\n\n${text}` : text, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setAdded((prev) => [...prev, index]);
   }
 
   // Organizacja jest poza RHF, więc jej błąd ustawiamy tu, od razu razem z błędami pozostałych pól.
@@ -184,18 +225,63 @@ export function NeedForm({
         />
       </FormField>
 
-      <FormField
-        label="Opis projektu *"
-        htmlFor="n-description"
-        error={errors.description?.message}
-      >
+      <FormField label="Opis *" htmlFor="n-description" error={errors.description?.message}>
         <Textarea
           id="n-description"
           rows={8}
-          placeholder="Co chcesz osiągnąć i jakiego rozwiązania szukasz? Dodaj ograniczenia (budżet, technologia, termin)."
+          placeholder="Co chcesz osiągnąć i jakiego rozwiązania szukasz? Na podstawie opisu wyszukujemy pasujące innowacje."
           aria-invalid={!!errors.description}
           {...form.register("description")}
         />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={generateSuggestions}
+            disabled={expanding || pending}
+          >
+            <SparklesIcon />
+            {expanding
+              ? "Generowanie…"
+              : suggestions.length
+                ? "Wygeneruj ponownie"
+                : "Zaproponuj uzupełnienia z AI"}
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            Wpisz kilka zdań, a AI zaproponuje, co jeszcze warto dodać. Kliknij propozycję, aby
+            dopisać ją do opisu.
+          </span>
+        </div>
+        {suggestions.length > 0 && (
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {suggestions.map((suggestion, i) => {
+              const isAdded = added.includes(i);
+              return (
+                <li key={`${suggestion.label}-${i}`} className="grid">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isAdded}
+                    onClick={() => addSuggestion(i)}
+                    className="h-auto items-start justify-start gap-2 px-3 py-2 text-left whitespace-normal"
+                  >
+                    <PlusIcon className="mt-0.5" />
+                    <span className="grid gap-0.5">
+                      <span className="font-medium">
+                        {suggestion.label}
+                        {isAdded && " (dodano)"}
+                      </span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {suggestion.text}
+                      </span>
+                    </span>
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </FormField>
 
       <div className="grid gap-4 rounded-lg border p-4">
