@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { after } from "next/server";
 import { isEmailBlocked } from "@/lib/blocklist";
 import { db } from "@/lib/db";
 import { sendResetPasswordEmail, sendVerificationEmail } from "@/lib/email";
@@ -18,16 +19,18 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     resetPasswordTokenExpiresIn: 60 * 60, // link do resetu ważny godzinę
     sendResetPassword: async ({ user, url }) => {
-      // bez await: nie blokuje odpowiedzi (i nie zdradza, czy konto istnieje, czasem odpowiedzi)
-      void sendResetPasswordEmail(user.email, user.name, url).catch(console.error);
+      // after(): nie blokuje odpowiedzi (i nie zdradza, czy konto istnieje, czasem odpowiedzi),
+      // a na Vercelu funkcja nie jest zamrażana przed końcem wysyłki
+      after(() => sendResetPasswordEmail(user.email, user.name, url).catch(console.error));
     },
   },
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      // bez await: nie blokuje odpowiedzi i chroni przed timing attackiem
-      void sendVerificationEmail(user.email, user.name, url).catch(console.error);
+      // after(): nie blokuje odpowiedzi i chroni przed timing attackiem,
+      // a na Vercelu funkcja nie jest zamrażana przed końcem wysyłki
+      after(() => sendVerificationEmail(user.email, user.name, url).catch(console.error));
     },
   },
   user: {
