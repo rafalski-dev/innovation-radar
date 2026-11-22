@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 export function SiteFooter() {
   return (
     <footer className="mt-8">
-      <div className="h-px bg-gradient-to-r from-transparent via-brand-blue/60 to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-brand/60 to-transparent" />
       <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 md:grid-cols-[1.2fr_1.6fr_auto] md:items-center">
         <div className="space-y-2">
           <p className="font-semibold">{site.name}</p>
@@ -31,7 +31,7 @@ export function SiteFooter() {
             href="https://pcinn.org/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-foreground underline decoration-brand-green decoration-2 underline-offset-4 hover:decoration-brand-blue"
+            className="font-medium text-foreground underline decoration-brand decoration-2 underline-offset-4 hover:decoration-brand"
           >
             Podkarpackiego Centrum Innowacji
           </a>

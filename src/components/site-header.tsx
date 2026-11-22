@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RadarIcon } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/auth/user-menu";
@@ -12,7 +13,10 @@ export async function SiteHeader() {
   return (
     <header className="border-b">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-6 px-4">
-        <Link href="/" className="font-semibold">
+        <Link href="/" className="flex items-center gap-2 font-semibold">
+          <span className="flex size-7 items-center justify-center rounded-lg bg-brand text-white">
+            <RadarIcon className="size-4" />
+          </span>
           {site.name}
         </Link>
         <SiteNav />
@@ -24,7 +28,14 @@ export async function SiteHeader() {
             <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               Zaloguj się
             </Link>
-            <Link href="/register" className={buttonVariants({ size: "sm" })}>
+            <Link
+              href="/register"
+              className={buttonVariants({
+                size: "sm",
+                className:
+                  "rounded-full bg-brand text-white hover:bg-brand/90 dark:bg-brand dark:text-white",
+              })}
+            >
               Załóż konto
             </Link>
           </div>

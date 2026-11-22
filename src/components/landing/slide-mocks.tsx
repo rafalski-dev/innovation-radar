@@ -21,7 +21,7 @@ export function ProjectMock() {
         </p>
       </div>
       <span className={fakeButton}>
-        <SparklesIcon className="size-3 text-brand-blue" />
+        <SparklesIcon className="size-3 text-brand" />
         Zaproponuj uzupełnienia z AI
       </span>
       <div className="grid grid-cols-2 gap-2">
@@ -30,7 +30,7 @@ export function ProjectMock() {
           ["Ograniczenia", "Bezpieczny demontaż ogniw"],
         ].map(([label, text]) => (
           <div key={label} className={cn(panel, "flex items-start gap-1.5")}>
-            <PlusIcon className="mt-0.5 size-3 shrink-0 text-brand-green" />
+            <PlusIcon className="mt-0.5 size-3 shrink-0 text-brand" />
             <span>
               <span className="block font-medium">{label}</span>
               <span className="text-muted-foreground">{text}</span>
@@ -60,7 +60,7 @@ export function PhrasesMock() {
       </div>
       <div className="flex flex-wrap gap-2">
         <span className={fakeButton}>
-          <SparklesIcon className="size-3 text-brand-blue" />
+          <SparklesIcon className="size-3 text-brand" />
           Generuj kolejną frazę
         </span>
         <span className={cn(panel, "min-w-0 flex-1 py-1.5 text-muted-foreground")}>
@@ -91,13 +91,13 @@ export function SourcesMock() {
             className={cn(
               panel,
               "flex items-start gap-2",
-              on ? "border-brand-blue/60 bg-brand-blue/5" : "opacity-50",
+              on ? "border-brand/60 bg-brand/5" : "opacity-50",
             )}
           >
             <span
               className={cn(
                 "mt-0.5 flex size-3.5 shrink-0 items-center justify-center rounded border",
-                on && "border-brand-blue bg-brand-blue text-white",
+                on && "border-brand bg-brand text-white",
               )}
             >
               {on && <CheckIcon className="size-2.5" strokeWidth={3} />}
@@ -125,12 +125,12 @@ export function ResultsMock() {
       <div className={cn(panel, "space-y-1.5")}>
         <div className="flex items-start justify-between gap-2">
           <p className="flex items-start gap-2 text-[13px] font-medium">
-            <span className="mt-0.5 flex size-3.5 shrink-0 items-center justify-center rounded border border-brand-blue bg-brand-blue text-white">
+            <span className="mt-0.5 flex size-3.5 shrink-0 items-center justify-center rounded border border-brand bg-brand text-white">
               <CheckIcon className="size-2.5" strokeWidth={3} />
             </span>
             Hydrometalurgiczny odzysk metali z ogniw Li-ion
           </p>
-          <span className="shrink-0 rounded-full border border-brand-green/60 bg-brand-green/10 px-2 py-0.5 text-[10px] font-medium">
+          <span className="shrink-0 rounded-full border border-brand/60 bg-brand/10 px-2 py-0.5 text-[10px] font-medium">
             TRL 7/9
           </span>
         </div>

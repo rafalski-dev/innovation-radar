@@ -84,7 +84,7 @@ export function HowItWorksCarousel() {
           >
             <div className="grid h-full gap-6 rounded-2xl border bg-card p-6 sm:p-10 md:grid-cols-2 md:items-center md:gap-10">
               <div className="space-y-3">
-                <p className="text-sm font-medium text-brand-blue">
+                <p className="text-sm font-medium text-brand">
                   Krok {index + 1} z {slides.length}
                 </p>
                 <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{slide.title}</h3>
@@ -121,7 +121,7 @@ export function HowItWorksCarousel() {
               aria-current={index === active}
               className={cn(
                 "h-2 rounded-full transition-all",
-                index === active ? "w-6 bg-brand-blue" : "w-2 bg-muted-foreground/30",
+                index === active ? "w-6 bg-brand" : "w-2 bg-muted-foreground/30",
               )}
             />
           ))}
