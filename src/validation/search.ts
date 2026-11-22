@@ -18,7 +18,8 @@ export const candidateSchema = z.object({
   summary: z.string().trim().min(1).max(800),
   organization: z.string().trim().max(200),
   sourceName: z.string().trim().min(1).max(100),
-  sourceUrl: z.url().max(1000),
+  // tylko http(s): odrzuca m.in. javascript: (adres trafia do <a href>)
+  sourceUrl: z.url({ protocol: /^https?$/ }).max(1000),
   why: z.string().trim().min(1).max(500),
   // skala gotowości technologicznej 1-9 oceniona na podstawie źródła; null = nie da się ocenić
   trl: z.number().int().min(1).max(9).nullable(),

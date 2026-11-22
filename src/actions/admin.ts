@@ -101,7 +101,12 @@ export async function addBlockedEmail(pattern: string): Promise<ActionResult> {
 export async function removeBlockedEmail(id: string): Promise<ActionResult> {
   const denied = await guard();
   if (denied) return denied;
-  await db.blockedEmail.deleteMany({ where: { id } });
+  try {
+    await db.blockedEmail.deleteMany({ where: { id } });
+  } catch (error) {
+    console.error(error);
+    return fail("Nie udało się usunąć wpisu");
+  }
   revalidatePath(PATH);
   return ok();
 }
@@ -128,7 +133,12 @@ export async function addBlockedTopic(phrase: string): Promise<ActionResult> {
 export async function removeBlockedTopic(id: string): Promise<ActionResult> {
   const denied = await guard();
   if (denied) return denied;
-  await db.blockedTopic.deleteMany({ where: { id } });
+  try {
+    await db.blockedTopic.deleteMany({ where: { id } });
+  } catch (error) {
+    console.error(error);
+    return fail("Nie udało się usunąć wpisu");
+  }
   revalidatePath(PATH);
   return ok();
 }

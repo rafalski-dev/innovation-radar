@@ -225,20 +225,6 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
       }
     }
 
-    // TYMCZASOWE logi diagnostyczne (usunąć po debugowaniu)
-    console.log(
-      "[agent] stop_reason:",
-      res.stop_reason,
-      "| bloki:",
-      res.content.map((b) => b.type).join(", "),
-    );
-    for (const block of res.content) {
-      if (block.type === "web_search_tool_result") {
-        console.log("[agent] web_search_tool_result:", JSON.stringify(block.content).slice(0, 600));
-      }
-      if (block.type === "text") console.log("[agent] tekst:", String(block.text).slice(0, 400));
-    }
-
     const save = res.content.find((b) => b.type === "tool_use" && b.name === SAVE_TOOL);
     if (save) {
       candidates = parseCandidates(save.input, limit);
@@ -249,12 +235,6 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
     }
   }
 
-  console.log(
-    "[agent] kandydaci przed filtrem:",
-    candidates?.length ?? 0,
-    "| znalezione URL-e:",
-    foundUrls.size,
-  );
   const excluded = new Set(exclude.map(normalizeUrl));
   const verified = (candidates ?? []).filter(
     (c) => foundUrls.has(normalizeUrl(c.sourceUrl)) && !excluded.has(normalizeUrl(c.sourceUrl)),

@@ -84,6 +84,14 @@ export async function deleteSearch(id: string): Promise<ActionResult> {
   if (!session) return fail("Zaloguj się");
 
   try {
+    // aspektów projektu z wysłanym raportem nie usuwamy (raport jest zamknięty)
+    const current = await db.search.findFirst({
+      where: { id, userId: session.user.id },
+      select: { need: { select: { sentAt: true } } },
+    });
+    if (current?.need?.sentAt) {
+      return fail("Raport projektu został wysłany, projekt jest zamknięty do edycji");
+    }
     const { count } = await db.search.deleteMany({ where: { id, userId: session.user.id } });
     if (count === 0) return fail("Nie znaleziono aspektu");
     revalidatePath("/dashboard/search");

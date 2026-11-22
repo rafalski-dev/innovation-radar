@@ -1,11 +1,13 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import type { UserRole } from "@/validation/auth";
 
-export async function getSession() {
+// cache(): layout, strona i zapytania w jednym żądaniu dzielą jedno zapytanie o sesję.
+export const getSession = cache(async () => {
   return auth.api.getSession({ headers: await headers() });
-}
+});
 
 // Dla stron i akcji, które wymagają logowania.
 export async function requireSession() {
