@@ -1,4 +1,5 @@
 import { fail, ok, type ActionResult } from "@/lib/action-result";
+import { callAnthropic, toolInput } from "@/lib/anthropic";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
@@ -12,7 +13,6 @@ import {
   MAX_SUGGESTIONS,
 } from "@/validation/need";
 
-const MODEL = "claude-haiku-5-5";
 // Limit generowań na użytkownika w oknie 30 minut (kontrola kosztów API).
 const WINDOW_LIMIT = 10;
 const WINDOW_MINUTES = 30;
@@ -55,16 +55,8 @@ export async function POST(request: Request) {
     // liczymy próbę przed wywołaniem API, żeby szybkie powtórne kliknięcia też się wliczały
     await db.descriptionGeneration.create({ data: { userId: session.user.id } });
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      signal: AbortSignal.timeout(30_000),
-      body: JSON.stringify({
-        model: MODEL,
+    const result = await callAnthropic(
+      {
         max_tokens: 1500,
         system:
           "Pomagasz firmom opisać projekt lub potrzebę innowacyjną, aby łatwiej znaleźć pasujące rozwiązania " +
@@ -90,15 +82,14 @@ export async function POST(request: Request) {
           },
         ],
         tool_choice: { type: "tool", name: "zapisz_propozycje" },
-      }),
-    });
-    if (!response.ok) {
-      console.error("Anthropic API:", response.status, await response.text());
+      },
+      30_000,
+    );
+    if (!result.ok) {
+      console.error("Anthropic API:", result.status, result.error);
       return respond(fail("Nie udało się wygenerować propozycji. Spróbuj ponownie"), 502);
     }
-    const data = (await response.json()) as { content: { type: string; input?: unknown }[] };
-    const toolUse = data.content.find((block) => block.type === "tool_use");
-    const output = outputSchema.safeParse(toolUse?.input);
+    const output = outputSchema.safeParse(toolInput(result.data));
     if (!output.success) {
       return respond(fail("Model zwrócił niepoprawne propozycje. Spróbuj ponownie"), 502);
     }

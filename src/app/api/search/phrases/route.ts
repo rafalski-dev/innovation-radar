@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
+import { callAnthropic, toolInput } from "@/lib/anthropic";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
@@ -8,7 +9,6 @@ import { getSetting } from "@/lib/settings";
 import { accessibleNeedWhere } from "@/queries/need";
 import { generatePhrasesSchema, phrasesSchema, type Phrases } from "@/validation/search";
 
-const PHRASES_MODEL = "claude-haiku-5-5";
 // Limit generowań na użytkownika w oknie 30 minut (kontrola kosztów API).
 const WINDOW_LIMIT = 20;
 const WINDOW_MINUTES = 30;
@@ -60,17 +60,9 @@ export async function POST(request: Request) {
     const single = body.data.existing !== undefined;
     const existing = (body.data.existing ?? []).filter(Boolean);
 
-    // Messages API Anthropic wprost (bez SDK). Wymuszamy narzędzie, żeby dostać JSON zgodny ze schematem.
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      signal: AbortSignal.timeout(30_000),
-      body: JSON.stringify({
-        model: PHRASES_MODEL,
+    // Wymuszamy narzędzie, żeby dostać JSON zgodny ze schematem.
+    const result = await callAnthropic(
+      {
         max_tokens: single ? 200 : 500,
         system:
           (single
@@ -105,15 +97,14 @@ export async function POST(request: Request) {
           },
         ],
         tool_choice: { type: "tool", name: "zapisz_frazy" },
-      }),
-    });
-    if (!response.ok) {
-      console.error("Anthropic API:", response.status, await response.text());
+      },
+      30_000,
+    );
+    if (!result.ok) {
+      console.error("Anthropic API:", result.status, result.error);
       return respond(fail("Nie udało się wygenerować fraz. Spróbuj ponownie"), 502);
     }
-    const data = (await response.json()) as { content: { type: string; input?: unknown }[] };
-    const toolUse = data.content.find((block) => block.type === "tool_use");
-    const output = (single ? singleOutputSchema : outputSchema).safeParse(toolUse?.input);
+    const output = (single ? singleOutputSchema : outputSchema).safeParse(toolInput(result.data));
     if (!output.success) {
       return respond(fail("Model zwrócił niepoprawne frazy. Spróbuj ponownie"), 502);
     }

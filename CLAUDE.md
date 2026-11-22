@@ -1,6 +1,6 @@
 # Starter: Next.js + Prisma + shadcn
 
-Next.js 16 App Router · Prisma 7 + Neon · Zod 4 · React Hook Form · shadcn (Base UI) · Tailwind 4 · AI SDK (Anthropic, Groq)
+Next.js 16 App Router · Prisma 7 + Neon · Zod 4 · React Hook Form · shadcn (Base UI) · Tailwind 4 · Claude API (Anthropic)
 
 ## Zanim zaczniesz zadanie
 
@@ -18,7 +18,7 @@ Next.js 16 App Router · Prisma 7 + Neon · Zod 4 · React Hook Form · shadcn (
 - `src/app/<encja>/page.tsx`: strona (Server Component)
 - `src/components/shadcn/`: komponenty UI (nie edytuj bez potrzeby; dodawaj przez `npx shadcn add`)
 - `src/components/`: komponenty wspólne (`site-header`, `page-header`, `form-field`, `confirm-delete-button`, `providers`)
-- `src/lib/`: `db.ts` (Prisma), `env.ts` (zmienne środowiskowe), `site.ts` (nazwa, nawigacja), `action-result.ts`, `ai.ts`, `utils.ts`
+- `src/lib/`: `db.ts` (Prisma), `env.ts` (zmienne środowiskowe), `site.ts` (nazwa, nawigacja), `action-result.ts`, `search-agent.ts` (agent AI), `utils.ts`
 
 ## Konwencje
 

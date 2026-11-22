@@ -10,7 +10,6 @@ const envSchema = z.object({
     .string()
     .url("BETTER_AUTH_URL: pełny adres aplikacji, np. http://localhost:3000"),
   ANTHROPIC_API_KEY: z.string().optional(),
-  GROQ_API_KEY: z.string().optional(),
   // E-maile administratorów radaru (po przecinku): konto z takim adresem dostaje rolę ADMIN przy wejściu do panelu.
   ADMIN_EMAILS: z.string().optional(),
   // E-mail (Resend). Bez klucza wiadomości trafiają tylko do konsoli serwera.
