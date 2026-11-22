@@ -59,7 +59,7 @@ Każdy wynik dostaje ocenę gotowości technologicznej, więc od razu widać, co
 
 - 🏢 **Organizacje i osoby**: wiele organizacji (NIP, adres, branża), dodawanie osób z istniejącymi kontami, role administratora i członka. NIP jest unikalny i po utworzeniu nie podlega edycji, a przy duplikacie aplikacja pokazuje e-mail administratora istniejącej organizacji.
 - 📊 **Statystyki aktywności**: na stronie organizacji widać, ile projektów i aspektów dodała każda osoba.
-- 📁 **Projekty**: opis problemu, do 3 linków i do 3 plików PDF (po 20 MB), numeracja, duplikowanie i filtrowanie listy (szukanie, organizacja, status udostępnienia). Karta pokazuje autora, autorów aspektów, użyte bazy i rozpiętość TRL.
+- 📁 **Projekty**: opis problemu, do 3 linków i do 3 plików PDF (po 20 MB), numeracja, duplikowanie i filtrowanie listy (szukanie i organizacja). Karta pokazuje autora, autorów aspektów, użyte bazy i rozpiętość TRL.
 - ✍️ **Asystent opisu**: AI proponuje uzupełnienia, a użytkownik dodaje wybrane jednym kliknięciem.
 - 🧩 **Aspekty**: lista z frazami, użytymi bazami, liczbą wyszukiwań, rozpiętością TRL i autorem, z filtrem zakresu TRL. Cudzy aspekt można podejrzeć, a edytować i usuwać może tylko autor.
 - 📚 **Materiały**: biblioteka wszystkich zapisanych wyników z kontekstem AI (uzasadnienie, frazy, źródło), z wyszukiwaniem i filtrami.
