@@ -112,6 +112,8 @@ ze źródeł, bez powtórzeń adresów, do limitu. Błąd jednego źródła nie 
 | 4–6           | 2 × 12 = 24           | ≈ 120–240 stron | ≈ $0,30 (1,2 zł)          |
 | 7–9           | 2 × 15 = 30           | ≈ 150–300 stron | ≈ $0,35–0,45 (1,4–1,8 zł) |
 
+**Pomiar po zmianie** (22.11.2026, temat AI w kontroli jakości, NCBiR + RAD-on, limit 9): 23 s, **10 wyszukań** (z 30 dozwolonych), 150 372 tokeny wejścia, 10 094 wyjścia, 9 wyników, 0 odrzuconych, **≈ $0,12 (0,48 zł)**. Agenci sami kończą wcześniej, gdy uznają, że mają dość wyników: `max_uses` to górna granica, nie liczba wykonanych wyszukań, więc realny koszt jest zwykle niższy od szacunku.
+
 Przy jednym źródle koszt i zasięg są o połowę mniejsze. Rzeczywisty koszt zapisujemy w `Search`
 (`inputTokens`, `outputTokens`, `webSearches`); po kilku uruchomieniach warto podmienić szacunki na pomiary.
 
