@@ -13,8 +13,9 @@ import {
 } from "@/validation/search";
 
 // Agent wyszukujący (Krok 2 z docs/AGENT.md), wersja oszczędna: Haiku, web search z limitem,
-// bez czytania całych stron, max 2 wywołania API i max tyle kandydatów, ile wybrał użytkownik.
-// Im więcej wyników chce użytkownik, tym więcej wyszukań web_search (kontrola kosztów): `webSearchesFor`.
+// bez czytania całych stron, max 2 wywołania API na źródło i max tyle kandydatów, ile wybrał użytkownik.
+// Każde wybrane źródło przeszukuje osobny agent, równolegle. Im więcej wyników chce użytkownik,
+// tym więcej wyszukań web_search na źródło (kontrola kosztów): `webSearchesFor`.
 const MAX_CALLS = 2;
 // Łączny budżet czasu agenta: trasa ma maxDuration = 60 s, więc kolejne wywołania dostają tylko pozostały czas
 // (wcześniej dwa wywołania po 55 s mogły przekroczyć limit funkcji i zakończyć się błędem 504 bez komunikatu).
@@ -189,6 +190,56 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
   const extra = await getSetting("agentPromptExtra");
   const exclude = input.exclude ?? [];
   const limit = input.limit ?? DEFAULT_RESULTS_LIMIT;
+  const deadline = Date.now() + TOTAL_BUDGET_MS;
+
+  // Jeden agent na źródło, równolegle: każdy ma własny limit wyszukań (webSearchesFor) i mieści się
+  // w budżecie czasu trasy. Błąd jednego źródła nie przekreśla wyników z pozostałych.
+  const settled = await Promise.allSettled(
+    sources.map((source) => runSourceAgent(input, source, extra, exclude, limit, deadline)),
+  );
+  const runs: SourceRun[] = [];
+  for (const result of settled) {
+    if (result.status === "fulfilled") runs.push(result.value);
+    else console.error(result.reason);
+  }
+  if (runs.length === 0) {
+    throw (settled[0] as PromiseRejectedResult | undefined)?.reason ?? new Error("Brak źródeł");
+  }
+
+  // Łączymy na przemian (po jednym z każdego źródła), bez powtórzeń adresów, do limitu.
+  const seen = new Set<string>();
+  const candidates: Candidate[] = [];
+  for (let i = 0; candidates.length < limit; i++) {
+    const round = runs.map((r) => r.candidates[i]).filter((c): c is Candidate => !!c);
+    if (round.length === 0) break;
+    for (const c of round) {
+      const url = normalizeUrl(c.sourceUrl);
+      if (seen.has(url) || candidates.length >= limit) continue;
+      seen.add(url);
+      candidates.push(c);
+    }
+  }
+
+  return {
+    candidates,
+    rejected: runs.reduce((sum, r) => sum + r.rejected, 0),
+    webSearches: runs.reduce((sum, r) => sum + r.webSearches, 0),
+    inputTokens: runs.reduce((sum, r) => sum + r.inputTokens, 0),
+    outputTokens: runs.reduce((sum, r) => sum + r.outputTokens, 0),
+  };
+}
+
+type SourceRun = AgentOutput;
+
+async function runSourceAgent(
+  input: AgentInput,
+  source: AgentSource,
+  extra: string,
+  exclude: string[],
+  limit: number,
+  deadline: number,
+): Promise<SourceRun> {
+  const sources = [source];
   const userMessage = {
     role: "user",
     content:
@@ -202,7 +253,6 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
   let outputTokens = 0;
   let candidates: Candidate[] | undefined;
 
-  const deadline = Date.now() + TOTAL_BUDGET_MS;
   for (let call = 0; call < MAX_CALLS && !candidates; call++) {
     const remaining = deadline - Date.now();
     if (call > 0 && remaining < MIN_CALL_MS) break; // brak czasu na kolejne wywołanie: zwracamy to, co jest

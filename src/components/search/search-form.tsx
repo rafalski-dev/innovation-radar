@@ -26,6 +26,7 @@ import {
   MAX_SOURCES,
   MAX_TOTAL_RESULTS,
   searchSchema,
+  totalWebSearchesFor,
   webSearchesFor,
   type AgentStats,
   type Candidate,
@@ -524,8 +525,9 @@ export function SearchForm({
                 gwarancja: zostają materiały z adresem potwierdzonym przez wyszukiwanie w wybranych
                 źródłach, więc wyników może być mniej. Przy {limit}{" "}
                 {plural(limit, "wyniku", "wynikach", "wynikach")} agent wykona do{" "}
-                {webSearchesFor(limit)} zapytań do wyszukiwarki (więcej wyników = dłuższe i droższe
-                wyszukiwanie).
+                {totalWebSearchesFor(limit, sources.length)} zapytań do wyszukiwarki (
+                {webSearchesFor(limit)} w każdym źródle, równolegle; więcej wyników = dłuższe i
+                droższe wyszukiwanie).
               </span>
             </p>
           </div>

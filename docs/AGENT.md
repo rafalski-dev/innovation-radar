@@ -92,7 +92,46 @@ Instrukcja dla agenta (prompt systemowy, w skrócie):
 Uwaga techniczna: długie wywołanie na Vercelu wymaga ustawienia czasu funkcji (`maxDuration`)
 albo uruchomienia w tle i odświeżania statusu. Sesja od kodu sprawdza aktualne możliwości Next 16 / Vercel.
 
-**Koszt (szacunek):** ok. $0,40 (≈1,6 zł) na Sonnecie. Rzeczywisty koszt zapisujemy z odpowiedzi API.
+**Koszt (szacunek z planu):** ok. $0,40 (≈1,6 zł) na Sonnecie. Rzeczywisty koszt zapisujemy z odpowiedzi API.
+Stan po wdrożeniu (Haiku): patrz sekcja „Koszt wyszukiwania (stan obecny)” niżej.
+
+### Koszt wyszukiwania (stan obecny)
+
+Model `claude-haiku-5-5`, cennik Anthropic (sprawdzony 22.11.2026): **$0,10 / 1M tokenów wejścia**,
+**$0,50 / 1M tokenów wyjścia** (do 100 tys. tokenów w zapytaniu; powyżej: $0,50 / $2,50),
+**web search: $10 / 1000 wyszukań**. Przeliczenie: ≈4 zł za $1.
+
+**Jak liczymy wyszukania (wariant A + B, wdrożony):** każde wybrane źródło (max `MAX_SOURCES` = 2)
+przeszukuje **osobny agent, równolegle**, z własnym limitem wyszukań (`webSearchesFor` w
+`src/validation/search.ts`): 1–3 wyniki → 8 wyszukań na źródło, 4–6 → 12, 7–9 → 15. Wyniki łączymy na przemian
+ze źródeł, bez powtórzeń adresów, do limitu. Błąd jednego źródła nie przekreśla wyników z drugiego.
+
+| Limit wyników | Wyszukania (2 źródła) | Zasięg          | Koszt (szacunek)          |
+| ------------- | --------------------- | --------------- | ------------------------- |
+| 1–3           | 2 × 8 = 16            | ≈ 80–160 stron  | ≈ $0,20 (0,8 zł)          |
+| 4–6           | 2 × 12 = 24           | ≈ 120–240 stron | ≈ $0,30 (1,2 zł)          |
+| 7–9           | 2 × 15 = 30           | ≈ 150–300 stron | ≈ $0,35–0,45 (1,4–1,8 zł) |
+
+Przy jednym źródle koszt i zasięg są o połowę mniejsze. Rzeczywisty koszt zapisujemy w `Search`
+(`inputTokens`, `outputTokens`, `webSearches`); po kilku uruchomieniach warto podmienić szacunki na pomiary.
+
+**Pomiar przed zmianą** (jeden agent na wszystkie źródła, 3–5 wyszukań; dane z bazy):
+
+| Wyszukania | Tokeny wej. | Tokeny wyj. | Tokeny  | Web search | **Razem**              |
+| ---------- | ----------- | ----------- | ------- | ---------- | ---------------------- |
+| 3          | 31 525      | 3 116       | $0,0047 | $0,03      | **≈ $0,035 (0,14 zł)** |
+| 4          | 39 346      | 3 563       | $0,0057 | $0,04      | **≈ $0,046 (0,18 zł)** |
+| 5          | 46 599      | 4 942       | $0,0071 | $0,05      | **≈ $0,057 (0,23 zł)** |
+
+Generowanie fraz (`/api/search/phrases`, bez web search, max 500 tokenów): ok. $0,0005, pomijalne.
+
+- Ok. 85% kosztu to opłata za web search ($0,01 za wyszukanie), nie tokeny.
+- Każde wyszukanie zwraca 5–10 trafień (fragmenty z wyników, bez czytania całych stron). Agent nie przegląda
+  całej bazy źródła, tylko to, co zwróci wyszukiwarka.
+- „Znajdź więcej” to kolejne uruchomienie z tym samym kosztem. Te same frazy w ciągu 7 dni: wynik z cache, $0.
+- Ryzyko: przy 15 wyszukaniach jedno wywołanie może przekroczyć 100 tys. tokenów i wtedy tokeny kosztują 5× więcej
+  (nadal mniej niż web search). Czas: agenci działają równolegle w budżecie 54 s trasy (`maxDuration` = 60 s);
+  jeśli agent nie zdąży, zwraca to, co znalazł.
 
 ## Krok 3. Kandydaci: porządkowanie
 

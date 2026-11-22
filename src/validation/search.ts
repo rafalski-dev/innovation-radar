@@ -16,8 +16,12 @@ export const resultsLimitSchema = z.number().int().min(1).max(MAX_TOTAL_RESULTS)
 
 // Limit wyników to GÓRNA granica, nie gwarancja: agent zwraca tylko materiały, których adres potwierdziło
 // wyszukiwanie w wybranych źródłach, więc wyników bywa mniej. Im wyższy limit, tym więcej zapytań
-// do wyszukiwarki (kontrola kosztów API).
-export const webSearchesFor = (limit: number) => (limit <= 3 ? 3 : limit <= 6 ? 4 : 5);
+// do wyszukiwarki (kontrola kosztów API: $10 / 1000 wyszukań, patrz docs/AGENT.md).
+// Każde wybrane źródło przeszukuje osobny agent (równolegle), więc to limit NA ŹRÓDŁO.
+export const webSearchesFor = (limit: number) => (limit <= 3 ? 8 : limit <= 6 ? 12 : 15);
+// Łączna liczba zapytań do wyszukiwarki przy danej liczbie źródeł (do komunikatów w UI).
+export const totalWebSearchesFor = (limit: number, sourceCount: number) =>
+  webSearchesFor(limit) * Math.max(1, sourceCount);
 export const candidateSchema = z.object({
   title: z.string().trim().min(1).max(300),
   summary: z.string().trim().min(1).max(800),

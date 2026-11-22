@@ -6,7 +6,12 @@ import { reportFileName } from "../src/lib/report-file-name";
 import { DEFAULT_TRL, effectiveTrl, formatTrlRange, trlRange } from "../src/lib/trl";
 import { businessSchema, normalizeNip } from "../src/validation/business";
 import { cleanLinks, projectSchema } from "../src/validation/project";
-import { candidateSchema, searchSchema, webSearchesFor } from "../src/validation/search";
+import {
+  candidateSchema,
+  searchSchema,
+  totalWebSearchesFor,
+  webSearchesFor,
+} from "../src/validation/search";
 
 const candidate = {
   title: "Tytuł",
@@ -124,8 +129,14 @@ describe("organizacja (NIP)", () => {
 });
 
 describe("limit wyników i zapytań do wyszukiwarki", () => {
-  it("im wyższy limit, tym więcej zapytań (3, 4, 5)", () => {
-    assert.deepEqual([1, 3, 4, 6, 7, 9].map(webSearchesFor), [3, 3, 4, 4, 5, 5]);
+  it("im wyższy limit, tym więcej zapytań na źródło (8, 12, 15)", () => {
+    assert.deepEqual([1, 3, 4, 6, 7, 9].map(webSearchesFor), [8, 8, 12, 12, 15, 15]);
+  });
+
+  it("łączna liczba zapytań rośnie z liczbą źródeł (minimum jedno źródło)", () => {
+    assert.equal(totalWebSearchesFor(3, 2), 16);
+    assert.equal(totalWebSearchesFor(9, 2), 30);
+    assert.equal(totalWebSearchesFor(3, 0), 8);
   });
 });
 
