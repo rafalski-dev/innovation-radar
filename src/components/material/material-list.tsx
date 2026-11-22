@@ -150,7 +150,7 @@ export function MaterialList({ rows }: { rows: MaterialRow[] }) {
                 <TrlBadge trl={m.trl} />
               </div>
               <p className="text-sm">{m.summary}</p>
-              <div className="space-y-1 rounded-xl border border-brand/30 bg-brand/5 p-3 text-sm">
+              <div className="space-y-1 rounded-xl border bg-muted/40 p-3 text-sm">
                 <p className="flex items-center gap-1.5 text-xs font-semibold text-brand">
                   <SparklesIcon className="size-3.5" />
                   Kontekst AI: dlaczego pasuje

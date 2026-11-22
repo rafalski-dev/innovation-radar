@@ -124,13 +124,13 @@
 
 /* Wszystkie przyciski w aplikacji są okrągłe (pigułki, jak w sekcji hero).
    Reguła poza warstwą, więc wygrywa z klasami rounded-* z komponentu Button. */
-.theme-app .group\/button {
+.theme-app .group\/button:not([data-shape="card"]) {
   border-radius: 9999px;
 }
 
-/* Pierścień focusu w kolorze akcentu w całej aplikacji. */
+/* Jeden, neutralny kolor obwódek fokusa (pola, przyciski, listy) w całej aplikacji: bez pomarańczowego akcentu. */
 .theme-app {
-  --ring: color-mix(in oklab, var(--brand) 70%, transparent);
+  --ring: #a1a1aa;
 }
 
 /* Ciemny, techniczny wygląd całej aplikacji (strony publiczne i panel): prawie czarne tło,

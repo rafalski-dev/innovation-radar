@@ -21,7 +21,7 @@ export function AuthCard({
         className="pointer-events-none absolute inset-x-[-20%] -top-24 -z-10 h-96 bg-[radial-gradient(50%_60%_at_50%_0%,color-mix(in_oklab,var(--brand)_24%,transparent),transparent)]"
       />
       <div aria-hidden className="bg-grid pointer-events-none absolute inset-0 -z-10" />
-      <div className="space-y-6 rounded-3xl border bg-card/80 p-6 shadow-2xl shadow-brand/10 backdrop-blur sm:p-8">
+      <div className="space-y-6 rounded-3xl border bg-card/80 p-6 shadow-2xl shadow-black/20 backdrop-blur sm:p-8">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-lg shadow-brand/30">

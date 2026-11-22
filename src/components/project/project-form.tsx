@@ -182,7 +182,7 @@ export function ProjectForm({
   }
 
   return (
-    <form onSubmit={onFormSubmit} className="grid max-w-2xl gap-4">
+    <form onSubmit={onFormSubmit} className="grid gap-4">
       {businesses && (
         <FormField label="Organizacja *" error={orgError}>
           <fieldset className="grid gap-3 sm:grid-cols-2">
@@ -191,7 +191,7 @@ export function ProjectForm({
               <label
                 key={b.id}
                 className={cn(
-                  "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50",
+                  "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-foreground/30",
                   b.id === selectedId &&
                     "border-foreground/60 bg-muted/70 ring-1 ring-foreground/15",
                 )}
@@ -267,7 +267,8 @@ export function ProjectForm({
                     variant="outline"
                     disabled={isAdded}
                     onClick={() => addSuggestion(i)}
-                    className="h-auto items-start justify-start gap-2 px-3 py-2 text-left whitespace-normal"
+                    data-shape="card"
+                    className="h-auto items-start justify-start gap-2 rounded-xl px-3 py-2.5 text-left whitespace-normal"
                   >
                     <PlusIcon className="mt-0.5" />
                     <span className="grid gap-0.5">

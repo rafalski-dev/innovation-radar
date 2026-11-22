@@ -87,7 +87,7 @@ export default async function DashboardPage() {
               <li key={label}>
                 <Link
                   href={href}
-                  className="block rounded-2xl border bg-card p-4 transition-colors hover:border-brand/50"
+                  className="block rounded-2xl border bg-card p-4 transition-colors hover:border-foreground/30"
                 >
                   <p className="text-xs text-muted-foreground">{label}</p>
                   <p className="mt-1 text-3xl font-semibold tracking-tight">{value}</p>

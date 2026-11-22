@@ -51,7 +51,7 @@ export function BusinessForm({ business }: { business?: BusinessRow }) {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid max-w-xl gap-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <FormField label="Nazwa organizacji" htmlFor="b-name" error={errors.name?.message}>
         <Input
           id="b-name"

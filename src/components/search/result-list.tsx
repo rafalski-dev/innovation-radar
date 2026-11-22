@@ -171,7 +171,7 @@ export function ResultList({
                       <span className="font-medium text-foreground">Dlaczego pasuje: </span>
                       {r.why}
                     </p>
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand/30 bg-brand/5 px-3 py-2">
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/40 px-3 py-2">
                       <div className="min-w-0 space-y-0.5">
                         <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
                           Źródło
@@ -190,7 +190,7 @@ export function ResultList({
                         href={r.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand/50 px-3 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand hover:text-white"
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand hover:text-white"
                       >
                         Otwórz źródło
                         <ExternalLinkIcon className="size-3" />

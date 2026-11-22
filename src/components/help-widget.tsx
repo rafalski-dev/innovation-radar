@@ -89,7 +89,7 @@ export function HelpWidget({ isLoggedIn }: { isLoggedIn: boolean }) {
               onClick={() => setType(value)}
               className={cn(
                 "flex flex-col items-start gap-1 rounded-xl border p-3 text-left text-sm transition-colors hover:bg-muted",
-                type === value && "border-brand bg-brand/5",
+                type === value && "border-foreground/60 bg-muted/70",
               )}
             >
               <Icon className="size-4 text-brand" />

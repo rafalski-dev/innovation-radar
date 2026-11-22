@@ -31,7 +31,7 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileInput }) 
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid max-w-md gap-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <div className="grid items-start gap-4 sm:grid-cols-2">
         <FormField label="Imię" htmlFor="p-first" error={errors.firstName?.message}>
           <Input
@@ -95,7 +95,7 @@ export function PasswordForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid max-w-md gap-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <FormField label="Obecne hasło" htmlFor="pw-cur" error={errors.currentPassword?.message}>
         <PasswordInput
           id="pw-cur"

@@ -166,7 +166,7 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
           {visible.map((s) => (
             <li
               key={s.id}
-              className="relative flex items-start gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-brand/50"
+              className="relative flex items-start gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-foreground/30"
             >
               <div className="min-w-0 flex-1 space-y-2">
                 {s.label && <p className="font-mono text-xs text-muted-foreground">{s.label}</p>}
