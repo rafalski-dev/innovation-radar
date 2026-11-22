@@ -7,7 +7,7 @@ import { HeroRadar } from "@/components/landing/hero-radar";
 import { HowItWorksCarousel } from "@/components/landing/how-it-works-carousel";
 import { StructureSection } from "@/components/landing/structure-section";
 import { ShinyLabel } from "@/components/landing/themed-react-bits";
-import { TrlDetails } from "@/components/landing/trl-details";
+import { TrlSection } from "@/components/landing/trl-section";
 import { ShareButtons } from "@/components/share-buttons";
 import { getSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -130,7 +130,21 @@ export default async function Home() {
           </p>
         </div>
         <Bento />
-        <TrlDetails />
+      </section>
+
+      <section id="trl" className="scroll-mt-20 space-y-8">
+        <div className="max-w-2xl space-y-3">
+          <Eyebrow>Skala TRL</Eyebrow>
+          <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">
+            Czym są poziomy <em className="font-serif font-normal text-brand italic">TRL</em>?
+          </h2>
+          <p className="text-muted-foreground">
+            TRL (Technology Readiness Level) to dziewięciostopniowa skala gotowości technologicznej:
+            od pierwszej obserwacji zjawiska po rozwiązanie sprawdzone w codziennej eksploatacji.
+            Dzięki niej od razu widać, co można wdrożyć, a co dopiero rozwijać z partnerem naukowym.
+          </p>
+        </div>
+        <TrlSection />
       </section>
 
       <section className="space-y-8">
