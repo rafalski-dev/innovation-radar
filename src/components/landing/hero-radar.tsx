@@ -1,8 +1,11 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import Radar from "@/components/landing/radar";
+
+// Ciężki kod WebGL (1000 linii) ładuje się osobno, dopiero w przeglądarce, więc nie blokuje pierwszego renderu.
+const Radar = dynamic(() => import("@/components/landing/radar"), { ssr: false });
 
 // Radar w tle sekcji głównej (preset „horizon” z React Bits) w pomarańczowym odcieniu akcentu.
 // W trybie jasnym ten sam radar jest rysowany ciemniejszym pomarańczem, żeby był widoczny na jasnym tle.
