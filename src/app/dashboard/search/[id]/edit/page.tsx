@@ -18,7 +18,7 @@ export default async function EditSearchPage({ params }: PageProps<"/dashboard/s
     getActiveSources(),
     getSearch(id),
   ]);
-  if (!search?.project) notFound();
+  if (!search?.project || !search.isMine) notFound();
   if (search.project.sentAt) redirect(`/dashboard/search/${search.id}`);
   const phrases = phrasesSchema.safeParse(search.phrases);
 

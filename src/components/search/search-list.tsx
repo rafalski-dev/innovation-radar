@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { BuildingIcon } from "lucide-react";
 import { SearchRowActions } from "@/components/search/search-row-actions";
 import { Input } from "@/components/shadcn/input";
 
 export type SearchRow = {
   id: string;
-  title: string | null; // nazwa aspektu (stare wpisy jej nie mają)
+  title: string; // nazwa aspektu (dla starych wpisów „Aspekt A3”)
   query: string;
+  isMine: boolean; // akcje (kopiuj, edytuj, usuń) tylko dla autora
   canChange: boolean; // pokazuje „Kopiuj” i „Edytuj”
   label: string | null; // numer aspektu, np. PRJ-…/A2
   createdAt: string; // ISO
@@ -17,10 +17,17 @@ export type SearchRow = {
   projectId: string | null;
   projectTitle: string | null;
   businessName: string | null;
-  resultsCount: number;
+  phrases: string[]; // słowa wyszukiwań (frazy aspektu)
+  sources: string[]; // użyte bazy (źródła wyników)
+  searchesCount: number; // liczba wyszukiwań (zapisanych wyników agenta)
+  trlMin: number | null;
+  trlMax: number | null;
+  authorEmail: string;
 };
 
 type SortKey = "newest" | "oldest" | "results" | "project";
+
+const TRL_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const selectClass =
   "h-9 rounded-full border bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -30,6 +37,8 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
   const [text, setText] = useState("");
   const [projectId, setProjectId] = useState("");
   const [onlyWithResults, setOnlyWithResults] = useState(false);
+  const [trlFrom, setTrlFrom] = useState(1);
+  const [trlTo, setTrlTo] = useState(9);
   const [sort, setSort] = useState<SortKey>("newest");
 
   const projects = useMemo(() => {
@@ -38,20 +47,25 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
     return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1], "pl"));
   }, [rows]);
 
+  const trlFilterActive = trlFrom > 1 || trlTo < 9;
+
   const visible = useMemo(() => {
     const q = text.trim().toLowerCase();
     const filtered = rows.filter(
       (r) =>
         (!q ||
-          `${r.title ?? ""} ${r.query} ${r.projectTitle ?? ""} ${r.label ?? ""}`
+          `${r.title} ${r.query} ${r.projectTitle ?? ""} ${r.label ?? ""} ${r.phrases.join(" ")} ${r.sources.join(" ")} ${r.authorEmail}`
             .toLowerCase()
             .includes(q)) &&
         (!projectId || r.projectId === projectId) &&
-        (!onlyWithResults || r.resultsCount > 0),
+        (!onlyWithResults || r.searchesCount > 0) &&
+        // filtr TRL: rozpiętość aspektu ma się przecinać z wybranym zakresem (bez wyszukiwań: ukryty, gdy filtr aktywny)
+        (!trlFilterActive ||
+          (r.trlMin !== null && r.trlMax !== null && r.trlMax >= trlFrom && r.trlMin <= trlTo)),
     );
     return [...filtered].sort((a, b) => {
       if (sort === "oldest") return a.createdAt.localeCompare(b.createdAt);
-      if (sort === "results") return b.resultsCount - a.resultsCount;
+      if (sort === "results") return b.searchesCount - a.searchesCount;
       if (sort === "project")
         return (
           (a.projectTitle ?? "").localeCompare(b.projectTitle ?? "", "pl") ||
@@ -59,7 +73,7 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
         );
       return b.createdAt.localeCompare(a.createdAt);
     });
-  }, [rows, text, projectId, onlyWithResults, sort]);
+  }, [rows, text, projectId, onlyWithResults, sort, trlFrom, trlTo, trlFilterActive]);
 
   return (
     <div className="space-y-4">
@@ -89,9 +103,45 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
         >
           <option value="newest">Najnowsze</option>
           <option value="oldest">Najstarsze</option>
-          <option value="results">Najwięcej wyników</option>
+          <option value="results">Najwięcej wyszukiwań</option>
           <option value="project">Wg projektu</option>
         </select>
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <span>TRL od</span>
+          <select
+            aria-label="TRL od"
+            value={trlFrom}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              setTrlFrom(v);
+              if (v > trlTo) setTrlTo(v);
+            }}
+            className={selectClass}
+          >
+            {TRL_LEVELS.map((l) => (
+              <option key={l} value={l}>
+                {l}
+              </option>
+            ))}
+          </select>
+          <span>do</span>
+          <select
+            aria-label="TRL do"
+            value={trlTo}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              setTrlTo(v);
+              if (v < trlFrom) setTrlFrom(v);
+            }}
+            className={selectClass}
+          >
+            {TRL_LEVELS.map((l) => (
+              <option key={l} value={l}>
+                {l}
+              </option>
+            ))}
+          </select>
+        </div>
         <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <input
             type="checkbox"
@@ -99,7 +149,7 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
             onChange={(e) => setOnlyWithResults(e.target.checked)}
             className="accent-current"
           />
-          Tylko z wynikami
+          Tylko z wyszukiwaniami
         </label>
         {visible.length !== rows.length && (
           <span className="text-xs text-muted-foreground">
@@ -118,37 +168,54 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
               key={s.id}
               className="relative flex items-start gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-brand/50"
             >
-              <div className="min-w-0 flex-1 space-y-1">
+              <div className="min-w-0 flex-1 space-y-2">
                 {s.label && <p className="font-mono text-xs text-muted-foreground">{s.label}</p>}
                 <Link
                   href={`/dashboard/search/${s.id}`}
-                  className={
-                    s.title
-                      ? "line-clamp-2 block text-sm font-medium after:absolute after:inset-0 after:content-['']"
-                      : "line-clamp-3 block text-sm after:absolute after:inset-0 after:content-['']"
-                  }
+                  className="line-clamp-2 block text-sm font-medium after:absolute after:inset-0 after:content-['']"
                 >
-                  {s.title ?? s.query}
+                  {s.title}
                 </Link>
-                {s.title && <p className="line-clamp-1 text-xs text-muted-foreground">{s.query}</p>}
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <time dateTime={s.createdAt}>{s.createdLabel}</time>
-                  {s.projectTitle && (
-                    <span className="inline-flex items-center gap-1">
-                      <BuildingIcon className="size-3" />
-                      {s.projectTitle} · {s.businessName}
-                    </span>
-                  )}
-                  <span>Wyniki: {s.resultsCount}</span>
+                {s.phrases.length > 0 && (
+                  <ul className="flex flex-wrap gap-1.5" aria-label="Słowa wyszukiwań">
+                    {s.phrases.map((p) => (
+                      <li key={p} className="rounded-full border px-2 py-0.5 text-[11px]">
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <dl className="grid gap-x-4 gap-y-0.5 text-xs sm:grid-cols-[auto_1fr]">
+                  <dt className="text-muted-foreground">Projekt</dt>
+                  <dd className="font-medium">
+                    {s.projectTitle ? `${s.projectTitle} · ${s.businessName}` : "bez projektu"}
+                  </dd>
+                  <dt className="text-muted-foreground">Użyte bazy</dt>
+                  <dd className="font-medium">
+                    {s.sources.length > 0 ? s.sources.join(", ") : "—"}
+                  </dd>
+                  <dt className="text-muted-foreground">Wyszukiwania</dt>
+                  <dd className="font-medium">{s.searchesCount}</dd>
+                  <dt className="text-muted-foreground">Rozpiętość TRL</dt>
+                  <dd className="font-medium">
+                    {s.trlMin === null || s.trlMax === null
+                      ? "—"
+                      : s.trlMin === s.trlMax
+                        ? `TRL ${s.trlMin}`
+                        : `TRL ${s.trlMin}–${s.trlMax}`}
+                  </dd>
+                  <dt className="text-muted-foreground">Autor aspektu</dt>
+                  <dd className="font-medium break-all">{s.authorEmail}</dd>
+                </dl>
+                <time dateTime={s.createdAt} className="block text-[11px] text-muted-foreground">
+                  {s.createdLabel}
+                </time>
+              </div>
+              {s.isMine && (
+                <div className="relative z-10">
+                  <SearchRowActions id={s.id} name={s.title} canChange={s.canChange} />
                 </div>
-              </div>
-              <div className="relative z-10">
-                <SearchRowActions
-                  id={s.id}
-                  name={s.title ?? s.projectTitle ?? "aspekt"}
-                  canChange={s.canChange}
-                />
-              </div>
+              )}
             </li>
           ))}
         </ul>

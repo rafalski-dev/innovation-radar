@@ -4,8 +4,10 @@ import { PlusIcon } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { SearchList } from "@/components/search/search-list";
 import { buttonVariants } from "@/components/shadcn/button";
-import { aspectLabel } from "@/lib/numbering";
+import { aspectLabel, aspectTitle } from "@/lib/numbering";
+import { trlRange } from "@/lib/trl";
 import { getMySearches } from "@/queries/search";
+import { phrasesSchema } from "@/validation/search";
 
 export const metadata: Metadata = { title: "Aspekty" };
 
@@ -18,7 +20,7 @@ export default async function SearchesPage() {
     <div className="space-y-6">
       <PageHeader
         accent="Aspekty"
-        description="Historia Twoich aspektów: frazy, źródła i wyniki znalezione przez agenta wraz z uzasadnieniem dopasowania."
+        description="Aspekty Twoich projektów: frazy, użyte bazy, wyszukiwania i rozpiętość TRL wraz z autorem."
         action={
           <Link href="/dashboard/search/new" className={buttonVariants()}>
             <PlusIcon />
@@ -32,19 +34,32 @@ export default async function SearchesPage() {
         </p>
       ) : (
         <SearchList
-          rows={searches.map((s) => ({
-            id: s.id,
-            title: s.title,
-            query: s.query,
-            label: aspectLabel(s.number, s.project?.createdAt),
-            canChange: !!s.project && !s.project.sentAt, // kopiować i edytować można aspekt z projektem, który nie jest zamknięty
-            createdAt: s.createdAt.toISOString(),
-            createdLabel: dateFormat.format(s.createdAt),
-            projectId: s.project?.id ?? null,
-            projectTitle: s.project?.title ?? null,
-            businessName: s.project?.business.name ?? null,
-            resultsCount: s._count.results,
-          }))}
+          rows={searches.map((s) => {
+            const phrases = phrasesSchema.safeParse(s.phrases);
+            const range = s.results.length > 0 ? trlRange(s.results.map((r) => r.trl)) : null;
+            return {
+              id: s.id,
+              title: aspectTitle(s.title, s.number),
+              query: s.query,
+              label: aspectLabel(s.number, s.project?.createdAt),
+              isMine: s.isMine,
+              // kopiować i edytować może autor aspektu z projektem, który nie jest zamknięty
+              canChange: s.isMine && !!s.project && !s.project.sentAt,
+              createdAt: s.createdAt.toISOString(),
+              createdLabel: dateFormat.format(s.createdAt),
+              projectId: s.project?.id ?? null,
+              projectTitle: s.project?.title ?? null,
+              businessName: s.project?.business.name ?? null,
+              phrases: phrases.success ? phrases.data : [],
+              sources: [...new Set(s.results.map((r) => r.sourceName))].sort((x, y) =>
+                x.localeCompare(y, "pl"),
+              ),
+              searchesCount: s.results.length,
+              trlMin: range?.min ?? null,
+              trlMax: range?.max ?? null,
+              authorEmail: s.user.email,
+            };
+          })}
         />
       )}
     </div>

@@ -41,16 +41,19 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
           .filter(Boolean)
           .join(" · ")}
         action={
-          <SearchRowActions
-            id={search.id}
-            name={search.title ?? search.project?.title ?? "aspekt"}
-            canChange={!!search.project && !closed}
-            redirectAfterDelete="/dashboard/search"
-          />
+          search.isMine ? (
+            <SearchRowActions
+              id={search.id}
+              name={search.title ?? search.project?.title ?? "aspekt"}
+              canChange={!!search.project && !closed}
+              redirectAfterDelete="/dashboard/search"
+            />
+          ) : undefined
         }
       />
 
       <div className="flex flex-wrap items-center gap-2">
+        <p className="text-sm text-muted-foreground">Autor aspektu: {search.user.email}</p>
         {search.project &&
           (closed ? (
             <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
