@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CheckIcon, Loader2Icon, SearchIcon, SparklesIcon } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { createSearch } from "@/actions/search";
 import type { ActionResult } from "@/lib/action-result";
 import { FormField } from "@/components/form-field";
@@ -12,11 +13,15 @@ import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
 import { ResultList } from "@/components/search/result-list";
 import {
+  DEFAULT_SOURCE_IDS,
   MAX_PHRASES,
+  MAX_SOURCES,
+  SOURCES,
   searchSchema,
   type AgentStats,
   type Candidate,
   type Phrases,
+  type SourceId,
 } from "@/validation/search";
 
 export type SearchNeedOption = {
@@ -55,12 +60,13 @@ type ResultsData = { candidates: Candidate[]; cached: boolean; stats: AgentStats
 async function requestResults(
   needId: string,
   phrases: Phrases,
+  sources: SourceId[],
 ): Promise<ActionResult<ResultsData>> {
   try {
     const response = await fetch("/api/search/results", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ needId, phrases }),
+      body: JSON.stringify({ needId, phrases, sources }),
     });
     return (await response.json()) as ActionResult<ResultsData>;
   } catch {
@@ -84,6 +90,7 @@ export function SearchForm({
   const [error, setError] = useState<string>();
   const [phrases, setPhrases] = useState<Phrases>();
   const [hint, setHint] = useState("");
+  const [sources, setSources] = useState<SourceId[]>(DEFAULT_SOURCE_IDS); // filtr źródeł (max MAX_SOURCES)
   const [generating, startGenerating] = useTransition();
   const [approved, setApproved] = useState(false); // frazy zatwierdzone, można szukać w źródłach
   const [results, setResults] = useState<ResultsData>();
@@ -117,7 +124,7 @@ export function SearchForm({
     }
     setError(undefined);
     startSearching(async () => {
-      const result = await requestResults(needId, list);
+      const result = await requestResults(needId, list, sources);
       if (!result.success) {
         toast.error(result.error);
         return;
@@ -163,6 +170,15 @@ export function SearchForm({
     });
   }
 
+  // Zaznaczanie źródeł: najwyżej MAX_SOURCES, co najmniej jedno. Zmiana unieważnia listę wyników.
+  function toggleSource(id: SourceId) {
+    setSources((prev) => {
+      if (prev.includes(id)) return prev.length > 1 ? prev.filter((x) => x !== id) : prev;
+      return prev.length < MAX_SOURCES ? [...prev, id] : prev;
+    });
+    setResults(undefined);
+  }
+
   function selectNeed(id: string) {
     if (id !== needId) {
       setPhrases(undefined);
@@ -186,6 +202,7 @@ export function SearchForm({
       phrases: cleaned,
       results: results?.candidates,
       stats: results?.stats,
+      sources,
     };
     const parsed = searchSchema.safeParse(input);
     if (!parsed.success) {
@@ -296,14 +313,45 @@ export function SearchForm({
       </div>
       {approved && (
         <div className="space-y-4 rounded-lg border p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-sm font-medium">Krok 2. Lista wyników ze źródeł</p>
-              <p className="text-xs text-muted-foreground">
-                Agent przeszuka NCBiR i RAD-on według zatwierdzonych fraz (do minuty). Jeśli lista
-                jest dobra, zatwierdź wyszukiwanie.
-              </p>
-            </div>
+          <div>
+            <p className="text-sm font-medium">Krok 2. Lista wyników ze źródeł</p>
+            <p className="text-xs text-muted-foreground">
+              Wybierz do {MAX_SOURCES} źródeł, w których agent ma szukać według zatwierdzonych fraz
+              (do minuty). Jeśli lista jest dobra, zatwierdź wyszukiwanie.
+            </p>
+          </div>
+          <fieldset className="grid gap-2 sm:grid-cols-2">
+            <legend className="sr-only">Źródła wyszukiwania</legend>
+            {SOURCES.map((source) => {
+              const checked = sources.includes(source.id);
+              const locked = !checked && sources.length >= MAX_SOURCES;
+              return (
+                <label
+                  key={source.id}
+                  className={cn(
+                    "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-muted/50",
+                    locked && "cursor-not-allowed opacity-50 hover:bg-transparent",
+                  )}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    disabled={locked || searching}
+                    onChange={() => toggleSource(source.id)}
+                    className="mt-1 accent-current"
+                  />
+                  <span className="grid min-w-0 gap-0.5">
+                    <span className="text-sm font-medium">{source.name}</span>
+                    <span className="text-xs text-muted-foreground">{source.description}</span>
+                  </span>
+                </label>
+              );
+            })}
+            <p className="text-xs text-muted-foreground sm:col-span-2">
+              Wybrano {sources.length} z {MAX_SOURCES}.
+            </p>
+          </fieldset>
+          <div>
             <Button type="button" onClick={searchSources} disabled={searching || generating}>
               {searching ? <Loader2Icon className="animate-spin" /> : <SearchIcon />}
               {searching ? "Szukam w źródłach…" : results ? "Szukaj ponownie" : "Szukaj w źródłach"}

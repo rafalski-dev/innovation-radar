@@ -26,9 +26,43 @@ export const agentStatsSchema = z.object({
 });
 export type AgentStats = z.infer<typeof agentStatsSchema>;
 
+// Źródła, w których może szukać agent. Użytkownik zaznacza do MAX_SOURCES z nich (filtr, kontrola kosztów).
+// Nowe źródło = nowy wpis tutaj (id, nazwa, domena do allowed_domains).
+export const MAX_SOURCES = 2;
+export const SOURCE_IDS = ["ncbr", "radon", "mapadotacji", "interreg"] as const;
+export type SourceId = (typeof SOURCE_IDS)[number];
+export const SOURCES: { id: SourceId; name: string; domain: string; description: string }[] = [
+  { id: "ncbr", name: "NCBiR", domain: "gov.pl/web/ncbr", description: "projekty B+R" },
+  {
+    id: "radon",
+    name: "RAD-on",
+    domain: "radon.nauka.gov.pl",
+    description: "patenty, projekty i instytucje naukowe",
+  },
+  {
+    id: "mapadotacji",
+    name: "Mapa Dotacji UE",
+    domain: "mapadotacji.gov.pl",
+    description: "projekty z funduszy UE",
+  },
+  {
+    id: "interreg",
+    name: "Interreg",
+    domain: "interreg.gov.pl",
+    description: "projekty współpracy regionów",
+  },
+];
+export const DEFAULT_SOURCE_IDS: SourceId[] = ["ncbr", "radon"];
+
+export const sourceIdsSchema = z
+  .array(z.enum(SOURCE_IDS))
+  .min(1, "Wybierz przynajmniej jedno źródło")
+  .max(MAX_SOURCES, `Możesz wybrać maksymalnie ${MAX_SOURCES} źródła`);
+
 export const generateResultsSchema = z.object({
   needId: z.string().trim().min(1, "Wybierz projekt"),
   phrases: phrasesSchema.min(1, "Najpierw wygeneruj frazy"),
+  sources: sourceIdsSchema,
 });
 
 export const searchSchema = z.object({
@@ -44,6 +78,8 @@ export const searchSchema = z.object({
   // zatwierdzona lista wyników agenta (opcjonalna) i statystyki jej wygenerowania
   results: z.array(candidateSchema).max(MAX_CANDIDATES).optional(),
   stats: agentStatsSchema.optional(),
+  // źródła, w których agent szukał (do klucza cache); brak = domyślne
+  sources: sourceIdsSchema.optional(),
 });
 export type SearchInput = z.infer<typeof searchSchema>;
 

@@ -17,7 +17,7 @@ type ResultsData = { candidates: Candidate[]; cached: boolean; stats: AgentStats
 const respond = (result: ActionResult<ResultsData>, status = 200) =>
   Response.json(result, { status });
 
-// POST /api/search/results  { needId, phrases }  →  { success, data: { candidates, cached, stats } }
+// POST /api/search/results  { needId, phrases, sources }  →  { success, data: { candidates, cached, stats } }
 // Uruchamia agenta dla podanych fraz. Niczego nie zapisuje (poza licznikiem limitu):
 // użytkownik ocenia listę i zatwierdza ją razem z frazami przy zapisie wyszukiwania.
 export async function POST(request: Request) {
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     if (!need) return respond(fail("Nie znaleziono projektu"), 404);
 
     // cache: te same frazy dla tego samego projektu w ciągu 7 dni = zapisany wynik, bez kosztu
-    const phrasesKey = phrasesKeyFor(body.data.needId, body.data.phrases);
+    const phrasesKey = phrasesKeyFor(body.data.needId, body.data.phrases, body.data.sources);
     const cached = await db.search.findFirst({
       where: {
         userId: session.user.id,
@@ -86,6 +86,7 @@ export async function POST(request: Request) {
         title: need.title,
         description: need.description,
         phrases: body.data.phrases,
+        sources: body.data.sources,
       });
       return respond(
         ok({

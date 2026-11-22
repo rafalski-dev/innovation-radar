@@ -4,8 +4,11 @@ import { env } from "@/lib/env";
 import {
   MAX_CANDIDATES,
   candidateSchema,
+  DEFAULT_SOURCE_IDS,
+  SOURCES,
   type AgentStats,
   type Candidate,
+  type SourceId,
 } from "@/validation/search";
 
 // Agent wyszukujący (Krok 2 z docs/AGENT.md), wersja oszczędna: Haiku, web search z limitem,
@@ -14,14 +17,19 @@ export const AGENT_MODEL = "claude-haiku-5-5";
 const MAX_SEARCHES = 3;
 const MAX_CALLS = 2;
 
-export const AGENT_SOURCES = [
-  { name: "NCBiR", domain: "gov.pl/web/ncbr" },
-  { name: "RAD-on", domain: "radon.nauka.gov.pl" },
-] as const;
+function sourcesFor(ids: SourceId[]) {
+  const selected = SOURCES.filter((s) => ids.includes(s.id));
+  return selected.length > 0 ? selected : SOURCES.filter((s) => DEFAULT_SOURCE_IDS.includes(s.id));
+}
 
 const outputSchema = z.object({ candidates: z.array(candidateSchema).max(MAX_CANDIDATES) });
 
-export type AgentInput = { title: string; description: string; phrases: string[] };
+export type AgentInput = {
+  title: string;
+  description: string;
+  phrases: string[];
+  sources: SourceId[]; // wybrane przez użytkownika (max MAX_SOURCES)
+};
 export type AgentOutput = AgentStats & { candidates: Candidate[] };
 
 type Block = { type: string; [key: string]: unknown };
@@ -37,17 +45,20 @@ type ApiResponse = {
 
 const SAVE_TOOL = "zapisz_kandydatow";
 
-const SYSTEM =
+const buildSystem = (sources: { name: string }[]) =>
   "Jesteś agentem szukającym gotowych innowacji i projektów dla firmy. Szukasz WYŁĄCZNIE przez narzędzie " +
   "web_search w podanych źródłach (polskie instytucje: " +
-  AGENT_SOURCES.map((s) => s.name).join(", ") +
+  sources.map((s) => s.name).join(", ") +
   "). Użyj podanych fraz jako zapytań, w razie potrzeby przeformułuj je. " +
   `Wybierz maksymalnie ${MAX_CANDIDATES} najlepiej pasujących kandydatów. Nie wymyślaj niczego: tytuł, organizacja ` +
   "i link muszą pochodzić z wyników wyszukiwania, a link musi być adresem znalezionej strony. " +
   "Jeśli czegoś nie ma w źródle, zostaw pole organization puste. Opisy po polsku, zwięzłe. " +
   `Na końcu wywołaj narzędzie ${SAVE_TOOL}. Jeśli nic nie pasuje, wywołaj je z pustą listą.`;
 
-async function callApi(messages: unknown[]): Promise<ApiResponse> {
+async function callApi(
+  messages: unknown[],
+  sources: { name: string; domain: string }[],
+): Promise<ApiResponse> {
   if (!env.ANTHROPIC_API_KEY) throw new Error("Brak ANTHROPIC_API_KEY");
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -60,14 +71,14 @@ async function callApi(messages: unknown[]): Promise<ApiResponse> {
     body: JSON.stringify({
       model: AGENT_MODEL,
       max_tokens: 2000,
-      system: SYSTEM,
+      system: buildSystem(sources),
       messages,
       tools: [
         {
           type: "web_search_20250305",
           name: "web_search",
           max_uses: MAX_SEARCHES,
-          allowed_domains: AGENT_SOURCES.map((s) => s.domain),
+          allowed_domains: sources.map((s) => s.domain),
         },
         {
           name: SAVE_TOOL,
@@ -147,6 +158,7 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
     return mockOutput();
   }
 
+  const sources = sourcesFor(input.sources);
   const userMessage = {
     role: "user",
     content:
@@ -161,7 +173,7 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
   let candidates: Candidate[] | undefined;
 
   for (let call = 0; call < MAX_CALLS && !candidates; call++) {
-    const res = await callApi(messages);
+    const res = await callApi(messages, sources);
     inputTokens += res.usage.input_tokens;
     outputTokens += res.usage.output_tokens;
     webSearches += res.usage.server_tool_use?.web_search_requests ?? 0;
@@ -210,10 +222,13 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
 }
 
 // Klucz cache: te same źródła, ten sam projekt (lub zapytanie) i te same frazy = ten sam wynik w ciągu 7 dni.
-export function phrasesKeyFor(scope: string, phrases: string[]) {
+export function phrasesKeyFor(scope: string, phrases: string[], sourceIds?: SourceId[]) {
   return createHash("sha256")
     .update(
-      `${AGENT_SOURCES.map((s) => s.domain).join(",")}|${scope}|${phrases
+      `${sourcesFor(sourceIds ?? DEFAULT_SOURCE_IDS)
+        .map((s) => s.domain)
+        .sort()
+        .join(",")}|${scope}|${phrases
         .map((p) => p.trim().toLowerCase())
         .sort()
         .join("|")}`,

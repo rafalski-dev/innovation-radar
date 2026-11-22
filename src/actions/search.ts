@@ -24,7 +24,7 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
       });
       if (!need) return fail("Nie znaleziono projektu");
     }
-    const { results, stats, phrases } = parsed.data;
+    const { results, stats, phrases, sources } = parsed.data;
     const search = await db.search.create({
       data: {
         query: parsed.data.query,
@@ -35,7 +35,7 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
           status: "DONE" as const,
           startedAt: new Date(),
           phrasesKey: phrases?.length
-            ? phrasesKeyFor(parsed.data.needId || parsed.data.query, phrases)
+            ? phrasesKeyFor(parsed.data.needId || parsed.data.query, phrases, sources)
             : null,
           webSearches: stats?.webSearches,
           inputTokens: stats?.inputTokens,
