@@ -11,7 +11,7 @@ type Props = { organizations: { id: string; name: string }[] };
 const SELECT_CLASS =
   "h-8 w-full appearance-none rounded-lg border border-input bg-transparent pr-8 pl-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
 
-// Wyszukiwanie i filtry listy projektów. Stan leży w adresie URL (q, org, shared), filtruje serwer.
+// Wyszukiwanie i filtry listy projektów. Stan leży w adresie URL (q, org), filtruje serwer.
 export function ProjectFilters({ organizations }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -34,7 +34,7 @@ export function ProjectFilters({ organizations }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  const active = params.has("q") || params.has("org") || params.has("shared");
+  const active = params.has("q") || params.has("org");
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -67,19 +67,6 @@ export function ProjectFilters({ organizations }: Props) {
           <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground" />
         </div>
       )}
-      <div className="relative">
-        <select
-          className={SELECT_CLASS}
-          value={params.get("shared") ?? ""}
-          onChange={(e) => update("shared", e.target.value)}
-          aria-label="Udostępnienie"
-        >
-          <option value="">Udostępniony: wszystkie</option>
-          <option value="yes">Udostępnione</option>
-          <option value="no">Nieudostępnione</option>
-        </select>
-        <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground" />
-      </div>
       {active && (
         <Button
           variant="ghost"

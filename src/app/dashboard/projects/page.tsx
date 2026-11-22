@@ -15,10 +15,10 @@ import { getMyProjects } from "@/queries/project";
 
 export const metadata: Metadata = { title: "Projekty" };
 
-type SearchParams = Promise<{ q?: string; org?: string; shared?: string }>;
+type SearchParams = Promise<{ q?: string; org?: string }>;
 
 export default async function ProjectsPage({ searchParams }: { searchParams: SearchParams }) {
-  const { q = "", org = "", shared = "" } = await searchParams;
+  const { q = "", org = "" } = await searchParams;
   const all = await getMyProjects();
   const organizations = [
     ...new Map(all.map((n) => [n.business.id, n.business.name])).entries(),
@@ -27,8 +27,6 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Sea
   const term = q.trim().toLowerCase();
   const projects = all.filter((project) => {
     if (org && project.business.id !== org) return false;
-    if (shared === "yes" && !project.sentAt) return false;
-    if (shared === "no" && project.sentAt) return false;
     if (!term) return true;
     const haystack = [
       project.title,
@@ -76,10 +74,6 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Sea
               ["Autorzy aspektów", aspectAuthors.length > 0 ? aspectAuthors.join(", ") : "—"],
               ["Użyte bazy", sources.length > 0 ? sources.join(", ") : "—"],
               ["Rozpiętość TRL", range ? formatTrlRange(range) : "—"],
-              [
-                "Udostępniony",
-                project.sentAt ? `tak (${project.sentAt.toLocaleDateString("pl-PL")})` : "nie",
-              ],
             ];
             return (
               <li key={project.id} className="rounded-2xl border bg-card">
