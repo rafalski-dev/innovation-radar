@@ -1,7 +1,9 @@
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { db } from "@/lib/db";
 import { phrasesKeyFor, runSearchAgent } from "@/lib/search-agent";
+import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
 import { getSession } from "@/lib/session";
+import { getNumberSetting } from "@/lib/settings";
 import { accessibleNeedWhere } from "@/queries/need";
 import { generateResultsSchema, type AgentStats, type Candidate } from "@/validation/search";
 
@@ -9,7 +11,6 @@ import { generateResultsSchema, type AgentStats, type Candidate } from "@/valida
 export const maxDuration = 60;
 
 // Limit uruchomień agenta na użytkownika (koszt API) i czas ważności cache.
-const RUN_LIMIT = 5;
 const RUN_WINDOW_MS = 30 * 60 * 1000;
 const CACHE_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -33,19 +34,29 @@ export async function POST(request: Request) {
       select: { title: true, description: true },
     });
     if (!need) return respond(fail("Nie znaleziono projektu"), 404);
+    const blocked = await findBlockedTopic(need.title, need.description, ...body.data.phrases);
+    if (blocked) return respond(fail(blockedTopicMessage(blocked)), 400);
 
     // cache: te same frazy dla tego samego projektu w ciągu 7 dni = zapisany wynik, bez kosztu
-    const phrasesKey = phrasesKeyFor(body.data.needId, body.data.phrases, body.data.sources);
-    const cached = await db.search.findFirst({
-      where: {
-        userId: session.user.id,
-        phrasesKey,
-        status: "DONE",
-        startedAt: { gte: new Date(Date.now() - CACHE_MS) },
-      },
-      orderBy: { startedAt: "desc" },
-      include: { results: { orderBy: { position: "asc" } } },
-    });
+    const phrasesKey = phrasesKeyFor(
+      body.data.needId,
+      body.data.phrases,
+      body.data.sources,
+      body.data.limit,
+    );
+    // „Znajdź więcej” (exclude) zawsze idzie do agenta: cache zawiera te same wyniki co już widać
+    const cached = body.data.exclude?.length
+      ? null
+      : await db.search.findFirst({
+          where: {
+            userId: session.user.id,
+            phrasesKey,
+            status: "DONE",
+            startedAt: { gte: new Date(Date.now() - CACHE_MS) },
+          },
+          orderBy: { startedAt: "desc" },
+          include: { results: { orderBy: { position: "asc" } } },
+        });
     if (cached) {
       return respond(
         ok({
@@ -62,6 +73,7 @@ export async function POST(request: Request) {
             sourceName: r.sourceName,
             sourceUrl: r.sourceUrl,
             why: r.why,
+            trl: r.trl,
           })),
         }),
       );
@@ -70,10 +82,11 @@ export async function POST(request: Request) {
     const recentRuns = await db.agentRun.count({
       where: { userId: session.user.id, createdAt: { gte: new Date(Date.now() - RUN_WINDOW_MS) } },
     });
-    if (recentRuns >= RUN_LIMIT) {
+    const runLimit = await getNumberSetting("agentRunLimit", 1, 100);
+    if (recentRuns >= runLimit) {
       return respond(
         fail(
-          `Limit uruchomień agenta: ${RUN_LIMIT} na ${RUN_WINDOW_MS / 60000} minut. Spróbuj za chwilę`,
+          `Limit uruchomień agenta: ${runLimit} na ${RUN_WINDOW_MS / 60000} minut. Spróbuj za chwilę`,
         ),
         429,
       );
@@ -87,6 +100,8 @@ export async function POST(request: Request) {
         description: need.description,
         phrases: body.data.phrases,
         sources: body.data.sources,
+        exclude: body.data.exclude,
+        limit: body.data.limit,
       });
       return respond(
         ok({

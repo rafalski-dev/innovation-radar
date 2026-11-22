@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { fail, ok, validationError, type ActionResult } from "@/lib/action-result";
 import { db } from "@/lib/db";
+import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
 import { phrasesKeyFor } from "@/lib/search-agent";
 import { getSession } from "@/lib/session";
 import { accessibleNeedWhere } from "@/queries/need";
@@ -16,26 +17,39 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
   const parsed = searchSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
 
+  const blocked = await findBlockedTopic(parsed.data.query, ...(parsed.data.phrases ?? []));
+  if (blocked) return fail(blockedTopicMessage(blocked));
+
   try {
     if (parsed.data.needId) {
       const need = await db.need.findFirst({
         where: { id: parsed.data.needId, ...accessibleNeedWhere(session.user.id) },
-        select: { id: true },
+        select: { id: true, sentAt: true },
       });
       if (!need) return fail("Nie znaleziono projektu");
+      if (need.sentAt)
+        return fail("Raport projektu został wysłany, projekt jest zamknięty do edycji");
     }
-    const { results, stats, phrases, sources } = parsed.data;
+    const { results, stats, phrases, sources, limit } = parsed.data;
+    // numer aspektu: kolejny w projekcie (albo wśród aspektów użytkownika bez projektu)
+    const last = await db.search.aggregate({
+      _max: { number: true },
+      where: parsed.data.needId
+        ? { needId: parsed.data.needId }
+        : { userId: session.user.id, needId: null },
+    });
     const search = await db.search.create({
       data: {
         query: parsed.data.query,
         needId: parsed.data.needId || null,
         phrases,
+        number: (last._max.number ?? 0) + 1,
         userId: session.user.id,
         ...(results && {
           status: "DONE" as const,
           startedAt: new Date(),
           phrasesKey: phrases?.length
-            ? phrasesKeyFor(parsed.data.needId || parsed.data.query, phrases, sources)
+            ? phrasesKeyFor(parsed.data.needId || parsed.data.query, phrases, sources, limit)
             : null,
           webSearches: stats?.webSearches,
           inputTokens: stats?.inputTokens,
@@ -49,6 +63,7 @@ export async function createSearch(input: SearchInput): Promise<ActionResult<{ i
               sourceName: c.sourceName,
               sourceUrl: c.sourceUrl,
               why: c.why,
+              trl: c.trl,
             })),
           },
         }),

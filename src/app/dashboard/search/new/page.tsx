@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
 import { SearchForm } from "@/components/search/search-form";
 import { getMyNeeds } from "@/queries/need";
+import { getActiveSources } from "@/queries/source";
 
 export const metadata: Metadata = { title: "Nowy aspekt" };
 
@@ -10,7 +11,11 @@ export default async function NewSearchPage({
 }: {
   searchParams: Promise<{ need?: string }>;
 }) {
-  const [needs, { need }] = await Promise.all([getMyNeeds(), searchParams]);
+  const [needs, sourceOptions, { need }] = await Promise.all([
+    getMyNeeds(),
+    getActiveSources(),
+    searchParams,
+  ]);
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -20,6 +25,7 @@ export default async function NewSearchPage({
       />
       <SearchForm
         initialNeedId={need}
+        sourceOptions={sourceOptions}
         needs={needs.map((n) => ({
           id: n.id,
           title: n.title,

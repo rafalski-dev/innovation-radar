@@ -1,7 +1,9 @@
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
+import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
 import { getSession } from "@/lib/session";
+import { getSetting } from "@/lib/settings";
 import { z } from "zod";
 import {
   type DescriptionSuggestion,
@@ -34,7 +36,11 @@ export async function POST(request: Request) {
   if (!env.ANTHROPIC_API_KEY)
     return respond(fail("Brak klucza ANTHROPIC_API_KEY na serwerze"), 503);
 
+  const blocked = await findBlockedTopic(body.data.title, body.data.description);
+  if (blocked) return respond(fail(blockedTopicMessage(blocked)), 400);
+
   try {
+    const extra = await getSetting("phrasesPromptExtra");
     const used = await db.descriptionGeneration.count({
       where: { userId: session.user.id, createdAt: { gte: new Date(Date.now() - WINDOW_MS) } },
     });
@@ -68,7 +74,8 @@ export async function POST(request: Request) {
           "Uzupełnienia mają być niezależne, tak by użytkownik mógł dodać dowolne z nich, i NIE mogą powtarzać tego, " +
           "co już jest w opisie. Trzymaj się wyłącznie informacji od użytkownika i ich rozsądnego doprecyzowania. " +
           "NIE wymyślaj faktów: liczb, budżetów, terminów, nazw technologii, firm ani wymagań, których nie podał. " +
-          "Jeśli czegoś nie wiadomo, pomiń takie uzupełnienie.",
+          "Jeśli czegoś nie wiadomo, pomiń takie uzupełnienie." +
+          (extra ? ` Dodatkowe wytyczne administratora: ${extra}` : ""),
         messages: [
           {
             role: "user",

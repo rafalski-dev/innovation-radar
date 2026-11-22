@@ -8,7 +8,12 @@ export async function getMySearches() {
   const session = await requireSession();
   return db.search.findMany({
     where: { userId: session.user.id },
-    include: { need: { select: { id: true, title: true, business: { select: { name: true } } } } },
+    include: {
+      need: {
+        select: { id: true, title: true, createdAt: true, business: { select: { name: true } } },
+      },
+      _count: { select: { results: true } },
+    },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
 }
@@ -20,7 +25,15 @@ export async function getSearch(id: string) {
   return db.search.findFirst({
     where: { id, userId: session.user.id },
     include: {
-      need: { select: { id: true, title: true, business: { select: { name: true } } } },
+      need: {
+        select: {
+          id: true,
+          title: true,
+          createdAt: true,
+          sentAt: true,
+          business: { select: { name: true } },
+        },
+      },
       results: { orderBy: { position: "asc" } },
     },
   });

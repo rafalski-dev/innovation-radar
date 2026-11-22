@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckIcon, Loader2Icon, SearchIcon, SparklesIcon } from "lucide-react";
+import { CheckIcon, Loader2Icon, PlusIcon, SearchIcon, SparklesIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { createSearch } from "@/actions/search";
@@ -13,15 +13,15 @@ import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
 import { ResultList } from "@/components/search/result-list";
 import {
-  DEFAULT_SOURCE_IDS,
+  DEFAULT_RESULTS_LIMIT,
   MAX_PHRASES,
   MAX_SOURCES,
-  SOURCES,
+  MAX_TOTAL_RESULTS,
   searchSchema,
   type AgentStats,
   type Candidate,
   type Phrases,
-  type SourceId,
+  type SourceOption,
 } from "@/validation/search";
 
 export type SearchNeedOption = {
@@ -60,13 +60,15 @@ type ResultsData = { candidates: Candidate[]; cached: boolean; stats: AgentStats
 async function requestResults(
   needId: string,
   phrases: Phrases,
-  sources: SourceId[],
+  sources: string[],
+  limit: number,
+  exclude?: string[],
 ): Promise<ActionResult<ResultsData>> {
   try {
     const response = await fetch("/api/search/results", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ needId, phrases, sources }),
+      body: JSON.stringify({ needId, phrases, sources, limit, exclude }),
     });
     return (await response.json()) as ActionResult<ResultsData>;
   } catch {
@@ -77,9 +79,12 @@ async function requestResults(
 // Formularz nowego wyszukiwania: wybór projektu (opcjonalny) + opis tego, czego szukamy.
 export function SearchForm({
   needs,
+  sourceOptions,
   initialNeedId,
 }: {
   needs: SearchNeedOption[];
+  sourceOptions: SourceOption[]; // aktywne źródła z bazy
+
   initialNeedId?: string; // projekt wybrany z góry (np. z listy projektów)
 }) {
   const router = useRouter();
@@ -90,7 +95,12 @@ export function SearchForm({
   const [error, setError] = useState<string>();
   const [phrases, setPhrases] = useState<Phrases>();
   const [hint, setHint] = useState("");
-  const [sources, setSources] = useState<SourceId[]>(DEFAULT_SOURCE_IDS); // filtr źródeł (max MAX_SOURCES)
+  // filtr źródeł (max MAX_SOURCES): domyślnie dwa pierwsze aktywne
+  const [sources, setSources] = useState<string[]>(() =>
+    sourceOptions.slice(0, MAX_SOURCES).map((o) => o.slug),
+  );
+  const [limit, setLimit] = useState(DEFAULT_RESULTS_LIMIT); // ile wyników ma zwrócić agent
+  const [selectedUrls, setSelectedUrls] = useState<string[]>([]); // wyniki uwzględnione w aspekcie
   const [generating, startGenerating] = useTransition();
   const [approved, setApproved] = useState(false); // frazy zatwierdzone, można szukać w źródłach
   const [results, setResults] = useState<ResultsData>();
@@ -116,20 +126,41 @@ export function SearchForm({
     setApproved(true);
   }
 
-  function searchSources() {
+  // more = „Znajdź więcej”: dokładamy kolejne materiały, pomijając już znalezione adresy
+  function searchSources(more = false) {
     const list = cleanPhrases();
     if (!needId || list.length === 0) {
       setError("Wybierz projekt i wygeneruj frazy");
       return;
     }
     setError(undefined);
+    const known = more ? (results?.candidates.map((c) => c.sourceUrl) ?? []) : undefined;
     startSearching(async () => {
-      const result = await requestResults(needId, list, sources);
+      const result = await requestResults(needId, list, sources, limit, known);
       if (!result.success) {
         toast.error(result.error);
         return;
       }
+      if (more && results) {
+        const added = result.data.candidates;
+        if (added.length === 0) {
+          toast.info("Agent nie znalazł więcej nowych materiałów");
+          return;
+        }
+        setResults({
+          ...result.data,
+          candidates: [...results.candidates, ...added].slice(0, MAX_TOTAL_RESULTS),
+          stats: {
+            webSearches: results.stats.webSearches + result.data.stats.webSearches,
+            inputTokens: results.stats.inputTokens + result.data.stats.inputTokens,
+            outputTokens: results.stats.outputTokens + result.data.stats.outputTokens,
+          },
+        });
+        setSelectedUrls((prev) => [...prev, ...added.map((c) => c.sourceUrl)]);
+        return;
+      }
       setResults(result.data);
+      setSelectedUrls(result.data.candidates.map((c) => c.sourceUrl)); // domyślnie wszystkie
       if (result.data.cached) toast.success("Wynik z zapisanego aspektu (bez kosztu)");
     });
   }
@@ -171,7 +202,7 @@ export function SearchForm({
   }
 
   // Zaznaczanie źródeł: najwyżej MAX_SOURCES, co najmniej jedno. Zmiana unieważnia listę wyników.
-  function toggleSource(id: SourceId) {
+  function toggleSource(id: string) {
     setSources((prev) => {
       if (prev.includes(id)) return prev.length > 1 ? prev.filter((x) => x !== id) : prev;
       return prev.length < MAX_SOURCES ? [...prev, id] : prev;
@@ -194,15 +225,22 @@ export function SearchForm({
     event.preventDefault();
     // zapis tylko ze zatwierdzonymi frazami i gotową listą wyników (Enter w polu nie zapisuje)
     if (!approved || !results || results.candidates.length === 0) return;
+    // tylko wyniki zaznaczone przez użytkownika (nieadekwatne są wykluczone)
+    const chosen = results.candidates.filter((c) => selectedUrls.includes(c.sourceUrl));
+    if (chosen.length === 0) {
+      setError("Zaznacz przynajmniej jeden wynik do zapisania");
+      return;
+    }
     // puste frazy (dodane i niewypełnione) odrzucamy
     const cleaned = phrases ? cleanPhrases() : undefined;
     const input = {
       query,
       needId,
       phrases: cleaned,
-      results: results?.candidates,
+      results: chosen,
       stats: results?.stats,
       sources,
+      limit,
     };
     const parsed = searchSchema.safeParse(input);
     if (!parsed.success) {
@@ -273,13 +311,6 @@ export function SearchForm({
           <>
             <PhrasesEditor value={phrases} onChange={changePhrases} />
             <div className="flex flex-wrap items-center gap-2 border-t pt-4">
-              <Input
-                value={hint}
-                onChange={(e) => setHint(e.target.value)}
-                placeholder="Wskazówka do nowej frazy (opcjonalnie), np. „bardziej technicznie”"
-                className="min-w-0 flex-1"
-                maxLength={300}
-              />
               <Button
                 type="button"
                 variant="outline"
@@ -289,6 +320,13 @@ export function SearchForm({
                 <SparklesIcon />
                 {generating ? "Generuję…" : "Generuj kolejną frazę"}
               </Button>
+              <Input
+                value={hint}
+                onChange={(e) => setHint(e.target.value)}
+                placeholder="Wskazówka do nowej frazy (opcjonalnie), np. „bardziej technicznie”"
+                className="min-w-0 flex-1"
+                maxLength={300}
+              />
             </div>
             <Button type="button" onClick={approvePhrases} disabled={generating}>
               <CheckIcon />
@@ -322,12 +360,12 @@ export function SearchForm({
           </div>
           <fieldset className="grid gap-2 sm:grid-cols-2">
             <legend className="sr-only">Źródła aspektu</legend>
-            {SOURCES.map((source) => {
-              const checked = sources.includes(source.id);
+            {sourceOptions.map((source) => {
+              const checked = sources.includes(source.slug);
               const locked = !checked && sources.length >= MAX_SOURCES;
               return (
                 <label
-                  key={source.id}
+                  key={source.slug}
                   className={cn(
                     "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-muted/50",
                     locked && "cursor-not-allowed opacity-50 hover:bg-transparent",
@@ -337,7 +375,7 @@ export function SearchForm({
                     type="checkbox"
                     checked={checked}
                     disabled={locked || searching}
-                    onChange={() => toggleSource(source.id)}
+                    onChange={() => toggleSource(source.slug)}
                     className="mt-1 accent-current"
                   />
                   <span className="grid min-w-0 gap-0.5">
@@ -351,11 +389,44 @@ export function SearchForm({
               Wybrano {sources.length} z {MAX_SOURCES}.
             </p>
           </fieldset>
-          <div>
-            <Button type="button" onClick={searchSources} disabled={searching || generating}>
+          <label className="flex items-center gap-2 text-sm">
+            Liczba wyników
+            <select
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              disabled={searching}
+              className="h-9 rounded-md border bg-background px-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {Array.from({ length: MAX_TOTAL_RESULTS }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs text-muted-foreground">
+              (więcej wyników = dłuższe i droższe wyszukiwanie)
+            </span>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              onClick={() => searchSources(false)}
+              disabled={searching || generating}
+            >
               {searching ? <Loader2Icon className="animate-spin" /> : <SearchIcon />}
-              {searching ? "Szukam w źródłach…" : results ? "Szukaj ponownie" : "Szukaj w źródłach"}
+              {searching ? "Szukam w źródłach…" : results ? "Szukaj od nowa" : "Szukaj w źródłach"}
             </Button>
+            {results && results.candidates.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => searchSources(true)}
+                disabled={searching || generating || results.candidates.length >= MAX_TOTAL_RESULTS}
+              >
+                <PlusIcon />
+                Znajdź więcej materiałów
+              </Button>
+            )}
           </div>
           {results &&
             (results.candidates.length === 0 ? (
@@ -363,12 +434,29 @@ export function SearchForm({
                 Agent nie znalazł wyników. Zmień frazy i spróbuj ponownie.
               </p>
             ) : (
-              <ResultList items={results.candidates} />
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Odznacz wyniki nieadekwatne do projektu: nie trafią do aspektu. Zaznaczono{" "}
+                  {selectedUrls.length} z {results.candidates.length}
+                  {results.candidates.length >= MAX_TOTAL_RESULTS && " (maksymalna liczba wyników)"}
+                  .
+                </p>
+                <ResultList
+                  items={results.candidates}
+                  selection={{
+                    selected: selectedUrls,
+                    onToggle: (url) =>
+                      setSelectedUrls((prev) =>
+                        prev.includes(url) ? prev.filter((u) => u !== url) : [...prev, url],
+                      ),
+                  }}
+                />
+              </>
             ))}
           {results && results.candidates.length > 0 && (
-            <Button type="submit" disabled={pending || searching}>
+            <Button type="submit" disabled={pending || searching || selectedUrls.length === 0}>
               <CheckIcon />
-              {pending ? "Zapisywanie…" : "Zatwierdź aspekt"}
+              {pending ? "Zapisywanie…" : `Zatwierdź aspekt (${selectedUrls.length})`}
             </Button>
           )}
         </div>

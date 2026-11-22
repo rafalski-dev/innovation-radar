@@ -2,7 +2,9 @@ import { z } from "zod";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
+import { blockedTopicMessage, findBlockedTopic } from "@/lib/blocklist";
 import { getSession } from "@/lib/session";
+import { getSetting } from "@/lib/settings";
 import { accessibleNeedWhere } from "@/queries/need";
 import { generatePhrasesSchema, phrasesSchema, type Phrases } from "@/validation/search";
 
@@ -37,6 +39,9 @@ export async function POST(request: Request) {
       select: { title: true, description: true, linkUrls: true },
     });
     if (!need) return respond(fail("Nie znaleziono projektu"), 404);
+    const blocked = await findBlockedTopic(need.title, need.description);
+    if (blocked) return respond(fail(blockedTopicMessage(blocked)), 400);
+    const extra = await getSetting("phrasesPromptExtra");
 
     const used = await db.phraseGeneration.count({
       where: { userId: session.user.id, createdAt: { gte: new Date(Date.now() - WINDOW_MS) } },
@@ -76,7 +81,8 @@ export async function POST(request: Request) {
           "projekty (NCBiR, Interreg, Mapa Dotacji UE). Na podstawie opisu projektu firmy podaj od 3 do 5 NAJBARDZIEJ " +
           "prawdopodobnych fraz, które warto wpisać w wyszukiwarkę, aby znaleźć pasujące rozwiązania. " +
           "Frazy po polsku, konkretne, każda do 8 słów, od najtrafniejszej. Nigdy więcej niż 5. " +
-          "Nie wymyślaj faktów spoza opisu, bez numeracji.",
+          "Nie wymyślaj faktów spoza opisu, bez numeracji." +
+          (extra ? ` Dodatkowe wytyczne administratora: ${extra}` : ""),
         messages: [
           {
             role: "user",

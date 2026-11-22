@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, FileTextIcon, PlusIcon } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { ResultList } from "@/components/search/result-list";
 import { buttonVariants } from "@/components/shadcn/button";
+import { aspectLabel } from "@/lib/numbering";
 import { getSearch } from "@/queries/search";
 import { SEARCH_STATUS_LABELS, phrasesSchema, type SearchStatusValue } from "@/validation/search";
 
@@ -18,6 +19,8 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
   const phrases = phrasesSchema.safeParse(search.phrases);
   const phraseList = phrases.success ? phrases.data : [];
   const status = search.status as SearchStatusValue;
+  const label = aspectLabel(search.number, search.need?.createdAt);
+  const closed = !!search.need?.sentAt;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -27,8 +30,32 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
       </Link>
       <PageHeader
         title={search.need?.title ?? "Aspekt"}
-        description={search.need ? search.need.business.name : search.query}
+        description={[label, search.need ? search.need.business.name : search.query]
+          .filter(Boolean)
+          .join(" · ")}
       />
+
+      {search.need && (
+        <div className="flex flex-wrap gap-2">
+          {closed ? (
+            <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
+              Raport projektu został wysłany, więc nie można dodawać kolejnych aspektów.
+            </p>
+          ) : (
+            <Link
+              href={`/dashboard/search/new?need=${search.need.id}`}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <PlusIcon />
+              Dodaj kolejny aspekt
+            </Link>
+          )}
+          <Link href={`/dashboard/projects/${search.need.id}/report`} className={buttonVariants()}>
+            <FileTextIcon />
+            Wygeneruj zbiorcze opracowanie projektu (PDF)
+          </Link>
+        </div>
+      )}
 
       <section className="space-y-2">
         <h2 className="text-sm font-medium">Frazy</h2>
@@ -49,7 +76,7 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-medium">Wyniki agenta</h2>
+          <h2 className="text-sm font-medium">Wyniki agenta ({search.results.length})</h2>
           <p className="text-xs text-muted-foreground">
             Status: {SEARCH_STATUS_LABELS[status]}
             {search.webSearches != null && ` · wyszukań: ${search.webSearches}`}
