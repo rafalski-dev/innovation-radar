@@ -25,7 +25,14 @@ export async function SiteHeader() {
           <UserMenu name={session.user.name} />
         ) : (
           <div className="flex items-center gap-2">
-            <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            <Link
+              href="/login"
+              className={buttonVariants({
+                variant: "outline",
+                size: "sm",
+                className: "h-9 bg-card/60 px-4 text-sm",
+              })}
+            >
               Zaloguj się
             </Link>
             <Link
@@ -33,7 +40,7 @@ export async function SiteHeader() {
               className={buttonVariants({
                 size: "sm",
                 className:
-                  "rounded-full bg-brand text-white hover:bg-brand/90 dark:bg-brand dark:text-white",
+                  "h-9 bg-brand px-4 text-sm text-white hover:bg-brand/90 dark:bg-brand dark:text-white",
               })}
             >
               Załóż konto

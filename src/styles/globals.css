@@ -122,6 +122,17 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Wszystkie przyciski na stronach publicznych są okrągłe (pigułki, jak w sekcji hero).
+   Reguła poza warstwą, więc wygrywa z klasami rounded-* z komponentu Button. */
+.theme-landing .group\/button {
+  border-radius: 9999px;
+}
+
+/* Pierścień focusu w kolorze akcentu na stronach publicznych. */
+.theme-landing {
+  --ring: color-mix(in oklab, var(--brand) 70%, transparent);
+}
+
 /* Ciemny, techniczny wygląd stron publicznych (landing, logowanie, rejestracja):
    prawie czarne tło, ciemne karty i delikatne obramowania. Tylko w ciemnym motywie. */
 .dark .theme-landing {

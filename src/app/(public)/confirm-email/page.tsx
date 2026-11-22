@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ResendVerification } from "@/components/auth/resend-verification";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/shadcn/card";
+import { AuthCard } from "@/components/auth/auth-card";
 import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Potwierdź e-mail" };
@@ -22,30 +16,30 @@ export default async function ConfirmEmailPage({
   const { email } = await searchParams;
 
   return (
-    <Card className="mx-auto w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Sprawdź skrzynkę</CardTitle>
-        <CardDescription>
-          {email ? (
-            <>
-              Wysłaliśmy link potwierdzający na adres <strong>{email}</strong>. Kliknij go, aby
-              aktywować konto.
-            </>
-          ) : (
-            "Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto."
-          )}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-4">
+    <AuthCard
+      title="Sprawdź"
+      accent="skrzynkę"
+      description={
+        email ? (
+          <>
+            Wysłaliśmy link potwierdzający na adres{" "}
+            <strong className="text-foreground">{email}</strong>. Kliknij go, aby aktywować konto.
+          </>
+        ) : (
+          "Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto."
+        )
+      }
+    >
+      <div className="grid gap-4">
         <ResendVerification email={email} />
         <p className="text-center text-sm text-muted-foreground">
           Po potwierdzeniu możesz się{" "}
-          <Link href="/login" className="font-medium text-foreground underline">
+          <Link href="/login" className="font-medium text-foreground underline decoration-brand">
             zalogować
           </Link>
           .
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </AuthCard>
   );
 }

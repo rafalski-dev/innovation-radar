@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { authSubmitClass } from "@/components/auth/auth-card";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/shadcn/button";
 import { Input } from "@/components/shadcn/input";
@@ -60,7 +61,7 @@ export function ForgotPasswordForm() {
           {...form.register("email")}
         />
       </FormField>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className={authSubmitClass}>
         {pending ? "Wysyłanie…" : "Wyślij link do resetu"}
       </Button>
       <p className="text-center text-sm text-muted-foreground">

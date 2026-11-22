@@ -49,6 +49,7 @@ export function ResendVerification({ email: initialEmail }: { email?: string }) 
       <Button
         type="button"
         variant="outline"
+        className="h-10 rounded-full"
         onClick={resend}
         disabled={pending || cooldown > 0 || !email.trim()}
       >

@@ -6,6 +6,7 @@ import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { authSubmitClass } from "@/components/auth/auth-card";
 import { PasswordInput } from "@/components/auth/password-input";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/shadcn/button";
@@ -53,7 +54,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           {...form.register("confirm")}
         />
       </FormField>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className={authSubmitClass}>
         {pending ? "Zapisywanie…" : "Ustaw nowe hasło"}
       </Button>
       <p className="text-center text-sm text-muted-foreground">

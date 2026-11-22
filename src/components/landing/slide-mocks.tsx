@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const panel = "rounded-lg border bg-background p-3 text-xs";
 const chip = "rounded-full border px-2.5 py-1 text-[11px]";
 const fakeButton =
-  "inline-flex items-center gap-1.5 rounded-md border bg-background px-2.5 py-1.5 text-[11px] font-medium";
+  "inline-flex items-center gap-1.5 rounded-full border bg-background px-3 py-1.5 text-[11px] font-medium";
 
 export function ProjectMock() {
   return (

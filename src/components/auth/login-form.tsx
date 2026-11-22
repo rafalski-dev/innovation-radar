@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { FormField } from "@/components/form-field";
 import { Button } from "@/components/shadcn/button";
+import { authSubmitClass } from "@/components/auth/auth-card";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Input } from "@/components/shadcn/input";
 import { authClient } from "@/lib/auth-client";
@@ -69,7 +70,7 @@ export function LoginForm() {
       >
         Nie pamiętam hasła
       </Link>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className={authSubmitClass}>
         {pending ? "Logowanie…" : "Zaloguj się"}
       </Button>
       <p className="text-center text-sm text-muted-foreground">
