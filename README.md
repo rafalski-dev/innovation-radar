@@ -62,7 +62,6 @@ Każdy wynik dostaje ocenę gotowości technologicznej, więc od razu widać, co
 - 📁 **Projekty**: opis problemu, do 3 linków i do 3 plików PDF (po 20 MB), numeracja, duplikowanie i filtrowanie listy (szukanie i organizacja). Karta pokazuje autora, autorów aspektów, użyte bazy i rozpiętość TRL.
 - ✍️ **Asystent opisu**: AI proponuje uzupełnienia, a użytkownik dodaje wybrane jednym kliknięciem.
 - 🧩 **Aspekty**: lista z frazami, użytymi bazami, liczbą wyszukiwań, rozpiętością TRL i autorem, z filtrem zakresu TRL. Cudzy aspekt można podejrzeć, a edytować i usuwać może tylko autor.
-- 📚 **Materiały**: biblioteka wszystkich zapisanych wyników z kontekstem AI (uzasadnienie, frazy, źródło), z wyszukiwaniem i filtrami.
 - 📄 **Raport projektu**: pobierany od razu jako plik PDF (rozpiętość TRL, rekomendowany następny krok, wszystkie aspekty i wyniki), z możliwością wysłania e-mailem do członków organizacji. Po wysłaniu projekt jest zamknięty do edycji.
 
 **AI i wyszukiwanie**
@@ -126,7 +125,6 @@ Pliki PDF trafiają prosto z przeglądarki do prywatnego bucketu R2 przez krótk
    - **Organizacje**: dodaj firmę (NIP, adres) i, jeśli chcesz, osoby z istniejącymi kontami.
    - **Projekty**: opisz problem, dodaj linki lub pliki PDF.
    - **Aspekty → Nowy aspekt**: wybierz projekt, wygeneruj i zatwierdź frazy, kliknij „Szukaj w źródłach” (do minuty), a potem zatwierdź listę wyników.
-   - **Materiały**: zobacz wszystkie zapisane wyniki z kontekstem AI.
    - **Projekty → Pobierz raport (PDF)** albo „Wyślij raport” do członków organizacji.
 4. Przycisk **Pomoc** (prawy dolny róg) pozwala zgłosić problem lub pomysł.
 
@@ -160,7 +158,7 @@ src/
 ├── actions/        akcje serwerowe (tylko mutacje)
 ├── queries/        odczyty z bazy
 ├── validation/     schematy Zod, typy i etykiety
-├── components/     komponenty (project/, search/, material/, landing/, shadcn/ …)
+├── components/     komponenty (project/, search/, landing/, shadcn/ …)
 └── lib/            baza, agent AI, raport PDF, TRL, treści strony głównej
 prisma/             schemat bazy i dane demo (seed)
 docs/               opis projektu, wytyczne organizatorów, plan agenta, zrzuty ekranu

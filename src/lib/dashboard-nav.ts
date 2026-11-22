@@ -1,6 +1,5 @@
 import {
   BuildingIcon,
-  LibraryIcon,
   LayoutDashboardIcon,
   ShieldIcon,
   ClipboardListIcon,
@@ -15,7 +14,6 @@ export type NavCounts = {
   businesses: number;
   projects: number;
   searches: number;
-  materials: number;
 };
 
 export type DashboardNavItem = {
@@ -30,7 +28,6 @@ export const dashboardNav: DashboardNavItem[] = [
   { href: "/dashboard/businesses", label: "Organizacje", icon: BuildingIcon, count: "businesses" },
   { href: "/dashboard/projects", label: "Projekty", icon: ClipboardListIcon, count: "projects" },
   { href: "/dashboard/search", label: "Aspekty", icon: SearchIcon, count: "searches" },
-  { href: "/dashboard/materials", label: "Materiały", icon: LibraryIcon, count: "materials" },
   { href: "/dashboard/profile", label: "Profil", icon: UserIcon },
 ];
 

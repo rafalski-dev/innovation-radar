@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import { DEFAULT_TRL } from "@/lib/trl";
 import { accessibleBusinessWhere } from "@/queries/business";
-import { countMyMaterials } from "@/queries/material";
 import { accessibleProjectWhere } from "@/queries/project";
 import { accessibleSearchWhere } from "@/queries/search";
 
@@ -13,13 +12,12 @@ export async function getNavCounts() {
   await connection();
   const session = await requireSession();
   const userId = session.user.id;
-  const [businesses, projects, searches, materials] = await Promise.all([
+  const [businesses, projects, searches] = await Promise.all([
     db.business.count({ where: accessibleBusinessWhere(userId) }),
     db.project.count({ where: accessibleProjectWhere(userId) }),
     db.search.count({ where: accessibleSearchWhere(userId) }),
-    countMyMaterials(userId),
   ]);
-  return { businesses, projects, searches, materials };
+  return { businesses, projects, searches };
 }
 
 // Dane strony głównej panelu: liczniki oraz ostatnie projekty i aspekty zalogowanego użytkownika.
