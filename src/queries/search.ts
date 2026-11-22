@@ -10,7 +10,13 @@ export async function getMySearches() {
     where: { userId: session.user.id },
     include: {
       need: {
-        select: { id: true, title: true, createdAt: true, business: { select: { name: true } } },
+        select: {
+          id: true,
+          title: true,
+          createdAt: true,
+          sentAt: true,
+          business: { select: { name: true } },
+        },
       },
       _count: { select: { results: true } },
     },

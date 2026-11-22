@@ -8,7 +8,9 @@ import { Input } from "@/components/shadcn/input";
 
 export type SearchRow = {
   id: string;
+  title: string | null; // nazwa aspektu (stare wpisy jej nie mają)
   query: string;
+  canChange: boolean; // pokazuje „Kopiuj” i „Edytuj”
   label: string | null; // numer aspektu, np. PRJ-…/A2
   createdAt: string; // ISO
   createdLabel: string;
@@ -40,7 +42,10 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
     const q = text.trim().toLowerCase();
     const filtered = rows.filter(
       (r) =>
-        (!q || `${r.query} ${r.needTitle ?? ""} ${r.label ?? ""}`.toLowerCase().includes(q)) &&
+        (!q ||
+          `${r.title ?? ""} ${r.query} ${r.needTitle ?? ""} ${r.label ?? ""}`
+            .toLowerCase()
+            .includes(q)) &&
         (!needId || r.needId === needId) &&
         (!onlyWithResults || r.resultsCount > 0),
     );
@@ -113,10 +118,15 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
                 {s.label && <p className="font-mono text-xs text-muted-foreground">{s.label}</p>}
                 <Link
                   href={`/dashboard/search/${s.id}`}
-                  className="line-clamp-3 block text-sm after:absolute after:inset-0 after:content-['']"
+                  className={
+                    s.title
+                      ? "line-clamp-2 block text-sm font-medium after:absolute after:inset-0 after:content-['']"
+                      : "line-clamp-3 block text-sm after:absolute after:inset-0 after:content-['']"
+                  }
                 >
-                  {s.query}
+                  {s.title ?? s.query}
                 </Link>
+                {s.title && <p className="line-clamp-1 text-xs text-muted-foreground">{s.query}</p>}
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   <time dateTime={s.createdAt}>{s.createdLabel}</time>
                   {s.needTitle && (
@@ -129,7 +139,11 @@ export function SearchList({ rows }: { rows: SearchRow[] }) {
                 </div>
               </div>
               <div className="relative z-10">
-                <SearchRowActions id={s.id} name={s.needTitle ?? "aspekt"} />
+                <SearchRowActions
+                  id={s.id}
+                  name={s.title ?? s.needTitle ?? "aspekt"}
+                  canChange={s.canChange}
+                />
               </div>
             </li>
           ))}

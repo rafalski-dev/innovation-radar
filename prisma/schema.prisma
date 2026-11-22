@@ -163,6 +163,7 @@ model BusinessMember {
 
 model Search {
   id           String         @id @default(cuid())
+  title        String? // nazwa aspektu nadana przez użytkownika (stare wpisy jej nie mają)
   query        String
   phrases      Json? // zatwierdzone frazy: lista 3-5 tekstów (po polsku)
   number       Int            @default(0) // numer aspektu w projekcie (0 = stare wpisy bez numeru)

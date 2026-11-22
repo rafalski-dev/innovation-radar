@@ -49,6 +49,18 @@ Potrzeba ma opcjonalnie do 3 **linków** (`linkUrls`) i do 3 **plików PDF** (ka
 rozmiar i klucz, a plik leży w prywatnym buckecie **Cloudflare R2** (`src/lib/r2.ts`, zmienne `R2_*`).
 Wysyłka idzie z przeglądarki prosto do R2 (podpisany adres), pobranie przez `/api/need-files/[fileId]`.
 
+**Aspekt** (kroki 5-6): `Search` należy do projektu i ma tytuł (`title`, wymagany przy zapisie; stare wpisy go nie mają),
+frazy i wyniki z oceną TRL. „Maksymalna liczba wyników” w formularzu to górny limit, nie gwarancja: agent zwraca tylko
+materiały z adresem potwierdzonym przez wyszukiwanie (formularz pokazuje „znaleziono X z maks. Y”). **Pusty TRL liczy się
+jako TRL 2** (`src/lib/trl.ts`; w bazie zostaje `null`). „Zastąp aspekt” (`/dashboard/search/new?replace=<id>`) otwiera
+formularz z kopią aspektu; stary znika dopiero po zapisaniu nowego (nowy dostaje jego numer).
+
+**Raport zbiorczy** jest tylko na poziomie projektu (`/dashboard/projects/[id]/report`): podsumowanie każdego aspektu z
+rozpiętością TRL, **rekomendowany następny krok** (aspekt z najwyższym TRL w wynikach; reguły i remisy w `src/lib/report.ts`),
+oraz domyślna nazwa pliku PDF `Projekt_<tytuł>_<data i godzina>`. Raport można wydrukować (PDF); udostępniania
+aspektów do wspólnej bazy nie ma (usunięte).
+Menu panelu pokazuje liczniki: Organizacje, Projekty, Aspekty (`getNavCounts` w `src/queries/dashboard.ts`).
+
 Zrobione: konto (1), organizacje (2), potrzeby (3-4), landing. Dalej: czat z pytaniami pomocniczymi i
 agent z wynikami (5-6), listy (7), kontakt i feedback (8-9), raport (10), panel administracji.
 
@@ -234,7 +246,7 @@ karty z kluczem i oceną, szczegóły w panelu bocznym. Zakres do potwierdzenia 
 
 ## 5. Funkcje AI
 
-Modele w `src/lib/ai.ts`. Każda funkcja AI zwraca **propozycję**, którą człowiek zatwierdza lub
+Wywołania modeli: `src/lib/search-agent.ts` i endpointy w `src/app/api`. Każda funkcja AI zwraca **propozycję**, którą człowiek zatwierdza lub
 poprawia. W UI zawsze widać, co pochodzi od AI.
 
 1. **Strukturyzacja zgłoszenia**: z wklejonego tekstu (opis, notatka, artykuł) wypełnia pola

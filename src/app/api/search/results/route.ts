@@ -14,7 +14,13 @@ export const maxDuration = 60;
 const RUN_WINDOW_MS = 30 * 60 * 1000;
 const CACHE_MS = 7 * 24 * 60 * 60 * 1000;
 
-type ResultsData = { candidates: Candidate[]; cached: boolean; stats: AgentStats };
+// rejected = kandydaci odrzuceni przez weryfikację adresu (0 przy wyniku z cache)
+type ResultsData = {
+  candidates: Candidate[];
+  cached: boolean;
+  stats: AgentStats;
+  rejected: number;
+};
 const respond = (result: ActionResult<ResultsData>, status = 200) =>
   Response.json(result, { status });
 
@@ -61,6 +67,7 @@ export async function POST(request: Request) {
       return respond(
         ok({
           cached: true,
+          rejected: 0,
           stats: {
             webSearches: cached.webSearches ?? 0,
             inputTokens: cached.inputTokens ?? 0,
@@ -107,6 +114,7 @@ export async function POST(request: Request) {
         ok({
           cached: false,
           candidates: output.candidates,
+          rejected: output.rejected,
           stats: {
             webSearches: output.webSearches,
             inputTokens: output.inputTokens,

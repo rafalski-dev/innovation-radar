@@ -138,6 +138,7 @@ export async function createNeed(
 
   revalidatePath(`/dashboard/businesses/${businessId}`);
   revalidatePath("/dashboard/projects");
+  revalidatePath("/dashboard", "layout"); // liczniki w menu
   return ok();
 }
 
@@ -225,6 +226,7 @@ export async function deleteNeed(id: string): Promise<ActionResult> {
 
   revalidatePath("/dashboard/businesses", "layout");
   revalidatePath("/dashboard/projects");
+  revalidatePath("/dashboard", "layout"); // liczniki w menu (projekty i aspekty)
   return ok();
 }
 
@@ -254,6 +256,7 @@ export async function duplicateNeed(id: string): Promise<ActionResult> {
 
   revalidatePath("/dashboard/businesses", "layout");
   revalidatePath("/dashboard/projects");
+  revalidatePath("/dashboard", "layout"); // liczniki w menu
   return ok();
 }
 

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, FileTextIcon, PlusIcon } from "lucide-react";
+import { ArrowLeftIcon, PlusIcon } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { ResultList } from "@/components/search/result-list";
+import { SearchRowActions } from "@/components/search/search-row-actions";
 import { buttonVariants } from "@/components/shadcn/button";
 import { aspectLabel } from "@/lib/numbering";
+import { formatTrlRange, trlRange } from "@/lib/trl";
 import { getSearch } from "@/queries/search";
 import { SEARCH_STATUS_LABELS, phrasesSchema, type SearchStatusValue } from "@/validation/search";
 
@@ -21,6 +23,7 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
   const status = search.status as SearchStatusValue;
   const label = aspectLabel(search.number, search.need?.createdAt);
   const closed = !!search.need?.sentAt;
+  const range = trlRange(search.results.map((r) => r.trl));
 
   return (
     <div className="space-y-6">
@@ -29,17 +32,30 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
         Wszystkie aspekty
       </Link>
       <PageHeader
-        title={search.need?.title ?? "Aspekt"}
-        description={[label, search.need ? search.need.business.name : search.query]
+        title={search.title ?? search.need?.title ?? "Aspekt"}
+        description={[
+          label,
+          search.title && search.need ? search.need.title : null,
+          search.need ? search.need.business.name : search.query,
+        ]
           .filter(Boolean)
           .join(" · ")}
+        action={
+          <SearchRowActions
+            id={search.id}
+            name={search.title ?? search.need?.title ?? "aspekt"}
+            canChange={!!search.need && !closed}
+            redirectAfterDelete="/dashboard/search"
+          />
+        }
       />
 
-      {search.need && (
-        <div className="flex flex-wrap gap-2">
-          {closed ? (
+      <div className="flex flex-wrap items-center gap-2">
+        {search.need &&
+          (closed ? (
             <p className="rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">
-              Raport projektu został wysłany, więc nie można dodawać kolejnych aspektów.
+              Raport projektu został wysłany, więc nie można dodawać, kopiować ani edytować
+              aspektów.
             </p>
           ) : (
             <Link
@@ -49,13 +65,8 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
               <PlusIcon />
               Dodaj kolejny aspekt
             </Link>
-          )}
-          <Link href={`/dashboard/projects/${search.need.id}/report`} className={buttonVariants()}>
-            <FileTextIcon />
-            Wygeneruj zbiorcze opracowanie projektu (PDF)
-          </Link>
-        </div>
-      )}
+          ))}
+      </div>
 
       <section className="space-y-2">
         <h2 className="text-sm font-medium">Frazy</h2>
@@ -79,6 +90,7 @@ export default async function SearchDetailPage({ params }: PageProps<"/dashboard
           <h2 className="text-sm font-medium">Wyniki agenta ({search.results.length})</h2>
           <p className="text-xs text-muted-foreground">
             Status: {SEARCH_STATUS_LABELS[status]}
+            {range && ` · rozpiętość: ${formatTrlRange(range)}`}
             {search.webSearches != null && ` · wyszukań: ${search.webSearches}`}
             {search.inputTokens != null &&
               ` · tokeny: ${search.inputTokens} wej. / ${search.outputTokens ?? 0} wyj.`}

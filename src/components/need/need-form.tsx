@@ -192,7 +192,8 @@ export function NeedForm({
                 key={b.id}
                 className={cn(
                   "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50",
-                  b.id === selectedId && "border-brand bg-brand/10",
+                  b.id === selectedId &&
+                    "border-foreground/60 bg-muted/70 ring-1 ring-foreground/15",
                 )}
               >
                 <input

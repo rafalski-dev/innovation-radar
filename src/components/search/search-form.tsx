@@ -2,10 +2,18 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckIcon, Loader2Icon, PlusIcon, SearchIcon, SparklesIcon } from "lucide-react";
+import {
+  CheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  PlusIcon,
+  RefreshCwIcon,
+  SearchIcon,
+  SparklesIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { createSearch } from "@/actions/search";
+import { createSearch, updateSearch } from "@/actions/search";
 import type { ActionResult } from "@/lib/action-result";
 import { FormField } from "@/components/form-field";
 import { PhrasesEditor } from "@/components/search/phrases-editor";
@@ -18,6 +26,7 @@ import {
   MAX_SOURCES,
   MAX_TOTAL_RESULTS,
   searchSchema,
+  webSearchesFor,
   type AgentStats,
   type Candidate,
   type Phrases,
@@ -29,6 +38,18 @@ export type SearchNeedOption = {
   title: string;
   description: string;
   businessName: string;
+};
+
+// Edytowany zapisany aspekt („Edytuj”): formularz startuje z jego tytułem, frazami i wynikami.
+export type EditingAspect = {
+  id: string;
+  label: string | null; // numer aspektu, np. PRJ-…/A2
+  title: string;
+  query: string;
+  phrases: string[];
+  needId: string;
+  needTitle: string;
+  results: Candidate[];
 };
 
 // POST /api/search/phrases: AI zwraca 3-5 fraz (nic nie zapisuje).
@@ -54,7 +75,21 @@ const WHITE_BUTTON =
   "border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-100 hover:text-neutral-900 " +
   "dark:border-transparent dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200";
 
-type ResultsData = { candidates: Candidate[]; cached: boolean; stats: AgentStats };
+// Odpowiedź /api/search/results; `requested` (ile wyników chciał użytkownik) dopisuje formularz.
+type ApiResultsData = {
+  candidates: Candidate[];
+  cached: boolean;
+  stats: AgentStats;
+  rejected: number;
+};
+type ResultsData = ApiResultsData & { requested: number };
+
+// Polska odmiana: 1 zapytanie, 2 zapytania, 5 zapytań.
+function plural(n: number, one: string, few: string, many: string) {
+  if (n === 1) return one;
+  const last = n % 10;
+  return last >= 2 && last <= 4 && (n % 100 < 10 || n % 100 >= 20) ? few : many;
+}
 
 // POST /api/search/results: agent szuka w źródłach dla podanych fraz (nic nie zapisuje).
 async function requestResults(
@@ -63,14 +98,14 @@ async function requestResults(
   sources: string[],
   limit: number,
   exclude?: string[],
-): Promise<ActionResult<ResultsData>> {
+): Promise<ActionResult<ApiResultsData>> {
   try {
     const response = await fetch("/api/search/results", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ needId, phrases, sources, limit, exclude }),
     });
-    return (await response.json()) as ActionResult<ResultsData>;
+    return (await response.json()) as ActionResult<ApiResultsData>;
   } catch {
     return { success: false, error: "Brak połączenia z serwerem" };
   }
@@ -81,29 +116,49 @@ export function SearchForm({
   needs,
   sourceOptions,
   initialNeedId,
+  editing,
 }: {
   needs: SearchNeedOption[];
   sourceOptions: SourceOption[]; // aktywne źródła z bazy
 
   initialNeedId?: string; // projekt wybrany z góry (np. z listy projektów)
+  editing?: EditingAspect; // edytowany aspekt: dane przepisane, projekt zablokowany
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const initialNeed = needs.find((n) => n.id === initialNeedId);
+  const initialNeed = needs.find((n) => n.id === (editing?.needId ?? initialNeedId));
   const [needId, setNeedId] = useState(initialNeed?.id ?? "");
-  const [query, setQuery] = useState(initialNeed?.description ?? "");
+  const [title, setTitle] = useState(editing?.title ?? "");
+  const [titleError, setTitleError] = useState<string>();
+  const [query, setQuery] = useState(initialNeed?.description ?? editing?.query ?? "");
   const [error, setError] = useState<string>();
-  const [phrases, setPhrases] = useState<Phrases>();
+  const [phrases, setPhrases] = useState<Phrases | undefined>(
+    editing && editing.phrases.length > 0 ? editing.phrases : undefined,
+  );
   const [hint, setHint] = useState("");
   // filtr źródeł (max MAX_SOURCES): domyślnie dwa pierwsze aktywne
   const [sources, setSources] = useState<string[]>(() =>
     sourceOptions.slice(0, MAX_SOURCES).map((o) => o.slug),
   );
-  const [limit, setLimit] = useState(DEFAULT_RESULTS_LIMIT); // ile wyników ma zwrócić agent
-  const [selectedUrls, setSelectedUrls] = useState<string[]>([]); // wyniki uwzględnione w aspekcie
+  const [limit, setLimit] = useState(DEFAULT_RESULTS_LIMIT); // ile wyników ma zwrócić agent (maksymalnie)
+  // wyniki uwzględnione w aspekcie (kopia startuje ze wszystkimi wynikami oryginału)
+  const [selectedUrls, setSelectedUrls] = useState<string[]>(() =>
+    editing ? editing.results.map((c) => c.sourceUrl) : [],
+  );
   const [generating, startGenerating] = useTransition();
-  const [approved, setApproved] = useState(false); // frazy zatwierdzone, można szukać w źródłach
-  const [results, setResults] = useState<ResultsData>();
+  // frazy zatwierdzone, można szukać w źródłach (przy zastępowaniu frazy są już przepisane)
+  const [approved, setApproved] = useState(!!editing && editing.phrases.length > 0);
+  const [results, setResults] = useState<ResultsData | undefined>(() =>
+    editing && editing.results.length > 0
+      ? {
+          candidates: editing.results,
+          cached: false,
+          rejected: 0,
+          stats: { webSearches: 0, inputTokens: 0, outputTokens: 0 },
+          requested: editing.results.length,
+        }
+      : undefined,
+  );
   const [searching, startSearching] = useTransition();
 
   function cleanPhrases() {
@@ -150,6 +205,8 @@ export function SearchForm({
         setResults({
           ...result.data,
           candidates: [...results.candidates, ...added].slice(0, MAX_TOTAL_RESULTS),
+          requested: Math.min(results.requested + limit, MAX_TOTAL_RESULTS),
+          rejected: results.rejected + result.data.rejected,
           stats: {
             webSearches: results.stats.webSearches + result.data.stats.webSearches,
             inputTokens: results.stats.inputTokens + result.data.stats.inputTokens,
@@ -159,7 +216,7 @@ export function SearchForm({
         setSelectedUrls((prev) => [...prev, ...added.map((c) => c.sourceUrl)]);
         return;
       }
-      setResults(result.data);
+      setResults({ ...result.data, requested: limit });
       setSelectedUrls(result.data.candidates.map((c) => c.sourceUrl)); // domyślnie wszystkie
       if (result.data.cached) toast.success("Wynik z zapisanego aspektu (bez kosztu)");
     });
@@ -234,6 +291,7 @@ export function SearchForm({
     // puste frazy (dodane i niewypełnione) odrzucamy
     const cleaned = phrases ? cleanPhrases() : undefined;
     const input = {
+      title,
       query,
       needId,
       phrases: cleaned,
@@ -244,30 +302,64 @@ export function SearchForm({
     };
     const parsed = searchSchema.safeParse(input);
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message);
+      const titleIssue = parsed.error.issues.find((i) => i.path[0] === "title");
+      if (titleIssue) {
+        setTitleError(titleIssue.message);
+        toast.error(titleIssue.message);
+        document.getElementById("aspect-title")?.focus();
+      } else {
+        setError(parsed.error.issues[0]?.message);
+      }
       return;
     }
     setError(undefined);
+    setTitleError(undefined);
     startTransition(async () => {
-      const result = await createSearch(input);
+      // edycja zapisuje zmiany w tym samym aspekcie, nowy formularz tworzy kolejny
+      const result = editing
+        ? await updateSearch(editing.id, input).then((r) =>
+            r.success ? { success: true as const, data: { id: editing.id } } : r,
+          )
+        : await createSearch(input);
       if (!result.success) {
         toast.error(result.error);
         return;
       }
-      toast.success("Zapisano aspekt");
+      toast.success(editing ? "Zapisano zmiany w aspekcie" : "Zapisano aspekt");
       router.push(`/dashboard/search/${result.data.id}`);
     });
   }
 
+  const found = results?.candidates.length ?? 0;
+
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      {needs.length > 0 && (
+      {editing && (
+        <div className="flex items-start gap-3 rounded-2xl border bg-muted/40 p-4">
+          <RefreshCwIcon className="mt-0.5 size-4 shrink-0 text-brand" />
+          <div className="space-y-1 text-sm">
+            <p className="font-medium">
+              Edytujesz aspekt{editing.label ? ` ${editing.label}` : ""}
+              <span className="font-normal text-muted-foreground">
+                {" "}
+                · projekt: {editing.needTitle}
+              </span>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Zmień tytuł, odznacz wyniki albo popraw frazy i wyszukaj ponownie. Zmiany zapiszą się
+              w tym aspekcie dopiero po kliknięciu „Zapisz zmiany”; jeśli zrezygnujesz, aspekt
+              zostaje bez zmian.
+            </p>
+          </div>
+        </div>
+      )}
+      {needs.length > 0 && !editing && (
         <FormField label="Projekt (opcjonalnie)" error={error}>
           <div className="grid gap-2 sm:grid-cols-2">
             {needs.map((n) => (
               <label
                 key={n.id}
-                className="flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50 has-[:checked]:border-brand has-[:checked]:bg-brand/10"
+                className="flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-foreground/30 has-[:checked]:border-foreground/60 has-[:checked]:bg-muted/70 has-[:checked]:ring-1 has-[:checked]:ring-foreground/15"
               >
                 <input
                   type="radio"
@@ -285,6 +377,22 @@ export function SearchForm({
           </div>
         </FormField>
       )}
+      <FormField label="Tytuł aspektu" htmlFor="aspect-title" error={titleError}>
+        <Input
+          id="aspect-title"
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setTitleError(undefined);
+          }}
+          placeholder="np. Odzysk metali metodami hydrometalurgicznymi"
+          maxLength={150}
+          aria-invalid={!!titleError}
+        />
+        <p className="text-xs text-muted-foreground">
+          Krótka nazwa, po której rozpoznasz aspekt na listach i w raporcie projektu.
+        </p>
+      </FormField>
       <div className="space-y-4 rounded-2xl border bg-card p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -349,6 +457,10 @@ export function SearchForm({
           </div>
         )}
       </div>
+      {/* bez wyboru projektu (zastępowanie) błędy nie mają się gdzie pokazać, więc są tutaj */}
+      {error && (editing || needs.length === 0) && (
+        <p className="text-xs text-destructive">{error}</p>
+      )}
       {approved && (
         <div className="space-y-4 rounded-2xl border bg-card p-4">
           <div>
@@ -367,7 +479,7 @@ export function SearchForm({
                 <label
                   key={source.slug}
                   className={cn(
-                    "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50 has-[:checked]:border-brand has-[:checked]:bg-brand/10 has-[:checked]:bg-muted/50",
+                    "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-foreground/30 has-[:checked]:border-foreground/60 has-[:checked]:bg-muted/70 has-[:checked]:ring-1 has-[:checked]:ring-foreground/15",
                     locked && "cursor-not-allowed opacity-50 hover:bg-transparent",
                   )}
                 >
@@ -389,24 +501,34 @@ export function SearchForm({
               Wybrano {sources.length} z {MAX_SOURCES}.
             </p>
           </fieldset>
-          <label className="flex items-center gap-2 text-sm">
-            Liczba wyników
-            <select
-              value={limit}
-              onChange={(e) => setLimit(Number(e.target.value))}
-              disabled={searching}
-              className="h-9 rounded-full border bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              {Array.from({ length: MAX_TOTAL_RESULTS }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-            <span className="text-xs text-muted-foreground">
-              (więcej wyników = dłuższe i droższe wyszukiwanie)
-            </span>
-          </label>
+          <div className="space-y-1.5">
+            <label className="flex flex-wrap items-center gap-2 text-sm">
+              Maksymalna liczba wyników
+              <select
+                value={limit}
+                onChange={(e) => setLimit(Number(e.target.value))}
+                disabled={searching}
+                className="h-9 rounded-full border bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                {Array.from({ length: MAX_TOTAL_RESULTS }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+              <InfoIcon className="mt-0.5 size-3 shrink-0" />
+              <span>
+                To liczba wyników, których agent ma szukać, ale tylko jako górny limit, nie
+                gwarancja: zostają materiały z adresem potwierdzonym przez wyszukiwanie w wybranych
+                źródłach, więc wyników może być mniej. Przy {limit}{" "}
+                {plural(limit, "wyniku", "wynikach", "wynikach")} agent wykona do{" "}
+                {webSearchesFor(limit)} zapytań do wyszukiwarki (więcej wyników = dłuższe i droższe
+                wyszukiwanie).
+              </span>
+            </p>
+          </div>
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
@@ -428,6 +550,31 @@ export function SearchForm({
               </Button>
             )}
           </div>
+          {results && (
+            <p className="rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">
+                Agent znalazł {found} z maks. {results.requested}{" "}
+                {plural(results.requested, "wyniku", "wyników", "wyników")}
+              </span>
+              {results.stats.webSearches > 0 &&
+                ` (${results.stats.webSearches} ${plural(
+                  results.stats.webSearches,
+                  "zapytanie",
+                  "zapytania",
+                  "zapytań",
+                )} do wyszukiwarki)`}
+              .
+              {results.rejected > 0 &&
+                ` ${results.rejected} ${plural(
+                  results.rejected,
+                  "kandydata",
+                  "kandydatów",
+                  "kandydatów",
+                )} odrzucono, bo wyszukiwanie nie potwierdziło ich adresu lub były już na liście.`}
+              {found < results.requested &&
+                " Wyników jest mniej niż limit, bo w wybranych źródłach nie znaleziono więcej pasujących materiałów. Zmień frazy lub źródła albo użyj „Znajdź więcej materiałów”."}
+            </p>
+          )}
           {results &&
             (results.candidates.length === 0 ? (
               <p className="rounded-2xl border border-dashed py-4 text-center text-sm text-muted-foreground">
@@ -456,7 +603,9 @@ export function SearchForm({
           {results && results.candidates.length > 0 && (
             <Button type="submit" disabled={pending || searching || selectedUrls.length === 0}>
               <CheckIcon />
-              {pending ? "Zapisywanie…" : `Zatwierdź aspekt (${selectedUrls.length})`}
+              {pending
+                ? "Zapisywanie…"
+                : `${editing ? "Zapisz zmiany" : "Zatwierdź aspekt"} (${selectedUrls.length})`}
             </Button>
           )}
         </div>

@@ -13,6 +13,11 @@ export type Phrases = z.infer<typeof phrasesSchema>;
 export const DEFAULT_RESULTS_LIMIT = 3;
 export const MAX_TOTAL_RESULTS = 9;
 export const resultsLimitSchema = z.number().int().min(1).max(MAX_TOTAL_RESULTS);
+
+// Limit wyników to GÓRNA granica, nie gwarancja: agent zwraca tylko materiały, których adres potwierdziło
+// wyszukiwanie w wybranych źródłach, więc wyników bywa mniej. Im wyższy limit, tym więcej zapytań
+// do wyszukiwarki (kontrola kosztów API).
+export const webSearchesFor = (limit: number) => (limit <= 3 ? 3 : limit <= 6 ? 4 : 5);
 export const candidateSchema = z.object({
   title: z.string().trim().min(1).max(300),
   summary: z.string().trim().min(1).max(800),
@@ -54,6 +59,12 @@ export const generateResultsSchema = z.object({
 });
 
 export const searchSchema = z.object({
+  // nazwa aspektu nadana przez użytkownika (do list, raportu i rozpoznawania aspektów)
+  title: z
+    .string()
+    .trim()
+    .min(3, "Nazwij aspekt (min. 3 znaki)")
+    .max(150, "Tytuł może mieć maksymalnie 150 znaków"),
   query: z
     .string()
     .trim()

@@ -169,7 +169,7 @@ export default async function DashboardPage() {
                           </p>
                         )}
                         <p className="line-clamp-1 text-sm font-medium group-hover:text-brand">
-                          {search.need?.title ?? search.query}
+                          {search.title ?? search.need?.title ?? search.query}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {dateFormat.format(search.createdAt)} · wyniki: {search._count.results}

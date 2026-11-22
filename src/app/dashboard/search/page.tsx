@@ -34,8 +34,10 @@ export default async function SearchesPage() {
         <SearchList
           rows={searches.map((s) => ({
             id: s.id,
+            title: s.title,
             query: s.query,
             label: aspectLabel(s.number, s.need?.createdAt),
+            canChange: !!s.need && !s.need.sentAt, // kopiować i edytować można aspekt z projektem, który nie jest zamknięty
             createdAt: s.createdAt.toISOString(),
             createdLabel: dateFormat.format(s.createdAt),
             needId: s.need?.id ?? null,

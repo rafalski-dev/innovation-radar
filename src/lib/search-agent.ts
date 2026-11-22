@@ -1,20 +1,20 @@
 import { z } from "zod";
 import { createHash } from "node:crypto";
+import { callAnthropic, type MessagesResponse } from "@/lib/anthropic";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { getSetting } from "@/lib/settings";
 import {
   DEFAULT_RESULTS_LIMIT,
   candidateSchema,
+  webSearchesFor,
   type AgentStats,
   type Candidate,
 } from "@/validation/search";
 
 // Agent wyszukujący (Krok 2 z docs/AGENT.md), wersja oszczędna: Haiku, web search z limitem,
-// bez czytania całych stron, max 2 wywołania API i max 3 kandydatów.
-export const AGENT_MODEL = "claude-haiku-5-5";
-// im więcej wyników chce użytkownik, tym więcej wyszukań web_search (kontrola kosztów)
-const searchesFor = (limit: number) => (limit <= 3 ? 3 : limit <= 6 ? 4 : 5);
+// bez czytania całych stron, max 2 wywołania API i max tyle kandydatów, ile wybrał użytkownik.
+// Im więcej wyników chce użytkownik, tym więcej wyszukań web_search (kontrola kosztów): `webSearchesFor`.
 const MAX_CALLS = 2;
 
 type AgentSource = { name: string; domain: string };
@@ -45,17 +45,11 @@ export type AgentInput = {
   limit?: number; // ile wyników ma zwrócić agent (domyślnie DEFAULT_RESULTS_LIMIT)
   exclude?: string[]; // adresy już znalezionych wyników: szukamy innych materiałów
 };
-export type AgentOutput = AgentStats & { candidates: Candidate[] };
-
-type Block = { type: string; [key: string]: unknown };
-type ApiResponse = {
-  content: Block[];
-  stop_reason: string;
-  usage: {
-    input_tokens: number;
-    output_tokens: number;
-    server_tool_use?: { web_search_requests?: number };
-  };
+export type AgentOutput = AgentStats & {
+  candidates: Candidate[];
+  // kandydaci, których agent zaproponował, ale odrzuciliśmy: adres nie pochodził z wyszukiwania
+  // (mógł być zmyślony) albo był już na liście. Wyjaśnia, czemu wyników jest mniej niż limit.
+  rejected: number;
 };
 
 const SAVE_TOOL = "zapisz_kandydatow";
@@ -70,7 +64,9 @@ const buildSystem = (
   "web_search w podanych źródłach (polskie instytucje: " +
   sources.map((s) => s.name).join(", ") +
   "). Użyj podanych fraz jako zapytań, w razie potrzeby przeformułuj je. " +
-  `Wybierz maksymalnie ${limit} najlepiej pasujących kandydatów. Nie wymyślaj niczego: tytuł, organizacja ` +
+  `Wybierz maksymalnie ${limit} najlepiej pasujących kandydatów i postaraj się wykorzystać ten limit w pełni: ` +
+  `jeśli znajdziesz ${limit} różnych, sensownie pasujących materiałów, zwróć dokładnie tyle (nie mniej), a mniej tylko wtedy, ` +
+  "gdy źródła naprawdę nie mają więcej. Nie wymyślaj niczego: tytuł, organizacja " +
   "i link muszą pochodzić z wyników wyszukiwania, a link musi być adresem znalezionej strony. " +
   "Jeśli czegoś nie ma w źródle, zostaw pole organization puste. Opisy po polsku, zwięzłe. " +
   "Dla każdego kandydata oceń poziom gotowości technologicznej TRL (liczba 1-9: 1-2 badania podstawowe, 3-4 koncepcja " +
@@ -89,18 +85,9 @@ async function callApi(
   extra: string,
   exclude: string[],
   limit: number,
-): Promise<ApiResponse> {
-  if (!env.ANTHROPIC_API_KEY) throw new Error("Brak ANTHROPIC_API_KEY");
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    signal: AbortSignal.timeout(55_000),
-    body: JSON.stringify({
-      model: AGENT_MODEL,
+): Promise<MessagesResponse> {
+  const result = await callAnthropic(
+    {
       max_tokens: 8000, // model „myśli” przed zapisem wyników; zbyt niski limit urywał odpowiedź i dawał 0 wyników
       system: buildSystem(sources, extra, exclude, limit),
       messages,
@@ -108,7 +95,7 @@ async function callApi(
         {
           type: "web_search_20250305",
           name: "web_search",
-          max_uses: searchesFor(limit),
+          max_uses: webSearchesFor(limit),
           allowed_domains: sources.map((s) => s.domain),
         },
         {
@@ -117,12 +104,11 @@ async function callApi(
           input_schema: z.toJSONSchema(outputSchemaFor(limit), { target: "draft-7" }),
         },
       ],
-    }),
-  });
-  if (!response.ok) {
-    throw new Error(`Anthropic API ${response.status}: ${await response.text()}`);
-  }
-  return (await response.json()) as ApiResponse;
+    },
+    55_000,
+  );
+  if (!result.ok) throw new Error(`Anthropic API ${result.status}: ${result.error}`);
+  return result.data;
 }
 
 // Odporne parsowanie: zbyt długie pola przycinamy, a niepoprawnych kandydatów pomijamy,
@@ -163,6 +149,7 @@ function mockOutput(): AgentOutput {
     webSearches: 0,
     inputTokens: 0,
     outputTokens: 0,
+    rejected: 0,
     candidates: [
       {
         title: "Przykład: system monitoringu jakości powietrza przy szkołach",
@@ -236,10 +223,17 @@ export async function runSearchAgent(input: AgentInput): Promise<AgentOutput> {
   }
 
   const excluded = new Set(exclude.map(normalizeUrl));
-  const verified = (candidates ?? []).filter(
+  const proposed = candidates ?? [];
+  const verified = proposed.filter(
     (c) => foundUrls.has(normalizeUrl(c.sourceUrl)) && !excluded.has(normalizeUrl(c.sourceUrl)),
   );
-  return { candidates: verified, webSearches, inputTokens, outputTokens };
+  return {
+    candidates: verified,
+    rejected: proposed.length - verified.length,
+    webSearches,
+    inputTokens,
+    outputTokens,
+  };
 }
 
 // Klucz cache: te same źródła, ten sam projekt (lub zapytanie) i te same frazy = ten sam wynik w ciągu 7 dni.

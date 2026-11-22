@@ -2,10 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { adminNavItem, dashboardNav } from "@/lib/dashboard-nav";
+import { adminNavItem, dashboardNav, type NavCounts } from "@/lib/dashboard-nav";
 import { cn } from "@/lib/utils";
 
-export function DashboardSidebar({ isAdmin = false }: { isAdmin?: boolean }) {
+export function DashboardSidebar({
+  isAdmin = false,
+  counts,
+}: {
+  isAdmin?: boolean;
+  counts: NavCounts;
+}) {
   const pathname = usePathname();
 
   return (
@@ -26,7 +32,12 @@ export function DashboardSidebar({ isAdmin = false }: { isAdmin?: boolean }) {
             )}
           >
             <item.icon className="size-4" />
-            {item.label}
+            <span>
+              {item.label}
+              {item.count && (
+                <span className="font-normal tabular-nums opacity-70"> ({counts[item.count]})</span>
+              )}
+            </span>
           </Link>
         );
       })}

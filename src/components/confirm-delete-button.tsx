@@ -21,9 +21,19 @@ type ConfirmDeleteButtonProps = {
   onConfirm: () => Promise<ActionResult>;
   // ikona przycisku (domyślnie kosz)
   icon?: React.ReactNode;
+  // tekst obok ikony (np. „Usuń”); bez niego przycisk jest samą ikoną
+  label?: string;
+  // po udanym usunięciu (np. przejście na listę)
+  onDeleted?: () => void;
 };
 
-export function ConfirmDeleteButton({ itemName, onConfirm, icon }: ConfirmDeleteButtonProps) {
+export function ConfirmDeleteButton({
+  itemName,
+  onConfirm,
+  icon,
+  label,
+  onDeleted,
+}: ConfirmDeleteButtonProps) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -33,6 +43,7 @@ export function ConfirmDeleteButton({ itemName, onConfirm, icon }: ConfirmDelete
       if (result.success) {
         toast.success(`Usunięto „${itemName}”`);
         setOpen(false);
+        onDeleted?.();
       } else {
         toast.error(result.error);
       }
@@ -41,9 +52,11 @@ export function ConfirmDeleteButton({ itemName, onConfirm, icon }: ConfirmDelete
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="ghost" size="icon-sm" />}>
+      <DialogTrigger
+        render={label ? <Button variant="outline" /> : <Button variant="ghost" size="icon-sm" />}
+      >
         {icon ?? <Trash2Icon />}
-        <span className="sr-only">Usuń</span>
+        {label ?? <span className="sr-only">Usuń</span>}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

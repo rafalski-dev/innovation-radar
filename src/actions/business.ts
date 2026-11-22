@@ -52,6 +52,7 @@ export async function createBusiness(input: BusinessInput): Promise<ActionResult
   }
 
   revalidatePath(PATH);
+  revalidatePath("/dashboard", "layout"); // liczniki w menu
   return ok();
 }
 
@@ -99,6 +100,7 @@ export async function deleteBusiness(id: string): Promise<ActionResult> {
   }
 
   revalidatePath(PATH);
+  revalidatePath("/dashboard", "layout"); // liczniki w menu
   return ok();
 }
 

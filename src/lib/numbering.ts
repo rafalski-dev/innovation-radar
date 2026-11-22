@@ -21,3 +21,9 @@ export function aspectLabel(number: number, projectCreatedAt?: Date | null) {
   if (number <= 0) return null;
   return projectCreatedAt ? `${projectNumber(projectCreatedAt)}/A${number}` : `A${number}`;
 }
+
+// Nazwa aspektu do wyświetlenia: tytuł nadany przez użytkownika, a dla starych wpisów „Aspekt A3”.
+export function aspectTitle(title: string | null | undefined, number: number) {
+  if (title) return title;
+  return number > 0 ? `Aspekt A${number}` : "Aspekt bez tytułu";
+}

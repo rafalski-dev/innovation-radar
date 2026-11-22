@@ -45,8 +45,8 @@ export function BusinessPicker({
           <label
             key={b.id}
             className={cn(
-              "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-brand/50",
-              b.id === selected.id && "border-brand bg-brand/10",
+              "flex cursor-pointer items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-foreground/30",
+              b.id === selected.id && "border-foreground/60 bg-muted/70 ring-1 ring-foreground/15",
             )}
           >
             <input

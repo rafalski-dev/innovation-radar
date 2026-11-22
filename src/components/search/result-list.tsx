@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ExternalLinkIcon } from "lucide-react";
+import { DEFAULT_TRL, TRL_LABELS, effectiveTrl } from "@/lib/trl";
 import { cn } from "@/lib/utils";
 
 export type ResultItem = {
@@ -14,33 +15,25 @@ export type ResultItem = {
   trl?: number | null;
 };
 
-// Skala gotowości technologicznej (TRL) w skrócie: podpowiedź przy plakietce.
-const TRL_LABELS: Record<number, string> = {
-  1: "Zaobserwowano podstawowe zasady",
-  2: "Sformułowano koncepcję technologii",
-  3: "Dowód słuszności koncepcji (laboratorium)",
-  4: "Walidacja w laboratorium",
-  5: "Walidacja w warunkach zbliżonych do rzeczywistych",
-  6: "Demonstracja prototypu w warunkach zbliżonych do rzeczywistych",
-  7: "Demonstracja prototypu w warunkach rzeczywistych",
-  8: "System zakończony i zakwalifikowany",
-  9: "System sprawdzony w eksploatacji",
-};
-
+// Wynik bez oceny TRL ze źródła ma TRL 2 (DEFAULT_TRL); plakietka zaznacza, że to wartość domyślna.
 export function TrlBadge({ trl }: { trl?: number | null }) {
-  if (!trl) {
+  const value = effectiveTrl(trl);
+  if (trl == null) {
     return (
-      <span className="rounded-full border border-dashed px-2 py-0.5 text-xs text-muted-foreground">
-        TRL: brak oceny
+      <span
+        title={`Źródło nie pozwala ocenić TRL, więc przyjęto TRL ${DEFAULT_TRL}: ${TRL_LABELS[value]}`}
+        className="rounded-full border border-dashed px-2 py-0.5 text-xs text-muted-foreground"
+      >
+        TRL {value}/9 (domyślnie)
       </span>
     );
   }
   return (
     <span
-      title={`TRL ${trl}: ${TRL_LABELS[trl]}`}
+      title={`TRL ${value}: ${TRL_LABELS[value]}`}
       className="rounded-full border border-brand/40 bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand"
     >
-      TRL {trl}/9
+      TRL {value}/9
     </span>
   );
 }
@@ -76,15 +69,15 @@ export function ResultList({
 
   const visible = useMemo(() => {
     const filtered = items.filter(
-      (i) => (!source || i.sourceName === source) && (minTrl === 0 || (i.trl ?? 0) >= minTrl),
+      (i) =>
+        (!source || i.sourceName === source) && (minTrl === 0 || effectiveTrl(i.trl) >= minTrl),
     );
     if (sort === "default") return filtered;
     return [...filtered].sort((a, b) => {
       if (sort === "title") return a.title.localeCompare(b.title, "pl");
-      // wyniki bez oceny TRL zawsze na końcu
-      const av = a.trl ?? (sort === "trl-desc" ? -1 : 99);
-      const bv = b.trl ?? (sort === "trl-desc" ? -1 : 99);
-      return sort === "trl-desc" ? bv - av : av - bv;
+      // brak oceny TRL liczy się jako TRL domyślny (DEFAULT_TRL)
+      const diff = effectiveTrl(a.trl) - effectiveTrl(b.trl);
+      return sort === "trl-desc" ? -diff : diff;
     });
   }, [items, source, minTrl, sort]);
 
