@@ -53,42 +53,6 @@ Każdy wynik dostaje ocenę gotowości technologicznej, więc od razu widać, co
 | 🛠️ **Prototyp**  | TRL 4–6 | walidacja w laboratorium i demonstracja prototypu         |
 | 🚀 **Wdrożenie** | TRL 7–9 | prototyp w warunkach rzeczywistych, system w eksploatacji |
 
-## 🖼️ Zrzuty ekranu
-
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/02-home-platform.jpg" alt="Platforma: ocena TRL, frazy, źródła, raport" /></td>
-    <td width="50%"><img src="docs/screenshots/03-home-structure.jpg" alt="Struktura: od organizacji do raportu" /></td>
-  </tr>
-  <tr>
-    <td align="center"><sub><b>Platforma</b>: ocena TRL, frazy pod kontrolą, źródła i raport</sub></td>
-    <td align="center"><sub><b>Struktura</b>: od organizacji do raportu i przewodnik w pięciu krokach</sub></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/04-home-articles.jpg" alt="Artykuły i FAQ" /></td>
-    <td width="50%"><img src="docs/screenshots/06-article.jpg" alt="Artykuł o finansowaniu innowacji" /></td>
-  </tr>
-  <tr>
-    <td align="center"><sub><b>Wiedza</b>: artykuły AI i najczęstsze pytania</sub></td>
-    <td align="center"><sub><b>Artykuł</b> z modułem udostępniania w social mediach</sub></td>
-  </tr>
-</table>
-
-### Wersja mobilna
-
-<table>
-  <tr>
-    <td width="33%"><img src="docs/screenshots/08-mobile-home.jpg" alt="Strona główna na telefonie" /></td>
-    <td width="33%"><img src="docs/screenshots/09-mobile-menu.jpg" alt="Menu hamburger na telefonie" /></td>
-    <td width="33%"><img src="docs/screenshots/07-login.jpg" alt="Logowanie" /></td>
-  </tr>
-  <tr>
-    <td align="center"><sub>Strona główna</sub></td>
-    <td align="center"><sub>Menu hamburger z ułatwieniami dostępu</sub></td>
-    <td align="center"><sub>Logowanie</sub></td>
-  </tr>
-</table>
-
 ## ✨ Funkcje
 
 **Praca nad projektem**
