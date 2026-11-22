@@ -34,5 +34,7 @@ export type BusinessInput = z.infer<typeof businessSchema>;
 
 export const addMemberSchema = z.object({
   email: z.string().trim().min(1, "Podaj e-mail").email("Niepoprawny adres e-mail"),
+  // oświadczenie o uprawnieniu do udostępnienia danych zapraszanej osoby (RODO)
+  consent: z.boolean().refine((v) => v === true, "Potwierdź oświadczenie, aby dodać osobę"),
 });
 export type AddMemberInput = z.infer<typeof addMemberSchema>;
