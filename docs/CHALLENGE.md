@@ -107,13 +107,13 @@ W miarę możliwości: **co najmniej dwa przykładowe przypadki użycia**.
 
 ## 8. Kryteria oceny (po 20%)
 
-| Kryterium                                                         | Waga |
-| ----------------------------------------------------------------- | ---- |
-| Związek z wyzwaniem i jakość rozwiązania problemu                  | 20%  |
-| Pomysł i oryginalność                                             | 20%  |
-| Użyteczność dla użytkowników i jakość doświadczenia (UX)          | 20%  |
-| Kompletność oraz jakość prototypu/demonstracji                    | 20%  |
-| Potencjał wdrożeniowy, skalowalność i możliwość transferu         | 20%  |
+| Kryterium                                                 | Waga |
+| --------------------------------------------------------- | ---- |
+| Związek z wyzwaniem i jakość rozwiązania problemu         | 20%  |
+| Pomysł i oryginalność                                     | 20%  |
+| Użyteczność dla użytkowników i jakość doświadczenia (UX)  | 20%  |
+| Kompletność oraz jakość prototypu/demonstracji            | 20%  |
+| Potencjał wdrożeniowy, skalowalność i możliwość transferu | 20%  |
 
 ## 9. Kontekst wdrożeniowy
 

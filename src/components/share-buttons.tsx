@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { CheckIcon, LinkIcon, Share2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { buttonVariants } from "@/components/shadcn/button";
@@ -34,8 +34,11 @@ const ICONS = {
 // Moduł „Udostępnij”: LinkedIn, Facebook, X, kopiowanie linku i (na urządzeniach z obsługą) systemowe udostępnianie.
 export function ShareButtons({ title, url, className }: Props) {
   const [copied, setCopied] = useState(false);
-  const [canShare, setCanShare] = useState(false);
-  useEffect(() => setCanShare("share" in navigator), []);
+  const canShare = useSyncExternalStore(
+    () => () => {},
+    () => "share" in navigator,
+    () => false,
+  );
   const target = () => url ?? window.location.href;
 
   function open(build: (u: string, t: string) => string) {

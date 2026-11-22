@@ -78,7 +78,8 @@ export async function updateBusiness(id: string, input: BusinessInput): Promise<
 
   try {
     // NIP nie podlega edycji po utworzeniu organizacji (pomijamy go, nawet jeśli ktoś go przyśle)
-    const { nip: _nip, ...data } = toData(parsed.data);
+    const data: Partial<ReturnType<typeof toData>> = toData(parsed.data);
+    delete data.nip;
     const result = await db.business.updateMany({
       where: { id, ...ownedBusinessWhere(session.user.id) },
       data,

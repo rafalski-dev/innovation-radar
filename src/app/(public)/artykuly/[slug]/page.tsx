@@ -5,6 +5,9 @@ import { ArrowLeftIcon, SparklesIcon } from "lucide-react";
 import { ShareButtons } from "@/components/share-buttons";
 import { AI_NOTE, articles, getArticle } from "@/lib/content";
 
+// nieznany adres artykułu od razu zwraca 404 (bez renderowania strony)
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return articles.map((a) => ({ slug: a.slug }));
 }

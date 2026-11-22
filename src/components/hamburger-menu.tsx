@@ -8,13 +8,14 @@ import { Button } from "@/components/shadcn/button";
 // Menu hamburger dla wąskich ekranów: panel pod nagłówkiem, zamykany po przejściu na inną stronę i klawiszem Esc.
 // Nagłówek musi być elementem pozycjonowanym (sticky), bo panel jest względem niego.
 export function HamburgerMenu({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
+  // menu jest otwarte tylko na stronie, na której je otwarto: po przejściu gdzie indziej zamyka się samo
   const pathname = usePathname();
+  const [openAt, setOpenAt] = useState<string | null>(null);
+  const open = openAt === pathname;
 
-  useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpenAt(null);
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
@@ -26,7 +27,7 @@ export function HamburgerMenu({ children }: { children: React.ReactNode }) {
         size="icon"
         aria-expanded={open}
         aria-controls="mobile-menu"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpenAt(open ? null : pathname)}
       >
         {open ? <XIcon /> : <MenuIcon />}
         <span className="sr-only">{open ? "Zamknij menu" : "Otwórz menu"}</span>

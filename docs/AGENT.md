@@ -34,14 +34,14 @@ krok 4 = (c) ocena, krok 5 = (d) wskazanie partnerów/ścieżek, krok 5–6 = (e
 Lista domen, po których wolno szukać agentowi. Trzymana w bazie (encja `Source`), żeby nowe źródło
 dodać bez zmiany kodu (argument „skalowalność” dla jury).
 
-| Źródło            | Domena (`allowed_domains`) | Co daje                                     |
-| ----------------- | -------------------------- | ------------------------------------------- |
-| NCBiR             | `gov.pl/web/ncbr`          | projekty B+R, sukcesy beneficjentów          |
-| Mapa Dotacji UE   | `mapadotacji.gov.pl`       | projekty z funduszy UE (kto, gdzie, za ile)  |
-| RAD-on            | `radon.nauka.gov.pl`       | patenty, projekty i instytucje naukowe       |
-| Interreg          | `interreg.gov.pl`          | projekty współpracy regionów                 |
-| Czasopisma PAN    | `czasopisma.pan.pl`        | publikacje naukowe (do przetestowania)       |
-| PPM               | `ppm.edu.pl`               | repozytorium publikacji (do przetestowania)  |
+| Źródło          | Domena (`allowed_domains`) | Co daje                                     |
+| --------------- | -------------------------- | ------------------------------------------- |
+| NCBiR           | `gov.pl/web/ncbr`          | projekty B+R, sukcesy beneficjentów         |
+| Mapa Dotacji UE | `mapadotacji.gov.pl`       | projekty z funduszy UE (kto, gdzie, za ile) |
+| RAD-on          | `radon.nauka.gov.pl`       | patenty, projekty i instytucje naukowe      |
+| Interreg        | `interreg.gov.pl`          | projekty współpracy regionów                |
+| Czasopisma PAN  | `czasopisma.pan.pl`        | publikacje naukowe (do przetestowania)      |
+| PPM             | `ppm.edu.pl`               | repozytorium publikacji (do przetestowania) |
 
 Pomijamy na start: UPRP i PBN (słabo indeksowane przez wyszukiwarkę; w prezentacji jako rozwój przez API).
 
@@ -56,16 +56,16 @@ Bez wyszukiwania w internecie. Koszt: grosze.
 
 **Wyjście (zapisywane w `Search.profile`):**
 
-| Pole            | Opis                                                                                      |
-| --------------- | ----------------------------------------------------------------------------------------- |
-| `problem`       | problem w 1 zdaniu                                                                         |
-| `keywordsPl`    | 5–10 słów/fraz kluczowych po polsku                                                        |
-| `synonyms`      | synonimy i warianty                                                                        |
-| `keywordsEn`    | odpowiedniki po angielsku (publikacje i RAD-on często mają angielskie opisy)               |
-| `domain`        | dziedzina (np. środowisko, edukacja, ICT)                                                  |
+| Pole              | Opis                                                                                            |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| `problem`         | problem w 1 zdaniu                                                                              |
+| `keywordsPl`      | 5–10 słów/fraz kluczowych po polsku                                                             |
+| `synonyms`        | synonimy i warianty                                                                             |
+| `keywordsEn`      | odpowiedniki po angielsku (publikacje i RAD-on często mają angielskie opisy)                    |
+| `domain`          | dziedzina (np. środowisko, edukacja, ICT)                                                       |
 | `innovationTypes` | jakich typów innowacji szukamy: technologiczna, organizacyjna, edukacyjna, społeczna, procesowa |
-| `queries`       | 3–5 gotowych zapytań do wyszukiwarki                                                       |
-| `exclusions`    | czego NIE szukamy (do odsiewania wyników)                                                  |
+| `queries`         | 3–5 gotowych zapytań do wyszukiwarki                                                            |
+| `exclusions`      | czego NIE szukamy (do odsiewania wyników)                                                       |
 
 **Ekran:** profil jako edytowalne „chipsy” (dodaj/usuń słowo, popraw zapytanie) + przycisk
 „Uruchom agenta”. Użytkownik kontroluje AI, zanim wydamy pieniądze na wyszukiwanie.
@@ -98,17 +98,17 @@ albo uruchomienia w tle i odświeżania statusu. Sesja od kodu sprawdza aktualne
 
 Każdy kandydat to wiersz `SearchResult`:
 
-| Pole            | Opis                                                        |
-| --------------- | ----------------------------------------------------------- |
-| `title`         | nazwa rozwiązania/projektu                                   |
-| `summary`       | 2–3 zdania: co to jest i co rozwiązuje                       |
-| `organization`  | kto to zrobił (firma, uczelnia, gmina, szkoła)               |
-| `location`      | miasto/region, jeśli podane                                  |
-| `year`          | rok, jeśli podany                                            |
-| `innovationType`| typ innowacji (jak w profilu)                                |
-| `maturity`      | etap: pomysł / prototyp / pilotaż / wdrożone                  |
-| `sourceUrl`     | link do źródła (wymagany)                                    |
-| `sourceName`    | nazwa źródła (np. „Mapa Dotacji UE”)                          |
+| Pole             | Opis                                           |
+| ---------------- | ---------------------------------------------- |
+| `title`          | nazwa rozwiązania/projektu                     |
+| `summary`        | 2–3 zdania: co to jest i co rozwiązuje         |
+| `organization`   | kto to zrobił (firma, uczelnia, gmina, szkoła) |
+| `location`       | miasto/region, jeśli podane                    |
+| `year`           | rok, jeśli podany                              |
+| `innovationType` | typ innowacji (jak w profilu)                  |
+| `maturity`       | etap: pomysł / prototyp / pilotaż / wdrożone   |
+| `sourceUrl`      | link do źródła (wymagany)                      |
+| `sourceName`     | nazwa źródła (np. „Mapa Dotacji UE”)           |
 
 Kod usuwa duplikaty (ten sam `sourceUrl` lub ta sama nazwa + organizacja).
 
@@ -117,13 +117,13 @@ Kod usuwa duplikaty (ten sam `sourceUrl` lub ta sama nazwa + organizacja).
 AI ocenia każdego kandydata w skali 1–5 i podaje 1 zdanie uzasadnienia do każdej oceny.
 **Wynik końcowy liczy kod**, nie model (powtarzalność i przejrzystość).
 
-| Kryterium         | Pytanie                                                       | Waga |
-| ----------------- | ------------------------------------------------------------- | ---- |
-| Dopasowanie       | Na ile rozwiązuje problem z projektu?                          | 20%  |
-| Dojrzałość        | Czy działa / jest wdrożone, czy to dopiero pomysł?             | 20%  |
-| Przenaszalność    | Czy da się je przenieść do firmy/instytucji z projektu?        | 20%  |
-| Wykonalność       | Koszt i trudność wdrożenia (5 = łatwo, tanio)                   | 20%  |
-| Nowość            | Na ile nowatorskie w porównaniu z typowymi rozwiązaniami?      | 20%  |
+| Kryterium      | Pytanie                                                   | Waga |
+| -------------- | --------------------------------------------------------- | ---- |
+| Dopasowanie    | Na ile rozwiązuje problem z projektu?                     | 20%  |
+| Dojrzałość     | Czy działa / jest wdrożone, czy to dopiero pomysł?        | 20%  |
+| Przenaszalność | Czy da się je przenieść do firmy/instytucji z projektu?   | 20%  |
+| Wykonalność    | Koszt i trudność wdrożenia (5 = łatwo, tanio)             | 20%  |
+| Nowość         | Na ile nowatorskie w porównaniu z typowymi rozwiązaniami? | 20%  |
 
 `score = (suma ocen − 5) / 20 × 100` → 0–100. Kryteria i wagi opisane na stronie „Metodologia”.
 
@@ -133,13 +133,13 @@ Może to być osobne, tańsze wywołanie modelu (structured output) po kroku 2, 
 
 Dla kandydatów z wynikiem ≥ 60 (do ustalenia):
 
-| Pole              | Opis                                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------------- |
-| `path`            | ścieżka: LICENSE (licencja/transfer technologii), PARTNERSHIP (wspólny projekt B+R), PURCHASE (zakup/wdrożenie), JOINT_GRANT (wspólny wniosek o grant), INSPIRATION (wzorzec do powtórzenia) |
-| `why`             | uzasadnienie w 2–3 zdaniach                                                                        |
-| `contact`         | do kogo się zwrócić (organizacja, strona/kontakt ze źródła, jeśli publiczny)                       |
-| `nextSteps`       | 2–3 konkretne kroki                                                                                |
-| `successMetrics`  | mierniki skuteczności (np. „pilotaż w 2 szkołach w 6 mies.”)                                       |
+| Pole             | Opis                                                                                                                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`           | ścieżka: LICENSE (licencja/transfer technologii), PARTNERSHIP (wspólny projekt B+R), PURCHASE (zakup/wdrożenie), JOINT_GRANT (wspólny wniosek o grant), INSPIRATION (wzorzec do powtórzenia) |
+| `why`            | uzasadnienie w 2–3 zdaniach                                                                                                                                                                  |
+| `contact`        | do kogo się zwrócić (organizacja, strona/kontakt ze źródła, jeśli publiczny)                                                                                                                 |
+| `nextSteps`      | 2–3 konkretne kroki                                                                                                                                                                          |
+| `successMetrics` | mierniki skuteczności (np. „pilotaż w 2 szkołach w 6 mies.”)                                                                                                                                 |
 
 ## Krok 6. Wyniki na ekranie
 
