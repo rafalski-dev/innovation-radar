@@ -52,7 +52,7 @@ export async function SiteHeader() {
           </span>
           {site.name}
         </Link>
-        <div className="hidden flex-1 items-center gap-6 md:flex">
+        <div className="hidden flex-1 items-center justify-end gap-6 md:flex">
           <SiteNav />
           <AccessibilityMenu />
           <ThemeToggle />
@@ -61,7 +61,7 @@ export async function SiteHeader() {
         <span className="flex-1 md:hidden" />
         <HamburgerMenu>
           <SiteNav vertical />
-          <div className="flex items-center justify-between border-t pt-4">
+          <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Motyw</span>
             <ThemeToggle />
           </div>

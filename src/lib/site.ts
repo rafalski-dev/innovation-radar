@@ -5,5 +5,6 @@ export const site = {
   name: "Horyzont Innowacji",
   description:
     "Znajdź gotowe innowacje, patenty i projekty dla swojej firmy. Asystent AI przeszukuje źródła publiczne i uzasadnia dopasowanie.",
-  nav: [{ href: "/", label: "Start" }] satisfies NavItem[],
+  // linki w górnym pasku strony publicznej (na razie brak: logo prowadzi na stronę główną)
+  nav: [] as NavItem[],
 };

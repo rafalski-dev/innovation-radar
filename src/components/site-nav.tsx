@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function SiteNav({ vertical = false }: { vertical?: boolean }) {
   const pathname = usePathname();
+  if (site.nav.length === 0) return null;
 
   return (
     <nav className={cn("flex text-sm", vertical ? "flex-col gap-3" : "flex-1 items-center gap-4")}>
